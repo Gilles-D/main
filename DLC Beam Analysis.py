@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 28 16:17:05 2020
-
 @author: Gil
-"""
 
-"""
 Read all csv of a folder (Files_path)
 Calculate the time the mouse takes to cross the beam (between the start and the end point)
-Create an excel file with the time for each file
+Plot trajectory of each trial
+Calculate mean passing time for each session
+Plot learning graph
+Create an excel file with the time for each trial, means and std of each session
 """
 
 import numpy as np 
@@ -21,7 +20,6 @@ Parameters :
     - Files_path = folder containing csv files to analyze
     - likelihood_value = DLC likelihood threshold 
     - frequency = capture frequency
-    
     
     Bodypart :
         -19 = start x
@@ -43,6 +41,7 @@ data_trial=[]
 data_csv=[]
 passing_times=[]
 crossing_idx=[]
+
 
 """File loading list loop"""
 Files = []
