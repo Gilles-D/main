@@ -301,12 +301,29 @@ class Analyse:
         if not os.path.exists("{}\Learning_plots".format(os.path.dirname(excel_path))):
             os.makedirs("{}\Learning_plots".format(os.path.dirname(excel_path)))
         for a in Animal:
-            fig = plt.figure()
+            learning_plot = plt.figure()
             sn.swarmplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9] , [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9],color='C3',size=2)
             sn.boxplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], palette=sn.color_palette("coolwarm", 9))
             plt.ylim(0,5), plt.title("Learning Animal {}".format(a)), plt.xlabel("Session"), plt.ylabel("Passing Time")
-            fig.savefig("{}\Learning_plots\{}.svg".format(os.path.dirname(excel_path),a))
-            
+            learning_plot.savefig("{}\Learning_plots\{}.svg".format(os.path.dirname(excel_path),a))
+
+    def plot_learning_curve_mean(self, excel_path):
+        
+        df_excel = pd.read_excel(excel_path)
+        """ Passing times means and std """
+        groups = df_excel.groupby(['Animal','Session'])
+        df_groups = groups['Passing_Time'].agg([np.mean, np.std])
+        df_groups = df_groups.query('Session > 9')
+        df_groups = df_groups.reset_index()
+        learning_plot_mean = plt.figure()
+        learning_plot_mean = sn.pointplot(x="Session", y="mean", hue="Animal", data=df_groups, dodge=False).get_figure()
+        if not os.path.exists("{}\Learning_plots".format(os.path.dirname(excel_path))):
+            os.makedirs("{}\Learning_plots".format(os.path.dirname(excel_path)))
+        learning_plot_mean.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        
+        # g = sn.FacetGrid(data=df_groups, hue='Animal')
+        # g.map(plt.errorbar, 'Session', 'mean', 'std', fmt='o', elinewidth=1, capsize=5, capthick=1)
+        
 
 Data_Analyser = Analyse()
 
@@ -368,18 +385,21 @@ while True:
                     window_insert_rootdir.close()
                     break
     
-        # [Perform the analysis] or [Plot the trajectories] pressed
+        # [Plot the learning curve] pressed
         elif event == 'Plot the learning curve':
             window.close()
             # Set the excel analysis file path
             layout2 = [[sg.Text('Enter the excel analysis file path:'), sg.InputText(), sg.FileBrowse()],
+                       [sg.Checkbox('Individual', default=True, key='Individual'), sg.Checkbox('Mean', key='Mean')],
                         [sg.Button('Ok'), sg.Button('Cancel')]]
             window_insert_excel_path = sg.Window('Please insert the path of the analysis excel file', layout2)
             while True:
                 event, values = window_insert_excel_path.read()
-                if event == 'Ok':
+                if event == 'Ok' :
                     excel_path = values[0]
-                    Data_Analyser.plot_learning_curve(excel_path)
+                    print(values)
+                    if values['Individual'] == True : Data_Analyser.plot_learning_curve(excel_path)
+                    if values['Mean'] == True : Data_Analyser.plot_learning_curve_mean(excel_path)
                     window_insert_excel_path.close()
                     break
                 elif event == sg.WIN_CLOSED or event == 'Cancel':
