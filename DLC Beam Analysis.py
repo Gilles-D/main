@@ -11,6 +11,7 @@ import os
 import math
 import seaborn as sn
 from progressbar import ProgressBar
+from scipy.signal import savgol_filter
 
 import PySimpleGUI as sg
 
@@ -264,9 +265,13 @@ class Analyse:
                 os.makedirs("{}\Trajectories\{}".format(root_dir, a))
             traj, subplot = plt.subplots(2,1)
             subplot[0].set_title("Instantaneous speed {} {} {}".format(a, s, t))
-            subplot[0].plot(IS_speed, color='crimson') 
+            try:
+                subplot[0].plot(savgol_filter(IS_speed,11,3), color='crimson') 
+            except:
+                subplot[0].plot(IS_speed, color='crimson')
             subplot[0].xaxis.set_visible(False)
             subplot[0].set_ylabel("Speed (cm/s)")
+            subplot[0].set_ylim(0,100)
                 
             "Trajectory plotting"
             subplot[1].scatter([self.start_coord[0], self.end_coord[0]], [self.flatten(self.start_coord[0],self.start_coord[1]), self.flatten(self.end_coord[0],self.end_coord[1])], color='crimson', marker='|')
