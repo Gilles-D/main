@@ -257,7 +257,7 @@ class Analyse:
                     IS_idx.append(data.iloc[w, self.bdy_tr])
                     IS_speed.append(distance/time)    
             
-            "Subplot avec trajectoire"
+            "Instantaneous speed plotting"
             if not os.path.exists("{}\Trajectories".format(root_dir)):
                 os.makedirs("{}\Trajectories".format(root_dir))
             if not os.path.exists("{}\Trajectories\{}".format(root_dir, a)):
@@ -304,26 +304,33 @@ class Analyse:
             learning_plot = plt.figure()
             sn.swarmplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9] , [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9],color='C3',size=2)
             sn.boxplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], palette=sn.color_palette("coolwarm", 9))
-            plt.ylim(0,5), plt.title("Learning Animal {}".format(a)), plt.xlabel("Session"), plt.ylabel("Passing Time")
+            plt.ylim(0,5), plt.title("Beam test learning (Animal {})".format(a)), plt.xlabel("'Session #'"), plt.ylabel("Passing time (s)")
             learning_plot.savefig("{}\Learning_plots\{}.svg".format(os.path.dirname(excel_path),a))
 
     def plot_learning_curve_mean(self, excel_path):
         
         df_excel = pd.read_excel(excel_path)
-        """ Passing times means and std """
-        groups = df_excel.groupby(['Animal','Session'])
-        df_groups = groups['Passing_Time'].agg([np.mean, np.std])
-        df_groups = df_groups.query('Session > 9')
-        df_groups = df_groups.reset_index()
-        learning_plot_mean = plt.figure()
-        learning_plot_mean = sn.pointplot(x="Session", y="mean", hue="Animal", data=df_groups, dodge=False).get_figure()
+
         if not os.path.exists("{}\Learning_plots".format(os.path.dirname(excel_path))):
             os.makedirs("{}\Learning_plots".format(os.path.dirname(excel_path)))
+        
+        fig1 = plt.figure(1)
+        learning_plot_mean = sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9'), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
+        plt.xlabel('Session #')
+        plt.ylabel('Time (s)')
+        plt.title('Mean passing time')
+        
+        fig2 = plt.figure(2)
+        learning_plot_mean_global = sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
+        plt.xlabel('Session #')
+        plt.ylabel('Time (s)')
+        plt.title('Combined average passing time')
         learning_plot_mean.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
-        
-        # g = sn.FacetGrid(data=df_groups, hue='Animal')
+        learning_plot_mean_global.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        plt.show()
+
+        # g = sn.FacetGrid(data=df_groups)
         # g.map(plt.errorbar, 'Session', 'mean', 'std', fmt='o', elinewidth=1, capsize=5, capthick=1)
-        
 
 Data_Analyser = Analyse()
 
