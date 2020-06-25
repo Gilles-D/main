@@ -309,7 +309,7 @@ class Analyse:
             learning_plot = plt.figure()
             sn.swarmplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9] , [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9],color='C3',size=2)
             sn.boxplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], palette=sn.color_palette("coolwarm", 9))
-            plt.ylim(0,5), plt.title("Beam test learning (Animal {})".format(a)), plt.xlabel("'Session #'"), plt.ylabel("Passing time (s)")
+            plt.ylim(0,5), plt.title("Beam test learning (Animal {})".format(a)), plt.xlabel("Session #"), plt.ylabel("Passing time (s)")
             learning_plot.savefig("{}\Learning_plots\{}.svg".format(os.path.dirname(excel_path),a))
 
     def plot_learning_curve_mean(self, excel_path):
@@ -320,18 +320,20 @@ class Analyse:
             os.makedirs("{}\Learning_plots".format(os.path.dirname(excel_path)))
         
         fig1 = plt.figure(1)
-        learning_plot_mean = sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9'), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
+        sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9'), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Mean passing time')
+        plt.show()
+        fig1.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
         
         fig2 = plt.figure(2)
-        learning_plot_mean_global = sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
+        sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Combined average passing time')
-        learning_plot_mean.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
-        learning_plot_mean_global.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        
+        fig2.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
         plt.show()
 
         # g = sn.FacetGrid(data=df_groups)
