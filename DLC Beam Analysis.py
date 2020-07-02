@@ -12,6 +12,7 @@ import math
 import seaborn as sn
 from progressbar import ProgressBar
 from scipy.signal import savgol_filter
+from pathlib import Path
 
 import PySimpleGUI as sg
 
@@ -103,6 +104,10 @@ class Analyse:
                 Session = 18
             if name[3]=='J15' and name[4]=='6mm' and name[5]=='R':
                 Session = 19
+            if name[3]=='J16' and name[4]=='6mm' and name[5]=='R':
+                Session = 20
+            if name[3]=='J17' and name[4]=='6mm' and name[5]=='R':
+                Session = 21                
             data_animal.append(name[2])
             data_session.append(Session)
             data_trial.append(name[6][0])
@@ -166,7 +171,10 @@ class Analyse:
         print('Chargement des fichiers\n')
         self.load(root_dir)
         print('Calcul des temps de passage et vitesse instantanée\n')
-        self.writer = pd.ExcelWriter('{}/Analysis.xlsx'.format(root_dir), engine='xlsxwriter')
+        root_dir_path = Path(root_dir)
+        if not os.path.exists('{}/Analysis'.format(root_dir_path.parent)):
+            os.makedirs('{}/Analysis'.format(root_dir_path.parent))
+        self.writer = pd.ExcelWriter('{}/Analysis/Analysis.xlsx'.format(root_dir_path.parent), engine='xlsxwriter')
         
         passing_times=[]
         crossing_idx=[]
@@ -204,11 +212,12 @@ class Analyse:
         self.df_data['Passing_Time']=passing_times
         self.df_data['Crossing_idx']=crossing_idx
         self.df_data = self.df_data.drop(['csv'], axis=1)
-        self.df_data['Fichier']=self.Files
+        self.df_data['Fichier']=[os.path.split(File)[-1].split('_')[1] for File in self.Files]
         self.df_data.to_excel(self.writer, sheet_name='Analysis')
         
         # #Excel File
         self.writer.save()
+        os.startfile(root_dir_path.parent)
         return
 
     def plot_the_trajectories(self, root_dir):
@@ -319,25 +328,28 @@ class Analyse:
         if not os.path.exists("{}\Learning_plots".format(os.path.dirname(excel_path))):
             os.makedirs("{}\Learning_plots".format(os.path.dirname(excel_path)))
         
-        fig1 = plt.figure(1)
+        fig2 = plt.figure()
         sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9'), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Mean passing time')
         plt.show()
-        fig1.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        fig2.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
         
-        fig2 = plt.figure(2)
+        fig3 = plt.figure()
         sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Combined average passing time')
         
-        fig2.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        fig3.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
         plt.show()
 
         # g = sn.FacetGrid(data=df_groups)
         # g.map(plt.errorbar, 'Session', 'mean', 'std', fmt='o', elinewidth=1, capsize=5, capthick=1)
+
+
+
 
 Data_Analyser = Analyse()
 
@@ -365,8 +377,6 @@ while True:
         
         # [Perform the analysis] pressed
         elif event == 'Perform the analysis':
-            window.close()
-            # Set the root_dir path
             layout2 = [[sg.Text('Select the CSV files directory path:'), sg.InputText(), sg.FolderBrowse()],
                         [sg.Button('Ok'), sg.Button('Cancel')]]
             window_insert_rootdir = sg.Window('Perform the analysis', layout2)
@@ -383,7 +393,6 @@ while True:
 
         #[Plot the trajectories] pressed
         elif event == 'Plot the trajectories':
-            window.close()
             # Set the root_dir path
             layout2 = [[sg.Text('Select the CSV files directory path:'), sg.InputText(), sg.FolderBrowse()],
                         [sg.Button('Ok'), sg.Button('Cancel')]]
@@ -401,7 +410,6 @@ while True:
     
         # [Plot the learning curve] pressed
         elif event == 'Plot the learning curve':
-            window.close()
             # Set the excel analysis file path
             layout2 = [[sg.Text('Enter the excel analysis file path:'), sg.InputText(), sg.FileBrowse()],
                        [sg.Checkbox('Individual', default=True, key='Individual'), sg.Checkbox('Mean', key='Mean')],
