@@ -43,6 +43,7 @@ class Analyse:
             Work dataframe containing the CSV files and their identification.
 
         """
+        self.df_data = 0
         self.Files = []
         for r, d, f in os.walk(root_dir):
         # r=root, d=directories, f = files
@@ -108,6 +109,12 @@ class Analyse:
                 Session = 20
             if name[3]=='J17' and name[4]=='6mm' and name[5]=='R':
                 Session = 21                
+            if name[3]=='J18' and name[4]=='6mm' and name[5]=='R':
+                Session = 22 
+            if name[3]=='J19' and name[4]=='6mm' and name[5]=='R':
+                Session = 23
+            if name[3]=='J20' and name[4]=='6mm' and name[5]=='R':
+                Session = 24
             data_animal.append(name[2])
             data_session.append(Session)
             data_trial.append(name[6][0])
@@ -212,7 +219,7 @@ class Analyse:
         self.df_data['Passing_Time']=passing_times
         self.df_data['Crossing_idx']=crossing_idx
         self.df_data = self.df_data.drop(['csv'], axis=1)
-        self.df_data['Fichier']=[os.path.split(File)[-1].split('_')[1] for File in self.Files]
+        self.df_data['Fichier']=[os.path.split(File)[-1] for File in self.Files]
         self.df_data.to_excel(self.writer, sheet_name='Analysis')
         
         # #Excel File
@@ -235,6 +242,7 @@ class Analyse:
 
         """
         self.load(root_dir)
+        root_dir_path = Path(root_dir)
         for i in self.pbar(range(len(self.df_data))):
             #Reset indexes
             traj=0
@@ -268,10 +276,10 @@ class Analyse:
                     IS_speed.append(distance/time)    
             
             "Instantaneous speed plotting"
-            if not os.path.exists("{}\Trajectories".format(root_dir)):
-                os.makedirs("{}\Trajectories".format(root_dir))
-            if not os.path.exists("{}\Trajectories\{}".format(root_dir, a)):
-                os.makedirs("{}\Trajectories\{}".format(root_dir, a))
+            if not os.path.exists("{}\Analysis\Trajectories".format(root_dir_path.parent)):
+                os.makedirs("{}\Analysis\Trajectories".format(root_dir_path.parent))
+            if not os.path.exists("{}\Analysis\Trajectories\{}".format(root_dir_path.parent, a)):
+                os.makedirs("{}\Analysis\Trajectories\{}".format(root_dir_path.parent, a))
             traj, subplot = plt.subplots(2,1)
             subplot[0].set_title("Instantaneous speed {} {} {}".format(a, s, t))
             try:
@@ -292,8 +300,9 @@ class Analyse:
             subplot[1].set_xlabel("X Coord"), subplot[1].set_ylabel("Y Coord"), subplot[1].set_title("Trajectory")
             subplot[1].set_ylim(self.flatten(self.start_coord[0],self.start_coord[1])-50,self.flatten(self.start_coord[0],self.start_coord[1])+50)
             subplot[1].invert_yaxis()
-            traj.savefig("{}\Trajectories\{}\{}_{}_{}.png".format(root_dir,a,a,s,t))
+            traj.savefig("{}\Analysis\Trajectories\{}\{}_{}_{}.png".format(root_dir_path.parent,a,a,s,t))
             plt.close(traj)
+        os.startfile(root_dir_path.parent)
 
     def plot_learning_curve(self, excel_path):
         """
@@ -330,6 +339,7 @@ class Analyse:
         
         fig2 = plt.figure()
         sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9'), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
+        plt.axvline(x=9.5, ls='--')
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Mean passing time')
@@ -338,17 +348,13 @@ class Analyse:
         
         fig3 = plt.figure()
         sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
+        plt.axvline(x=19.5, ls='--')
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Combined average passing time')
         
         fig3.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
         plt.show()
-
-        # g = sn.FacetGrid(data=df_groups)
-        # g.map(plt.errorbar, 'Session', 'mean', 'std', fmt='o', elinewidth=1, capsize=5, capthick=1)
-
-
 
 
 Data_Analyser = Analyse()
