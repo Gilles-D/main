@@ -58,66 +58,15 @@ class Analyse:
         data_csv=[]
         
         for File in self.Files:  
-            Session = 0 #Reset indexes
-                
             df_raw = pd.read_csv(File) #Load file
             
             name = os.path.split(File) # Split name from path to get classification values
             name = name[1].split('.', )
             name = name[0].split()
-            
-            #Determine session number
-            if name[3]=='J1' and name[4]=='12mm' and name[5]=='C':
-                Session = 1
-            if name[3]=='J1' and name[4]=='10mm' and name[5]=='C':
-                Session = 2
-            if name[3]=='J2' and name[4]=='10mm' and name[5]=='C':
-                Session = 3
-            if name[3]=='J2' and name[4]=='10mm' and name[5]=='R':
-                Session = 4
-            if name[3]=='J3' and name[4]=='10mm' and name[5]=='R':
-                Session = 5
-            if name[3]=='J4' and name[4]=='10mm' and name[5]=='R':
-                Session = 6
-            if name[3]=='J4' and name[4]=='8mm' and name[5]=='R':
-                Session = 7
-            if name[3]=='J5' and name[4]=='8mm' and name[5]=='R':
-                Session = 8
-            if name[3]=='J5' and name[4]=='6mm' and name[5]=='R':
-                Session = 9
-            if name[3]=='J6' and name[4]=='6mm' and name[5]=='R':
-                Session = 10
-            if name[3]=='J7' and name[4]=='6mm' and name[5]=='R':
-                Session = 11
-            if name[3]=='J8' and name[4]=='6mm' and name[5]=='R':
-                Session = 12
-            if name[3]=='J9' and name[4]=='6mm' and name[5]=='R':
-                Session = 13
-            if name[3]=='J10' and name[4]=='6mm' and name[5]=='R':
-                Session = 14
-            if name[3]=='J11' and name[4]=='6mm' and name[5]=='R':
-                Session = 15
-            if name[3]=='J12' and name[4]=='6mm' and name[5]=='R':
-                Session = 16
-            if name[3]=='J13' and name[4]=='6mm' and name[5]=='R':
-                Session = 17
-            if name[3]=='J14' and name[4]=='6mm' and name[5]=='R':
-                Session = 18
-            if name[3]=='J15' and name[4]=='6mm' and name[5]=='R':
-                Session = 19
-            if name[3]=='J16' and name[4]=='6mm' and name[5]=='R':
-                Session = 20
-            if name[3]=='J17' and name[4]=='6mm' and name[5]=='R':
-                Session = 21                
-            if name[3]=='J18' and name[4]=='6mm' and name[5]=='R':
-                Session = 22 
-            if name[3]=='J19' and name[4]=='6mm' and name[5]=='R':
-                Session = 23
-            if name[3]=='J20' and name[4]=='6mm' and name[5]=='R':
-                Session = 24
-            data_animal.append(name[2])
-            data_session.append(Session)
-            data_trial.append(name[6][0])
+
+            data_animal.append(name[1])
+            data_session.append(int(name[3]))
+            data_trial.append(name[4][0])
             data_csv.append(df_raw)
         self.df_data = pd.DataFrame({'Animal' : data_animal, 'Session' :  data_session, 'Trial' : data_trial, 'csv' : data_csv})
         return self.Files, self.df_data
