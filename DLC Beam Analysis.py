@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jun 18 15:48:34 2020
+v1.3 09/07/2020
+- File naming in the analysis excel
+- Updated scaling for Combined average of passing time
+- Added stat analysis : OneWayANOVA + post hoc Holm
 
 @author: Gilles.DELBECQ
 """
@@ -13,6 +16,8 @@ import seaborn as sn
 from progressbar import ProgressBar
 from scipy.signal import savgol_filter
 from pathlib import Path
+import pingouin as pg
+from pingouin import pairwise_ttests, read_dataset
 
 import PySimpleGUI as sg
 
@@ -109,6 +114,9 @@ class Analyse:
         c = (self.end_coord[1] - (m * self.end_coord[0]))
         return  y-(x * m + c)
     
+    def range1(self, start, end):
+        return range(start, end+1)
+    
     def do_the_analysis(self, root_dir):
         """
         Perform the analysis of the passing time from the DLC output CSV files.
@@ -168,7 +176,7 @@ class Analyse:
         self.df_data['Passing_Time']=passing_times
         self.df_data['Crossing_idx']=crossing_idx
         self.df_data = self.df_data.drop(['csv'], axis=1)
-        self.df_data['Fichier']=[os.path.split(File)[-1] for File in self.Files]
+        self.df_data['Fichier']=[os.path.split(File)[-1].split('_')[0] for File in self.Files]
         self.df_data.to_excel(self.writer, sheet_name='Analysis')
         
         # #Excel File
@@ -299,12 +307,45 @@ class Analyse:
         sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
         plt.axvline(x=19.5, ls='--')
         plt.xlabel('Session #')
+        plt.xticks(list(set(df_excel.query('Session > 9')['Session'].tolist())))
         plt.ylabel('Time (s)')
         plt.title('Combined average passing time')
         
         fig3.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
         plt.show()
 
+
+    def stats_effect_weeks(self, excel_path):
+        df_excel = pd.read_excel(excel_path)
+        Week1= list(self.range1(1,9))
+        Week2= list(self.range1(10,14))
+        Week3= list(self.range1(15,19))
+        Week4= list(self.range1(20,24))
+        Week5= list(self.range1(25,29))
+        week=[]
+        for i in range(len(df_excel.index)):
+            week.append(1 if df_excel.iloc[i,2] in Week1 else 2 if df_excel.iloc[i,2] in Week2 else 3 if df_excel.iloc[i,2] in Week3 else 4 if df_excel.iloc[i,2] in Week4 else 5 if df_excel.iloc[i,2] in Week5 else 'Error')
+        df_excel['Semaine'] = week
+        df_stats = df_excel[['Animal','Passing_Time','Semaine']].groupby(['Animal','Semaine']).mean().reset_index()
+        
+        # sn.lineplot(x="Semaine", y="Passing_Time", data=df_stats.query('Semaine > 1'), hue='Animal').get_figure()
+        
+        df_stats_arranged = pd.DataFrame(columns=['Animal', 'Semaine 1', 'Semaine 2', 'Semaine 3', 'Semaine 4', 'Semaine 5'])
+        
+        Animal = list(dict.fromkeys(df_excel.Animal.tolist()))
+        for a in Animal:
+            for i in range(len(df_stats.index)):
+                if df_stats.iloc[i,1] == 1 and df_stats.iloc[i,0] == a:
+                    df_stats_arranged = df_stats_arranged.append({'Animal': a, 'Semaine 1': df_stats.iloc[i,2], 'Semaine 2': df_stats.iloc[i+1,2], 'Semaine 3': df_stats.iloc[i+2,2], 'Semaine 4': df_stats.iloc[i+3,2], 'Semaine 5' : df_stats.iloc[i+4,2]}, ignore_index=True)
+        
+        df_result = pd.DataFrame(pg.rm_anova(dv='Passing_Time', within='Semaine', subject='Animal', data=df_stats, detailed=True))
+        df_post_hocs = pd.DataFrame(pairwise_ttests(dv='Passing_Time', within='Semaine', subject='Animal', data=df_stats, padjust='holm'))
+        
+        self.writer = pd.ExcelWriter('{}/Stats.xlsx'.format(Path(excel_path).parent), engine='xlsxwriter')
+        df_stats_arranged.to_excel(self.writer, sheet_name='Data')
+        df_result.to_excel(self.writer, sheet_name='ANOVA')
+        df_post_hocs.to_excel(self.writer, sheet_name='Post Hoc')
+        self.writer.save()
 
 Data_Analyser = Analyse()
 
@@ -316,7 +357,7 @@ sg.theme('DarkBlack')	# Add a touch of color
 while True:
     find = False
     layout = [  [sg.Text('What would you like to do ?')],
-              [sg.Button('Perform the analysis'),sg.Button('Plot the trajectories'),sg.Button('Plot the learning curve'), sg.Button('Cancel')] ]
+              [sg.Button('Perform the analysis'),sg.Button('Plot the trajectories'),sg.Button('Plot the learning curve'), sg.Button('Stat analysis'), sg.Button('Quit')] ]
  
     window = sg.Window('Analysis selection', layout)
     
@@ -324,8 +365,8 @@ while True:
     while True:
         event, values = window.read()
         
-        """[Cancel] pressed"""
-        if event == sg.WIN_CLOSED or event == 'Cancel':
+        """[Quit] pressed"""
+        if event == sg.WIN_CLOSED or event == 'Quit':
             window.close()
             find = True
             break
@@ -383,5 +424,25 @@ while True:
                     window_insert_excel_path.close()
                     find = True
                     break
+
+        # [Stat Analysis] pressed
+        elif event == 'Stat analysis':
+            # Set the excel analysis file path
+            layout2 = [[sg.Text('Enter the excel analysis file path:'), sg.InputText(), sg.FileBrowse()],
+                       [sg.Button('Ok'), sg.Button('Cancel')]]
+            window_insert_excel_path = sg.Window('Please insert the path of the analysis excel file', layout2)
+            while True:
+                event, values = window_insert_excel_path.read()
+                if event == 'Ok' :
+                    excel_path = values[0]
+                    print(values)
+                    Data_Analyser.stats_effect_weeks(excel_path)
+                    window_insert_excel_path.close()
+                    break
+                elif event == sg.WIN_CLOSED or event == 'Cancel':
+                    window_insert_excel_path.close()
+                    find = True
+                    break
+
     if find:
         break
