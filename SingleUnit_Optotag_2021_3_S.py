@@ -26,7 +26,7 @@ import math
 
 
 #Files location
-data_dir = r'C:\Users\Gilles.DELBECQ\Desktop\17-05-21\7'
+data_dir = r'C:\Users\Gilles.DELBECQ\Desktop\single unit\traces\17-05-21\smr protocol S'
 
 
 #File loading list loop
@@ -67,7 +67,8 @@ def extract_spike_waveform(signal, spike_idx, left_width, right_width):
     return SPIKES
           
 
-JITTER=[]            
+JITTER=[]     
+names=[]       
 
 for file_path in List_File_paths:
     '''--------Initialization--------'''
@@ -75,6 +76,7 @@ for file_path in List_File_paths:
     #File identification
     exp = os.path.splitext(os.path.basename(file_path))[0]
     print(exp)
+    names.append(exp)
     
     #Load file and block
     reader = spike2(file_path)
@@ -169,7 +171,7 @@ for file_path in List_File_paths:
     for i in FIRST_SPIKES_TIMES:
         plt.axvline(i, color='blue', alpha=0.1)
         
-    # plt.savefig("{}\Spike Detection {}.pdf".format(data_dir,exp))
+    plt.savefig("{}\Spike Detection {}.pdf".format(data_dir,exp))
     
     
     fig, subplot = plt.subplots(2,1,sharex=True) #subplots (lignes,colonnes,sharex=true pour partager le même axe x entre les plots)
@@ -216,6 +218,7 @@ for file_path in List_File_paths:
     plt.tight_layout()
     plt.savefig("{}\Waveform {}.pdf".format(data_dir,exp))
     
-    JITTER.append((exp, np.mean(np.ravel(RASTER)),np.std(np.ravel(RASTER)), 100-(len(RASTER)/len(stim_idx)*100)))
+    JITTER.append((np.mean(np.ravel(RASTER)),np.std(np.ravel(RASTER)), 100-(len(RASTER)/len(stim_idx)*100)))
 df = pd.DataFrame(JITTER)
+df = pd.DataFrame(JITTER,index=names,columns=['Delay', 'Jitter (std)', 'Failure (%)'])
 df.to_excel('{}/datas.xlsx'.format(data_dir))

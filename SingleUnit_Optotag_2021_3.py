@@ -26,7 +26,7 @@ import math
 
 
 #Files location
-data_dir = r'C:\Users\Gilles.DELBECQ\Desktop\21-05-21\smr'
+data_dir = r'C:\Users\Gilles.DELBECQ\Desktop\single unit\traces\21-05-21\smr'
 
 
 #File loading list loop
@@ -68,12 +68,14 @@ def extract_spike_waveform(signal, spike_idx, left_width, right_width):
           
 
 JITTER=[]            
+names=[]
 
 for file_path in List_File_paths:
     '''--------Initialization--------'''
 
     #File identification
     exp = os.path.splitext(os.path.basename(file_path))[0]
+    names.append(exp)
     print(exp)
     
     #Load file and block
@@ -155,7 +157,7 @@ for file_path in List_File_paths:
     for i in FIRST_SPIKES_TIMES:
         plt.axvline(i, color='blue', alpha=0.1)
         
-    # plt.savefig("{}\Spike Detection {}.pdf".format(data_dir,exp))
+    plt.savefig("{}\Spike Detection {}.pdf".format(data_dir,exp))
     
     
     fig, subplot = plt.subplots(2,1,sharex=True) #subplots (lignes,colonnes,sharex=true pour partager le même axe x entre les plots)
@@ -173,7 +175,7 @@ for file_path in List_File_paths:
     subplot[1].axvspan(0, 2, alpha=0.1, color='blue')
     subplot[1].set_xlim(-0,25)
     
-    # plt.savefig("{}\Raster+PSTH {}.pdf".format(data_dir,exp))
+    plt.savefig("{}\Raster+PSTH {}.pdf".format(data_dir,exp))
     
     
     '''Extraction des waveform'''  
@@ -200,8 +202,9 @@ for file_path in List_File_paths:
     # subplot[1].text(0.5, -2.8, 'Error : {}%'.format(100-(len(RASTER)/len(stim_idx)*100)), fontsize=10)
     # subplot[1].text(0.5, -2.5, 'Jitter : {}ms +/- {}ms'.format(round(np.mean(np.ravel(RASTER)),3),round(np.std(np.ravel(RASTER)),3)), fontsize=10)
     plt.tight_layout()
-    # plt.savefig("{}\Waveform {}.pdf".format(data_dir,exp))
+    plt.savefig("{}\Waveform {}.pdf".format(data_dir,exp))
     
-    JITTER.append((exp, np.mean(np.ravel(RASTER)),np.std(np.ravel(RASTER)), 100-(len(RASTER)/len(stim_idx)*100)))
+    JITTER.append((np.mean(np.ravel(RASTER)),np.std(np.ravel(RASTER)), 100-(len(RASTER)/len(stim_idx)*100)))
 df = pd.DataFrame(JITTER)
-# df.to_excel('{}/datas.xlsx'.format(data_dir))
+df = pd.DataFrame(JITTER,index=names,columns=['Delay', 'Jitter (std)', 'Failure (%)'])
+df.to_excel('{}/datas.xlsx'.format(data_dir))
