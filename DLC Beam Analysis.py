@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
 """
+v1.6 03/06/2021
+- Ability to use trials above 9 (2 digits trial)
+- Light status
+- Fail and none detection
+
+v1.5 08/10/2020
+- Modified sessions method for learning curves (starts from session 1)
+
 v1.4 18/09/2020 - 14/10/2020
 - Automated column indexes
 - Added task selector
@@ -26,8 +34,8 @@ class Analyse:
     
     def __init__(self):
         self.pbar = ProgressBar()
-        self.likelihood_value = 0.8
-        self.frequency = 120
+        self.likelihood_value = 0.9
+        self.frequency = 197
         
     def load(self, root_dir):
         """
@@ -81,7 +89,10 @@ class Analyse:
 
             data_animal.append(name[1]) #append animal number
             data_session.append(int(name[3])) #append session number
-            data_trial.append(name[4][0]) #append trial number
+            if name[4][1] != 'D':
+                data_trial.append(name[4][0:2]) #append trial number
+            else:
+                data_trial.append(name[4][0]) #append trial number
             data_csv.append(df_raw) #append the csv values as a dataframe
         
         #Generate the work dataframe df_data, from the lists of animal number, session, trial and dataframes from each csv file
@@ -158,7 +169,7 @@ class Analyse:
             if data.iloc[0][i] == 'Tail_base' and data.iloc[1][i]=='x':
                 self.bdy_pt = i
                 
-            if data.iloc[0][i] == 'Hind_limb' and data.iloc[1][i]=='x':
+            if data.iloc[0][i] == 'Hind_limb' or data.iloc[0][i] == 'Foot' and data.iloc[1][i]=='x':
                 self.bdy_tr = i
                 
             if data.iloc[0][i] == 'Eye' and data.iloc[1][i]=='x':
@@ -178,6 +189,9 @@ class Analyse:
     def analysis_beam(self, root_dir):
         """
         Perform the analysis of the passing time from the DLC output CSV files.
+        Detect Fails and None
+            Fail = did not complete the course at all, or in time (max 10sec)
+        Setup on/off light : requires manual 
         Creates an excel file.
 
         Parameters
@@ -192,6 +206,7 @@ class Analyse:
         
         print('Loading Files...\n')
         self.load(root_dir)
+    
         
         print('Calculating passing times and instantaneous speed...\n')
         root_dir_path = Path(root_dir) #Getting folder path containing csv files
@@ -201,6 +216,9 @@ class Analyse:
         
         passing_times=[] #Initialize list containing passing times
         crossing_idx=[] #Initialize list containing frame indexes when tail_base crosses start and end points
+        
+        trial_status=[]
+        
         
         
         for i in self.pbar(range(len(self.df_data))): #Loop on all rows in the working dataframe df_data
@@ -228,19 +246,50 @@ class Analyse:
                     crossing_end_idx = data.iloc[index, 0]
                     break
             
+            
+            
+            
+            
             #Translates idexes in time using frequency set in initial parameters   
             passing_times.append((float(crossing_end_idx)-float(crossing_start_idx)) /self.frequency)
             crossing_idx.append([crossing_start_idx,crossing_end_idx])
-        
+            
+
+            if (float(crossing_end_idx)-float(crossing_start_idx)) /self.frequency == 0:
+                trial_status.append("None")
+            else:
+                if int(self.df_data.iloc[i][2]) >= 9 and int(self.df_data.iloc[i][1]) >5:
+                    trial_status.append("On")
+                else:
+                    trial_status.append("Off")
+
+            
+            """
+            if passing time = 0 -> None = excluded
+            if passing time < 0 -> Fail = should indicate failure
+            """
+            
+            """
+            if trial > 5 and session >= 9 
+            append on to light_status
+            """
+            
+            
+            
+            
         #Creates excel file from work dataframe
         self.df_data['Passing_Time']=passing_times
         self.df_data['Crossing_idx']=crossing_idx
         self.df_data = self.df_data.drop(['csv'], axis=1) #remove the column containing the csv dataframes
         self.df_data['Fichier']=[os.path.split(File)[-1].split('_')[0] for File in self.Files]
+        self.df_data['Status']=trial_status
         self.df_data.to_excel(self.writer, sheet_name='Analysis')
         
         self.writer.save()
         os.startfile(root_dir_path.parent)#opens the save folder
+        
+        
+        
         return
 
     def plot_the_trajectories(self, root_dir):
@@ -325,13 +374,14 @@ class Analyse:
             subplot[1].set_xlabel("X Coord"), subplot[1].set_ylabel("Y Coord"), subplot[1].set_title("Trajectory")
             subplot[1].set_ylim(self.flatten(self.start_coord[0],self.start_coord[1])-50,self.flatten(self.start_coord[0],self.start_coord[1])+50)
             subplot[1].invert_yaxis()
-            traj.savefig("{}\Analysis\Trajectories\{}\{}_{}_{}.svg".format(root_dir_path.parent,a,a,s,t))
+            traj.savefig("{}\Analysis\Trajectories\{}\{}_{}_{}.pdf".format(root_dir_path.parent,a,a,s,t))
             plt.close(traj)
         os.startfile(root_dir_path.parent)
 
     def plot_learning_curve(self, excel_path):
         """
         Generates learning plots from the excel file of the passing time analysis (output from analysis_beam()).
+            Exclude light on , None and fails
         Saves it in a dedicated folder in root_dir.
 
         Parameters
@@ -349,13 +399,35 @@ class Analyse:
             
         #Loop on all animal
         for a in Animal:
-            learning_plot = plt.figure()
             #Swarm + boxplot of the passing times for each session
-            # X axis = session (after 9th session = skip first week) , Y axis = Passing time
-            sn.swarmplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9] , [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9],color='C3',size=2)
-            sn.boxplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,2] > 9], palette=sn.color_palette("coolwarm", 9))
-            plt.ylim(0,5), plt.title("Beam test learning (Animal {})".format(a)), plt.xlabel("Session #"), plt.ylabel("Passing time (s)")
+            #With status Off (exclude light on, None, and fails)
+            # X axis = session (no skipping) , Y axis = Passing time
+            #barplot of fails for each session (with light off)
+ 
+            sessions = df_excel.Session.unique()
+            subset_df = df_excel[df_excel["Animal"] == a]
+            fails=[]
+            fails_session=[]
+            
+            for i in sessions:
+                fails.append(int(subset_df.Status[(subset_df.Passing_Time < 0)&(subset_df.Session == i)&(subset_df.Status == 'Off')].count()))
+                fails_session.append(i)
+            
+            learning_plot, subplot = plt.subplots(2,1,sharex=True) #subplots (lignes,colonnes,sharex=true pour partager le même axe x entre les plots)
+            learning_plot.suptitle("Beam test learning (Animal {})".format(a))
+            subplot[0].set_ylabel("Passing time (s)")
+            sn.swarmplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,7] =='Off'and df_excel.iloc[i,4]>0], [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,7] =='Off'and df_excel.iloc[i,4]>0],color='C3',size=2,ax=subplot[0])
+            sn.boxplot([df_excel.iloc[i,2] for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,7] =='Off'and df_excel.iloc[i,4]>0], [df_excel.iloc[i,4]for i in range(len(df_excel.index)) if df_excel.iloc[i,1] == a and df_excel.iloc[i,7] =='Off'and df_excel.iloc[i,4]>0], palette=sn.color_palette("pastel", 15),ax=subplot[0])
+            subplot[0].set_ylim(-0,10)
+            subplot[1].set_xlabel("Session #"), subplot[1].set_ylabel("Number of fails")
+            subplot[1].set_ylim(0,10)
+            sn.barplot(ax=subplot[1],x=fails_session, y=fails, palette="pastel")
+            
             learning_plot.savefig("{}\Learning_plots\{}.svg".format(os.path.dirname(excel_path),a)) #Save figure
+        
+        """
+        Add sheet with mean values ?
+        """
 
     def plot_learning_curve_mean(self, excel_path):
         """
@@ -378,23 +450,25 @@ class Analyse:
             os.makedirs("{}\Learning_plots".format(os.path.dirname(excel_path)))
         
         fig2 = plt.figure()
-        sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9'), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
-        plt.axvline(x=9.5, ls='--')
+        sn.pointplot(x="Session", y="Passing_Time", data=df_excel.query("Passing_Time > 0 & Status == 'Off'"), hue="Animal", dodge=True, palette=sn.color_palette("pastel", 9)).get_figure()
+        #Exclude passing times <0 and status = on
+        
         plt.xlabel('Session #')
         plt.ylabel('Time (s)')
         plt.title('Mean passing time')
         plt.show()
-        fig2.savefig("{}\Learning_plots\Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        fig2.savefig("{}\Learning_plots\Mean Learning Plot.pdf".format(os.path.dirname(excel_path)))
         
         fig3 = plt.figure()
-        sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query('Session > 9')).get_figure()  
-        plt.axvline(x=19.5, ls='--')
+        sn.lineplot(x="Session", y="Passing_Time", data=df_excel.query("Passing_Time > 0 & Status == 'Off'")).get_figure()  
+        #Exclude passing times <0 and status = on
+        
         plt.xlabel('Session #')
-        plt.xticks(list(set(df_excel.query('Session > 9')['Session'].tolist())))
+        plt.xticks(list(set(df_excel['Session'].tolist())))
         plt.ylabel('Time (s)')
         plt.title('Combined average passing time')
         
-        fig3.savefig("{}\Learning_plots\Global Mean Learning Plot.svg".format(os.path.dirname(excel_path)))
+        fig3.savefig("{}\Learning_plots\Global Mean Learning Plot.pdf".format(os.path.dirname(excel_path)))
         plt.show()
 
 
@@ -527,18 +601,16 @@ class Analyse:
             X_list=[]
             Y_list=[]
             for w in data.index[2:]:
-                threshold_list = [float(data.iloc[w, self.bdy_foot+2]), float(data.iloc[w, self.bdy_ankle+2]), float(data.iloc[w, self.bdy_knee+2]), float(data.iloc[w, self.bdy_thigh+2])]
+                threshold_list = [float(data.iloc[w, self.bdy_foot+2]), float(data.iloc[w, self.bdy_ankle+2]), float(data.iloc[w, self.bdy_thigh+2])]
                 if all(i >= self.likelihood_value for i in threshold_list):
                     # x_list = [data.iloc[w, self.bdy_foot], data.iloc[w, self.bdy_ankle], data.iloc[w, self.bdy_knee], data.iloc[w, self.bdy_thigh]]
                     # y_list = [data.iloc[w, self.bdy_foot+1], data.iloc[w, self.bdy_ankle+1], data.iloc[w, self.bdy_knee+1], data.iloc[w, self.bdy_thigh+1]]
                     # subplot[1].scatter(x_list, y_list)
                     X_list.append(data.iloc[w, self.bdy_foot])
                     X_list.append(data.iloc[w, self.bdy_ankle])
-                    X_list.append(data.iloc[w, self.bdy_knee])
                     X_list.append(data.iloc[w, self.bdy_thigh])
                     Y_list.append(data.iloc[w, self.bdy_foot+1])
                     Y_list.append(data.iloc[w, self.bdy_ankle+1])
-                    Y_list.append(data.iloc[w, self.bdy_knee+1])
                     Y_list.append(data.iloc[w, self.bdy_thigh+1])
                     
             subplot[1].plot([float(data.iloc[w, self.bdy_foot]) for w in data.index[2:] if float(data.iloc[w, self.bdy_foot+2])>=self.likelihood_value],[self.flatten(float(data.iloc[w, self.bdy_foot]),float(data.iloc[w, self.bdy_foot+1])) for w in data.index[2:] if float(data.iloc[w, self.bdy_foot+2])>=self.likelihood_value], color='crimson') 
