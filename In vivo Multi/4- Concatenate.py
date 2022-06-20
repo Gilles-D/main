@@ -14,8 +14,8 @@ import os
 Parameters
 '''
 sampling_rate = 20000
-folderpath=r'D:\Working_Dir\In vivo Mars 2022\RBF\06-01'
-Animal='2989'
+folderpath=r'D:\Working_Dir\In vivo Mars 2022\RBF\06-02'
+Animal='2209'
 Channels_to_plot=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 Save=True
 

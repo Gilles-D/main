@@ -12,8 +12,17 @@ Hope it will work
 Then all you have to do is to load HdF5IO from eletroPy package; init class with smthg = HdF5IO(filepath)
 After that u can load every instance with associated function, they are all described bellow. 
 """
-import matplotlib.pyplot as plt
+
 import os
+
+
+"""
+Parameters
+"""
+experience_list=['06-15']
+
+
+
 
 class HdF5IO:
     
@@ -57,7 +66,7 @@ class HdF5IO:
 def convert_folder(folderpath, newpath, data_type='raw'):
     
     import os, re
-    import numpy as np
+    
     
     list_dir = os.listdir(folderpath)
 #    folderpath = folderpath
@@ -93,13 +102,10 @@ def convert_folder(folderpath, newpath, data_type='raw'):
                 
 
 if __name__ == '__main__':
-    
-    experience_list = []
 
-
-    folderpath = rf'D:\Working_Dir\In vivo Mars 2022\H5' #Folder containing H5 files, with a subdirectory for each experience (day)
+    folderpath = r'D:\Working_Dir\In vivo Mars 2022\H5' #Folder containing H5 files, with a subdirectory for each experience (day)
     
-    experience_list=['02-07', '02-14', '02-15', '03-22', '03-24', '03-29', '03-30', '04-08', '05-24', '05-25', '05-30', '06-01', '06-02', '06-10']
+    
     
     # for subfolder in os.walk(folderpath):
     #     experience_list.append((subfolder[0].split('\\'))[-1])  #List all experiences

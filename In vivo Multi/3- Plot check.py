@@ -15,7 +15,7 @@ Parameters
 '''
 sampling_rate = 20000
 
-path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-01/2022-06-01T17-02-55McsRecording_20000Hz.rbf'
+path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-02/2022-06-02T18-07-12test echelle 2209_20000Hz.rbf'
 path_filter = rf'{path.split(".")[0]}_filtered.rbf'
 path_cmr = rf'{path.split(".")[0]}_filtered_cmr.rbf'
 
