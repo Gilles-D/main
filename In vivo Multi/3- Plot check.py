@@ -15,7 +15,7 @@ Parameters
 '''
 sampling_rate = 20000
 
-path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-10/2209_03_0007_20000Hz.rbf'
+path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-01/2022-06-01T17-02-55McsRecording_20000Hz.rbf'
 path_filter = rf'{path.split(".")[0]}_filtered.rbf'
 path_cmr = rf'{path.split(".")[0]}_filtered_cmr.rbf'
 
@@ -27,6 +27,7 @@ file_cmr=np.fromfile(path_cmr).reshape(16,-1)
 
 time_vector = np.arange(0,len(file[0])/sampling_rate,1/sampling_rate)
 
+Save=False
 
 """
 Plot every channel (raw, filtered, cmr) on individual plot
@@ -42,17 +43,25 @@ Plot every channel (raw, filtered, cmr) on individual plot
 """
 Plot all channel cmr on 1 plot
 """   
-fig, axs = plt.subplots(len(file_cmr))
-fig.suptitle('CMR of all channels')
+fig1, axs = plt.subplots(len(file_cmr),sharex=True)
+fig1.suptitle('CMR of all channels')
 for i in range(len(file_cmr)):
     axs[i].plot(time_vector,file_cmr[i,:])
+    axs[i].get_yaxis().set_visible(False)
 
 
 """
 Plot all channel raw on 1 plot
 """
-fig, axs = plt.subplots(len(file),sharex=True)
-fig.suptitle('Raw signal of all channels')
+fig2, axs = plt.subplots(len(file),sharex=True)
+fig2.suptitle('Raw signal of all channels')
 for i in range(len(file)):
     axs[i].plot(time_vector,file[i,:])
     axs[i].get_yaxis().set_visible(False)
+    
+"""
+Save plots
+"""
+if Save==True:
+    fig1.savefig(rf'{path.split(".")[0]}_cmr.png')
+    fig2.savefig(rf'{path.split(".")[0]}_raw.png')

@@ -22,7 +22,7 @@ freq_low = 300
 freq_high = 3000
 order = 3
 
-folderpath = r'D:\Working_Dir\In vivo Mars 2022\RBF\06-02'
+folderpath = r'D:\Working_Dir\In vivo Mars 2022\RBF\06-01'
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
