@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as sp
 
-path = r'C:/Users/Gilles.DELBECQ/Desktop/Record tests/H5/07-02/2022-02-07T15-32-15Test_8489_Day3.h5'
+path = r'D:/Working_Dir/In vivo Mars 2022/H5/06-02/2022-06-02T18-07-12test echelle 2209.h5'
 
 f = h5.File(path,'r')
 sigs = f['Data']['Recording_0']['AnalogStream']['Stream_0']['ChannelData']

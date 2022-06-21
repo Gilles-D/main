@@ -15,7 +15,7 @@ Parameters
 '''
 sampling_rate = 20000
 
-path = r'E:/Data/Ephy/in vivo multiunit/In vivo Mars 2022/RBF/06-15/2989_03_0001_20000Hz.rbf'
+path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/2209_04_0003_20000Hz.rbf'
 path_filter = rf'{path.split(".")[0]}_filtered.rbf'
 path_cmr = rf'{path.split(".")[0]}_filtered_cmr.rbf'
 
@@ -32,12 +32,12 @@ Save=False
 """
 Plot every channel (raw, filtered, cmr) on individual plot
 """
-#     for i in range(len(file)):
-#     plt.figure()
-#     plt.title(rf'Channel {i}')
-#     plt.plot(time_vector,file[i,:],alpha=0.25)
-#     plt.plot(time_vector,file_filtered[i,:],alpha=0.5)
-#     plt.plot(time_vector,file_cmr[i,:])
+for i in range(len(file)):
+    plt.figure()
+    plt.title(rf'Channel {i}')
+    # plt.plot(time_vector,file[i,:],alpha=0.25)
+    # plt.plot(time_vector,file_filtered[i,:],alpha=0.5)
+    plt.plot(time_vector,file_cmr[i,:])
     
     
 """
@@ -50,18 +50,18 @@ for i in range(len(file_cmr)):
     # axs[i].get_yaxis().set_visible(False)
 
 
-"""
-Plot all channel raw on 1 plot
-"""
-fig2, axs = plt.subplots(len(file),sharex=True,sharey=True)
-fig2.suptitle(f'{path.split("/")[-1]} Raw signal of all channels')
-for i in range(len(file)):
-    axs[i].plot(time_vector,file[i,:])
-    # axs[i].get_yaxis().set_visible(False)
+# """
+# Plot all channel raw on 1 plot
+# """
+# fig2, axs = plt.subplots(len(file),sharex=True,sharey=True)
+# fig2.suptitle(f'{path.split("/")[-1]} Raw signal of all channels')
+# for i in range(len(file)):
+#     axs[i].plot(time_vector,file[i,:])
+#     # axs[i].get_yaxis().set_visible(False)
     
-"""
-Save plots
-"""
-if Save==True:
-    fig1.savefig(rf'{path.split(".")[0]}_cmr.png')
-    fig2.savefig(rf'{path.split(".")[0]}_raw.png')
+# """
+# Save plots
+# """
+# if Save==True:
+#     fig1.savefig(rf'{path.split(".")[0]}_cmr.png')
+#     fig2.savefig(rf'{path.split(".")[0]}_raw.png')
