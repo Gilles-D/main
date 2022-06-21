@@ -15,7 +15,7 @@ Parameters
 '''
 sampling_rate = 20000
 
-path = r'E:/Data/Ephy/in vivo multiunit/In vivo Mars 2022/RBF/06-15/2209_04_0003_20000Hz.rbf'
+path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/2209_04_0004_20000Hz.rbf'
 path_filter = rf'{path.split(".")[0]}_filtered.rbf'
 path_cmr = rf'{path.split(".")[0]}_filtered_cmr.rbf'
 
@@ -35,9 +35,9 @@ Plot every channel (raw, filtered, cmr) on individual plot
 for i in range(len(file)):
     plt.figure()
     plt.title(rf'Channel {i}')
-    # plt.plot(time_vector,file[i,:],alpha=0.25)
+    plt.plot(time_vector,file[i,:],alpha=1,linewidth=1)
     # plt.plot(time_vector,file_filtered[i,:],alpha=0.5)
-    plt.plot(time_vector,file_cmr[i,:])
+    # plt.plot(time_vector,file_cmr[i,:])
     
     
 """

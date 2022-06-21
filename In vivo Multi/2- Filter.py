@@ -20,9 +20,9 @@ selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 
 freq_low = 300
 freq_high = 3000
-order = 3
+order = 2
 
-folderpath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15'
+folderpath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/'
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
