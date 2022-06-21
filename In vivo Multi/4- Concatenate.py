@@ -14,7 +14,7 @@ import os
 Parameters
 '''
 sampling_rate = 20000
-folderpath=r'D:\Working_Dir\In vivo Mars 2022\RBF\06-02'
+folderpath=r'E:\Data\Ephy\in vivo multiunit\In vivo Mars 2022\RBF\06-15'
 Animal='2209'
 Channels_to_plot=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 Save=True
@@ -44,7 +44,7 @@ for index,file in np.ndenumerate(files_to_analyse):
 """
 Plot channels
 """   
-fig, axs = plt.subplots(len(Channels_to_plot),sharex=True)
+fig, axs = plt.subplots(len(Channels_to_plot),sharex=True,sharey=True)
 fig.suptitle(f'Animal : {Animal} Channels : {Channels_to_plot}')
 
 time_vector = np.arange(0,len(big_data[0])/sampling_rate,1/sampling_rate)
