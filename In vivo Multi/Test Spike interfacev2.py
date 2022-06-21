@@ -23,7 +23,7 @@ import probeinterface as pi
 
 """Setup"""
 # file path
-recording_file = r'D:/Working_Dir/In vivo Mars 2022/RBF/01-06/2989_012022-06-01T17-13-10_20000Hz.rbf'
+recording_file = r'E:/Data/Ephy/in vivo multiunit/In vivo Mars 2022/RBF/06-15/2209_04_0004_20000Hz.rbf'
 
 Experience_identifier='2989_01_03'
 Date=recording_file.split('/')[-2]
