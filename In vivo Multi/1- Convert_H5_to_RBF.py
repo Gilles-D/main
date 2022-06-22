@@ -19,7 +19,7 @@ import os
 """
 Parameters
 """
-experience_list=['06-15']
+experience_list=['06-10','06-15','06-02','06-01','05-30']
 
 
 
@@ -63,7 +63,7 @@ class HdF5IO:
 
 #---------CONVERT H5 to RAW BINARY-----------------------------------------------------------------------------------
 
-def convert_folder(folderpath, newpath, data_type='raw'):
+def convert_folder(folderpath, newpath, data_type='raw',transpose=True):
     
     import os, re
     
@@ -89,7 +89,11 @@ def convert_folder(folderpath, newpath, data_type='raw'):
             file_save = '%s/%s_%sHz.rbf'%(newpath,name,sampling_rate)
         
             with open(file_save, mode='wb') as file : 
-
+                
+                if transpose == True:                
+                    traces.transpose().tofile(file,sep='')
+                    
+                else:
                     traces.tofile(file,sep='')                    
                 
             print ('Conversion DONE')
@@ -123,10 +127,7 @@ if __name__ == '__main__':
             os.makedirs(RBF_path) #Create folder for the experience if it is not already done
             
         convert_folder(H5_path, RBF_path) #Convert all the files from the experience folder
-    
-    
-
-    
+        
 
      
     
