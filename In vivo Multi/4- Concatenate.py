@@ -14,7 +14,7 @@ import os
 Parameters
 '''
 sampling_rate = 20000
-folderpath=r'D:\Working_Dir\In vivo Mars 2022\RBF\06-15'
+folderpath=r'D:\Working_Dir\In vivo Mars 2022\RBF\06-10'
 Animal='2209'
 Channels_to_plot=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 Save=True
@@ -32,10 +32,11 @@ list_dir = os.listdir(folderpath)
 Raw Files
 """
 if Raw == True:
-    
+    raw_path=rf'{folderpath}/raw/'
+    list_dir = os.listdir(raw_path)
     for file in list_dir:
         if file.endswith('.rbf') and Animal in file and not "filtered" in file and not "concatenated" in file:
-            files_to_analyse.append('%s/%s'%(folderpath,file))
+            files_to_analyse.append(rf'{raw_path}/{file}')
     
     
     for index,file in np.ndenumerate(files_to_analyse):
@@ -73,8 +74,14 @@ if Raw == True:
             Save plot
             """  
     if Save==True:
-        fig.savefig(rf'{folderpath}\{Animal}_concatenated_raw.png')
-        file_save = rf'{folderpath}\{Animal}_concatenated_raw.rbf'
+        save_path=rf'{folderpath}\concatenated/'
+        isExist = os.path.exists(save_path)
+        if not isExist:
+            os.makedirs(save_path) #Create folder for the experience if it is not already done
+            
+            
+        fig.savefig(rf'{save_path}\{Animal}_concatenated_raw.png')
+        file_save = rf'{save_path}\{Animal}_concatenated_raw.rbf'
     
         with open(file_save, mode='wb') as file : 
                 big_data.tofile(file,sep='')     
@@ -86,10 +93,12 @@ if Raw == True:
 Preprocessed files
 """
 if Preprocessed==True:
+    preprocessed_path=rf'{folderpath}/preprocessed/'
+    list_dir = os.listdir(preprocessed_path)
     files_to_analyse, record_lengths=[],[]
     for file in list_dir:
         if file.endswith('.rbf') and Animal in file and "cmr" in file and not "concatenated" in file:
-            files_to_analyse.append('%s/%s'%(folderpath,file))
+            files_to_analyse.append(rf'{preprocessed_path}/{file}')
     
     
     for index,file in np.ndenumerate(files_to_analyse):
@@ -127,8 +136,13 @@ if Preprocessed==True:
             Save plot
             """  
     if Save==True:
-        fig.savefig(rf'{folderpath}\{Animal}_concatenated_preprocessed.png')
-        file_save = rf'{folderpath}\{Animal}_concatenated_preprocessed.rbf'
+        save_path=rf'{folderpath}\concatenated/'
+        isExist = os.path.exists(save_path)
+        if not isExist:
+            os.makedirs(save_path) #Create folder for the experience if it is not already done
+            
+        fig.savefig(rf'{save_path}\{Animal}_concatenated_preprocessed.png')
+        file_save = rf'{save_path}\{Animal}_concatenated_preprocessed.rbf'
     
         with open(file_save, mode='wb') as file : 
                 big_data.tofile(file,sep='')                    

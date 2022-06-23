@@ -19,8 +19,8 @@ import os
 """
 Parameters
 """
-experience_list=['06-10','06-15','06-02','06-01','05-30']
-
+experience_list=['06-15']
+folderpath = r'D:\Working_Dir\In vivo Mars 2022\H5' #Folder containing H5 files, with a subdirectory for each experience (day)
 
 
 
@@ -107,7 +107,7 @@ def convert_folder(folderpath, newpath, data_type='raw',transpose=True):
 
 if __name__ == '__main__':
 
-    folderpath = r'D:\Working_Dir\In vivo Mars 2022\H5' #Folder containing H5 files, with a subdirectory for each experience (day)
+    
     
     
     
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     
     for experience in experience_list:
         H5_path=rf'D:\Working_Dir\In vivo Mars 2022\H5\{experience}'
-        RBF_path = rf'D:\Working_Dir\In vivo Mars 2022\RBF\{experience}'
+        RBF_path = rf'D:\Working_Dir\In vivo Mars 2022\RBF\{experience}\raw'
         
         isExist = os.path.exists(RBF_path)
         if not isExist:

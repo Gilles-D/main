@@ -22,7 +22,7 @@ freq_low = 300
 freq_high = 3000
 order = 2
 
-folderpath = r'D:/Working_Dir/In vivo Mars 2022/RBF/'
+folderpath = r'D:/Working_Dir/In vivo Mars 2022/RBF/' #use /
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
@@ -32,23 +32,31 @@ def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_
     filtered_signal = scipy.signal.sosfiltfilt(sos_coeff, signal, axis=axis)
     return filtered_signal
 
+list_files=[]
+for path, subdirs, files in os.walk(folderpath):
+    for name in files:
+        list_files.append(os.path.join(path, name))
 
-list_dir = os.listdir(folderpath)
-#    folderpath = folderpath
-#    newpath = newpath
-
-for file in list_dir:
+for file in list_files:
     
-    if file.endswith('.rbf'):
-
-        print ('Filtering ' + file + '...')
-        new_path = '%s/%s'%(folderpath,file)
+    if file.endswith('.rbf') and not "filtered" in file and not "concatenated" in file:
+        name = file.split('\\')[-1].split('.rbf')[0]
+        path = file.split('\\')[0]
         
-    
-    
-        data = np.fromfile(new_path).reshape(16,-1)
+        print ('Filtering ' + file + '...')
+        # new_path = rf'{folderpath}{file}'
+      
+        
+        # data = np.fromfile(new_path).reshape(16,-1)
+        
+        raw_file = np.fromfile(file)
+        data = raw_file.reshape(int(len(raw_file)/16),-1).transpose()
+        
         time_vector = np.arange(0,len(data[0])/sampling_rate,1/sampling_rate)
+        
+        
         filtered_signals =[]
+              
         
         for i in range(len(data)):
             if i in selected_chan:
@@ -60,27 +68,23 @@ for file in list_dir:
         median = np.median(filtered_signals, axis=0)
 
         cmr_signals = filtered_signals-median     
+
         
-        # for i in range(len(filtered_signals)):
-        #     signal = np.asarray(filtered_signals[i])
-        #     plt.figure()
-        #     plt.plot(time_vector,np.asarray(cmr_signals[i]))
-        #     plt.plot(time_vector,signal)
-        #     plt.title(rf'{file} Channel {selected_chan[i]}')
+        save_path = rf'{path}/preprocessed/'
+        
+        isExist = os.path.exists(save_path)
+        if not isExist:
+            os.makedirs(save_path) #Create folder for the experience if it is not already done
         
         
-        
-        name = re.sub('\.rbf$', '', file)
-        
-        file_save = '%s/%s_filtered.rbf'%(folderpath,name)
-    
+        file_save=rf'{save_path}/{name}_filtered.rbf'
         with open(file_save, mode='wb') as file : 
 
                 filtered_signals.tofile(file,sep='')                    
             
                 print ('Filter DONE')
         
-        file_save = '%s/%s_filtered_cmr.rbf'%(folderpath,name)
+        file_save=rf'{save_path}/{name}_cmr.rbf'
         with open(file_save, mode='wb') as file : 
 
                 cmr_signals.tofile(file,sep='')                    
@@ -91,4 +95,3 @@ for file in list_dir:
         print (file + ' is not an rbf file, will not be filtered')
         
 print ('Whole directory has been converted successfully')
-
