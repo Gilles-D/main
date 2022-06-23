@@ -19,7 +19,7 @@ import os
 """
 Parameters
 """
-experience_list=['06-15']
+experience_list=['06-23']
 folderpath = r'D:\Working_Dir\In vivo Mars 2022\H5' #Folder containing H5 files, with a subdirectory for each experience (day)
 
 

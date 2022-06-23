@@ -18,14 +18,14 @@ sampling_rate = 20000
 
 # path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
 
-folderpath = r'D:\Working_Dir\In vivo Mars 2022\RBF\06-15/' #use / at the end
+folderpath = r'D:\Working_Dir\In vivo Mars 2022\RBF\06-23/' #use / at the end
 Animal='2209'
 
-Save=True
+Save=False
 plot_format='png'
-Preprocessed=True
-Indivdual_plots=True
-Autoclose=True
+Preprocessed=False
+Indivdual_plots=False
+Autoclose=False
 
 
 
