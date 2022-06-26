@@ -15,7 +15,7 @@ import scipy.signal as sp
 PARAMETERS
 """
 sampling_rate = 20000
-selected_chan=[1,2,3,4,6,7,8,9,10]
+selected_chan=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 
 
 #Filtering parameters
@@ -32,8 +32,9 @@ distance = 25 # distance between 2 spikes
 filepath = r'I:/Data/Ephy/in vivo multiunit/In vivo Mars 2022/RBF/06-23/raw/2209_05_0020_20000Hz.rbf'
 
 
-Plot = True
-Waveforms = True
+Plot = False
+Plot_raw = False
+Waveforms = False
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
@@ -140,10 +141,11 @@ spikes_list= np.array(spikes_list)
 """
 Plot all channel raw on 1 plot
 """
+#Filtered
 if Plot == True: 
     fig, axs = plt.subplots(len(selected_chan),sharex=True,sharey=True)
     fig.suptitle('signal of all channels')
-    plt.setp(axs, xlim=[26.75,27.15])
+    plt.setp(axs, xlim=[25,28.8])
     
     for i in range(len(selected_chan)):
         std = np.std(cmr_signals[i], axis=0)
@@ -163,10 +165,31 @@ if Plot == True:
             a=0
             axs[i].scatter(spikes[0],spikes[1],label='spike detected',color='orange')
     fig.savefig(rf'{save_path}\signal.svg')
-            
-for index,i in np.ndenumerate(waveforms):
-    plt.figure()
-    plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
-    for j in i:
-        plt.plot(j)
-    plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
+    
+#Waveforms
+        
+    for index,i in np.ndenumerate(waveforms):
+        plt.figure()
+        plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
+        for j in i:
+            plt.plot(j)
+        plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
+
+#Raw signal
+if Plot_raw == True:
+    fig, axs = plt.subplots(len(selected_chan),sharex=True,sharey=True)
+    fig.suptitle('signal of all raw channels')
+    # plt.setp(axs, xlim=[26.75,27.15])
+    
+    for i in range(len(selected_chan)): 
+        axs[i].plot(time_vector,data[i,:])
+        axs[i].get_yaxis().set_visible(False)
+
+    fig.savefig(rf'{save_path}\signal_raw.svg')
+    
+"""
+Raster plot
+"""
+plt.eventplot(spikes_list)
+plt.gca().invert_yaxis()
+plt.savefig(rf'{save_path}\raster.svg')
