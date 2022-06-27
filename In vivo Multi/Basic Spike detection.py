@@ -15,7 +15,7 @@ import scipy.signal as sp
 PARAMETERS
 """
 sampling_rate = 20000
-selected_chan=[1,2,3,5]
+selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 
 
 #Filtering parameters
@@ -24,12 +24,12 @@ freq_high = 3000
 order = 2
 
 # Noise parameters
-std_threshold = 8 #Times the std
+std_threshold = 10 #Times the std
 noise_window = 1 #window for the noise calculation in sec
-distance = 25 # distance between 2 spikes
+distance = 50 # distance between 2 spikes
 
 
-filepath = r'F:/Data/Ephy/in vivo multiunit/In vivo Mars 2022/RBF/06-23/raw/Merge_2209_05_0022_20000Hz.rbf'
+filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-23/raw/Merge_2209_05_0022_20000Hz.rbf'
 
 
 Plot = True
@@ -110,7 +110,7 @@ cmr_signals = filtered_signals-median
 """
 Spike detection
 """
-"""
+
 for signal in cmr_signals:
     # Threshold calculation
     noise = signal[0:int(noise_window*sampling_rate)] #noise window taken from individual channel signal
@@ -132,11 +132,14 @@ for signal in cmr_signals:
     if Waveforms == True :
         wfs = extract_spike_waveform(signal,spike_idx)
         waveforms.append(wfs)
-"""   
+
+
 
 """
+
+""
 Spike detection absolute (Neg + Pos)
-"""
+""
 
 
 waveforms_neg=[]
@@ -146,7 +149,6 @@ for signal in cmr_signals:
     noise = signal[0:int(noise_window*sampling_rate)] #noise window taken from individual channel signal
     threshold = np.median(noise)+std_threshold*np.std(noise) #threshold calculation for the channel
     thresholds.append(threshold) #append it to the list regrouping threshold for each channel
-    
     
     #Detect the spike indexes
     spike_idx, _ = sp.find_peaks(abs_signal,height=threshold,distance=distance)
@@ -162,31 +164,33 @@ for signal in cmr_signals:
     if Waveforms == True :
         for index,i in np.ndenumerate(spike_idx):
             if spike_y[index] < threshold:
-                wfs_neg = extract_spike_waveform(signal,i)
-            else:
-                wfs = extract_spike_waveform(signal,i)
+                print('neg')
+                wfs_neg = extract_spike_waveform(signal,spike_idx)
+            # else:
+            #     print('pos')
+            #     wfs = extract_spike_waveform(signal,spike_idx)
         
         waveforms_neg.append(wfs_neg)    
-        waveforms.append(wfs)  
+        # waveforms.append(wfs)  
 
 #Transform the list of spikes in array
 spikes_list= np.array(spikes_list)
 
 #Plot waveforms for each channel
-for index,i in np.ndenumerate(waveforms):
-    plt.figure()
-    plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
-    for j in i:
-        plt.plot(j)
-    plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
+# for index,i in np.ndenumerate(waveforms):
+#     plt.figure()
+#     plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
+#     for j in i:
+#         plt.plot(((np.array((range(len(j))))-25)/sampling_rate)*1000,j*1000)
+#     plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
 
-for index,i in np.ndenumerate(waveforms_neg):
+for i in range(len(waveforms_neg)):
     plt.figure()
-    plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
-    for j in i:
-        plt.plot(j)
-    plt.savefig(rf'{save_path}\waveform_neg_chan_{selected_chan[index[0]]}.svg')
-
+    plt.title(rf'waveform_chan_neg_{selected_chan[i]}')
+    for j in waveforms_neg[i]:
+        plt.plot(((np.array((range(len(j))))-25)/sampling_rate)*1000,j*1000)
+    plt.savefig(rf'{save_path}\waveform_neg_chan_{selected_chan[i]}.svg')
+"""
 
 """
 Plot all channel on 1 plot
@@ -195,7 +199,7 @@ Plot all channel on 1 plot
 if Plot_raw == True:
     fig, axs = plt.subplots(len(selected_chan),sharex=True,sharey=True)
     fig.suptitle('signal of all raw channels')
-    # plt.setp(axs, xlim=[26.75,27.15])
+    # plt.setp(axs, xlim=[353.925,354.100],ylim=[-0.00353,0.00292])
     
     for i in range(len(selected_chan)): 
         axs[i].plot(time_vector,data[i,:])
@@ -207,8 +211,8 @@ if Plot_raw == True:
 if Plot == True: 
     fig, axs = plt.subplots(len(selected_chan),sharex=True,sharey=True)
     fig.suptitle('signal of all channels')
-    # plt.setp(axs, xlim=[25,28.8])
-    
+    # plt.setp(axs, xlim=[353.925,354.100],ylim=[-0.00158,0.00165])
+    plt.setp(axs,ylim=[-0.00158,0.00165])
     for i in range(len(selected_chan)):
         std = np.std(cmr_signals[i], axis=0)
         
@@ -225,7 +229,7 @@ if Plot == True:
         for spike in spikes:
             # axs[i].axvline(spike,color='red')
             a=0
-            axs[i].scatter(spikes[0],spikes[1],label='spike detected',color='orange')
+            # axs[i].scatter(spikes[0],spikes[1],label='spike detected',color='orange')
     fig.savefig(rf'{save_path}\signal.svg')
 
 #Plot waveforms for each channel
