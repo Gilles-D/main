@@ -29,14 +29,6 @@ Autoclose=False
 
 
 
-
-
-
-
-
-
-
-
 """
 Setups
 """

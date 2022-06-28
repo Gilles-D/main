@@ -29,7 +29,7 @@ noise_window = 1 #window for the noise calculation in sec
 distance = 50 # distance between 2 spikes
 
 
-filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-23/raw/Merge_2209_05_0022_20000Hz.rbf'
+filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-27/raw/Merge_2209_06_0022_20000Hz.rbf'
 
 
 Plot = True
