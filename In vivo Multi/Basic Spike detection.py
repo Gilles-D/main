@@ -15,7 +15,7 @@ import scipy.signal as sp
 PARAMETERS
 """
 sampling_rate = 20000
-selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+selected_chan=[0,1,2,3,4,5,6,7,8,9,11,12,14,15]
 
 
 #Filtering parameters
@@ -24,12 +24,12 @@ freq_high = 3000
 order = 2
 
 # Noise parameters
-std_threshold = 10 #Times the std
+std_threshold = 5 #Times the std
 noise_window = 1 #window for the noise calculation in sec
 distance = 50 # distance between 2 spikes
 
 
-filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-27/raw/Merge_2209_06_0022_20000Hz.rbf'
+filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-27/raw/2209_06_0003_20000Hz.rbf'
 
 
 Plot = True
@@ -200,6 +200,7 @@ if Plot_raw == True:
     fig, axs = plt.subplots(len(selected_chan),sharex=True,sharey=True)
     fig.suptitle('signal of all raw channels')
     # plt.setp(axs, xlim=[353.925,354.100],ylim=[-0.00353,0.00292])
+    # plt.setp(axs, xlim=[25,29])
     
     for i in range(len(selected_chan)): 
         axs[i].plot(time_vector,data[i,:])
@@ -212,7 +213,8 @@ if Plot == True:
     fig, axs = plt.subplots(len(selected_chan),sharex=True,sharey=True)
     fig.suptitle('signal of all channels')
     # plt.setp(axs, xlim=[353.925,354.100],ylim=[-0.00158,0.00165])
-    plt.setp(axs,ylim=[-0.00158,0.00165])
+    # plt.setp(axs, xlim=[25,29],ylim=[-0.00158,0.00165])
+    # plt.setp(axs,ylim=[-0.00158,0.00165])
     for i in range(len(selected_chan)):
         std = np.std(cmr_signals[i], axis=0)
         
@@ -237,7 +239,7 @@ if Plot == True:
         plt.figure()
         plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
         for j in i:
-            plt.plot(j)
+            plt.plot(j*1000)
         plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
 
 
@@ -247,5 +249,6 @@ Raster plot
 """
 plt.figure()
 plt.eventplot(spikes_list)
+# plt.xlim([25,29])
 plt.gca().invert_yaxis()
 plt.savefig(rf'{save_path}\raster.svg')
