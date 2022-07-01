@@ -15,7 +15,7 @@ import scipy.signal as sp
 PARAMETERS
 """
 sampling_rate = 20000
-selected_chan=[0,1,2,3,4,5,6,7,8,9,11,12,14,15]
+selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,14,15]
 
 
 #Filtering parameters
@@ -24,12 +24,12 @@ freq_high = 3000
 order = 2
 
 # Noise parameters
-std_threshold = 5 #Times the std
+std_threshold = 7 #Times the std
 noise_window = 1 #window for the noise calculation in sec
 distance = 50 # distance between 2 spikes
 
 
-filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-27/raw/2209_06_0003_20000Hz.rbf'
+filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/merged 2209/concatenated/2209_concatenated_raw.rbf'
 
 
 Plot = True
