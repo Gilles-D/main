@@ -89,7 +89,7 @@ void Triggered(){
       else if (irrecv.decode(&results)){
         irrecv.resume();
         Serial.println(results.value);
-        if (results.value == 3810010651 && Record_Status ==0){
+        if (results.value == 1286666973 && Record_Status ==0){
           Serial.println(results.value, HEX);
           Serial.println("Start");
           delay(500);
