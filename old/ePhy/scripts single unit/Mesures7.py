@@ -27,8 +27,8 @@ import os
 
 
 #Files location
-Baselinepath = 'D:/Analyses\Baseline\Traces'
-savedir = 'D:/Analyses\Baseline\data2'
+Baselinepath = r'D:\Working_Dir\Ephy\Anesth\Optotag cx\Thy1\19-07-22'
+savedir = r'D:\Working_Dir\Ephy\Anesth\Optotag cx\Thy1\19-07-22'
     
 List_File_paths = []
 for r, d, f in os.walk(Baselinepath):
@@ -144,18 +144,18 @@ for file_path in List_File_paths:
     plt.xlabel('Time (s)') ; plt.ylabel('Signal ({})'.format(units[-2:]))   
     
     '''Plot all the waveforms and the average waveform of a neuron'''
-    # fig, subplot = plt.subplots(2,1,sharex=True) #subplots (lignes,colonnes,sharex=true pour partager le même axe x entre les plots)
-    # subplot[0].set_title('All the waveforms Manip {} {}'.format(date, manip))
-    # subplot[0].set_xlabel('Time (ms)'), subplot[0].set_ylabel('Signal ({})'.format(units[-2:]))
-    # subplot[0].scatter(NEGSPIKES_TIMES_ms,NEGSPIKES_Y,label='negspike detected',color='red')
-    # for wf in spike_wfs:
-    #     subplot[0].plot(spike_wfs_times,wf,alpha=0.8)
+    fig, subplot = plt.subplots(2,1,sharex=True) #subplots (lignes,colonnes,sharex=true pour partager le même axe x entre les plots)
+    subplot[0].set_title('All the waveforms Manip {} {}'.format(date, manip))
+    subplot[0].set_xlabel('Time (ms)'), subplot[0].set_ylabel('Signal ({})'.format(units[-2:]))
+    subplot[0].scatter(NEGSPIKES_TIMES_ms,NEGSPIKES_Y,label='negspike detected',color='red')
+    for wf in spike_wfs:
+        subplot[0].plot(spike_wfs_times,wf,alpha=0.8)
 
-    # subplot[1].set_title('Waveform average Manip {} {}'.format(date, manip))
-    # subplot[1].set_xlabel('Time (ms)'), subplot[1].set_ylabel('Signal ({})'.format(units[-2:]))
-    # subplot[1].plot(spike_wfs_times,spike_wfs_average,alpha=0.8)
-    # subplot[1].errorbar(spike_wfs_times,spike_wfs_average,yerr=spike_wfs_average_sem)
-    # plt.tight_layout()
+    subplot[1].set_title('Waveform average Manip {} {}'.format(date, manip))
+    subplot[1].set_xlabel('Time (ms)'), subplot[1].set_ylabel('Signal ({})'.format(units[-2:]))
+    subplot[1].plot(spike_wfs_times,spike_wfs_average,alpha=0.8)
+    subplot[1].errorbar(spike_wfs_times,spike_wfs_average,yerr=spike_wfs_average_sem)
+    plt.tight_layout()
 
 
      
