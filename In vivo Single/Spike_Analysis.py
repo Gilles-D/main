@@ -193,7 +193,7 @@ for file_path in List_File_paths:
     subplot[0].set_title('RasterPlot {}'.format(manip))
     subplot[0].set_ylabel("Nombre d'événements")
     subplot[0].eventplot(RASTER, lineoffsets = 1, linelengths = 0.5, colors = 'black')
-    subplot[0].axvspan(0, 2, alpha=0.1, color='blue')
+    subplot[0].axvspan(0, 1, alpha=0.1, color='blue')
     subplot[0].set_xlim(-0,25)
 
     width_bins = float(0.02)
@@ -201,9 +201,17 @@ for file_path in List_File_paths:
     subplot[1].set_title("Peri Stimulus Histogramme {}. Bins = {}".format(manip, width_bins))
     subplot[1].set_xlabel('Time (ms)'), subplot[0].set_ylabel("Nombre d'événements")
     subplot[1].hist(np.array(RASTER), bins=n_bins, color='black')
-    subplot[1].axvspan(0, 2, alpha=0.1, color='blue')
+    subplot[1].axvspan(0, 1, alpha=0.1, color='blue')
     subplot[1].set_xlim(-0,25)
     
     print(len(stim_idx))
     print(len(spike_idx))
+    
+    Jitter = np.mean(np.ravel(RASTER))
+    Jitter_std = np.std(np.ravel(RASTER))
+    Failure = 100-(len(RASTER)/len(stim_idx)*100)
+    
+    print (Jitter)
+    print(Jitter_std)
+    print(Failure)
     
