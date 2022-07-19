@@ -10,16 +10,16 @@ import pyautogui
 import keyboard
 import time
 
-List=[(-1905, 33), (-1833, 190), (-1043, 724), (-1036, 758)]
+List=[(-1905, 33), (-1833, 190), (-1043, 724), (-1036, 758),(-1048, 701)]
 
 while True:  # making a loop
     try:  # used try so that if user pressed other than the given key error will not be shown
-        if keyboard.is_pressed('x'):  # if key 'q' is pressed
-            print('You Pressed A Key!')
+        if keyboard.is_pressed('x'):  # if key 'x' is pressed
+            print('Position added')
             List.append((pyautogui.position()[0],pyautogui.position()[1]))
             time.sleep(1)
         if keyboard.is_pressed('z'):  # if key 'q' is pressed
-            print('You Pressed The Key!')
+            print('Sequence started')
             for i in range(len(List)):
                 print((List[i][0], List[i][1]))
                 pyautogui.click(List[i][0], List[i][1])
