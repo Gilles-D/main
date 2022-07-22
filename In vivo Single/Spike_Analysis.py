@@ -16,8 +16,8 @@ import math
 
 
 #Files location
-files_path = r'D:\Working_Dir\Ephy\Anesth\Optotag cx\Thy1\19-07-22'
-savedir = r'D:\Working_Dir\Ephy\Anesth\Optotag cx\Thy1\19-07-22'
+files_path = r'D:\Working_Dir\Ephy\Anesth\Optotag cx\Thy1\20-07-22'
+savedir = r'D:\Working_Dir\Ephy\Anesth\Optotag cx\Thy1\20-07-22'
 
 """
 PARAMETERS
