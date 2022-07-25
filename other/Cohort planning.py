@@ -6,16 +6,16 @@ Created on Fri Jul 22 17:02:42 2022
 """
 
 import datetime
-
+from datetime import date
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-from matplotlib.patches import Patch
 
 
 
-date_of_birth = [("01","09","2022"),("07","09","2022")]
+
+date_of_birth = [("08","08","2022"),("15","08","2022")]
 
 Delai_Injection_j = 0
 Delai_Implantation_j = 14
@@ -28,18 +28,34 @@ iterator=1
 
 for date in date_of_birth:
     DOB = datetime.date(int(date[2]),int(date[1]),int(date[0]))
-    # Weaning = DOB + datetime.timedelta(days=21)
-    # Injection = Weaning + datetime.timedelta(days=Delai_Injection_j)
-    # Implantation = Injection + datetime.timedelta(days=Delai_Implantation_j)
-    # Behavior_start = Implantation + datetime.timedelta(days=Delai_Rest_j)
-    # Behavior_end = Behavior_start + datetime.timedelta(days=Behavior_j)
+    Weaning = DOB + datetime.timedelta(days=21)
+    Injection = Weaning + datetime.timedelta(days=Delai_Injection_j)
+    Implantation = Injection + datetime.timedelta(days=Delai_Implantation_j)
+    Behavior_start = Implantation + datetime.timedelta(days=Delai_Rest_j)
+    Behavior_end = Behavior_start + datetime.timedelta(days=Behavior_j)
 
     
     dates.append((str(iterator),DOB,Weaning,Injection,Implantation,Behavior_start,Behavior_end))
     
+    print(f"Cohorte {iterator}")
+    print(f"Naissance : {DOB}")
+    print(f"Weaning : {Weaning}")
+    print(f"Injection : {Injection}")
+    print(f"Implantation : {Implantation}")
+    print(f'Behavior from {Behavior_start} to {Behavior_end}')
+    
+    
     iterator=iterator+1
     
 df = pd.DataFrame(dates,columns=['Cohort','DOB','Weaning','Injection','Implantation','Behavior_start','Behavior_end'])
+
+
+
+
+
+
+
+"""
 
 # project start date
 proj_start = df.DOB.min()
@@ -67,14 +83,15 @@ ax.barh(df.Cohort, Delai_Rest_j,left=df.imp) #rest
 
 ax.barh(df.Cohort, Behavior_j,left=df.behavior) #behavior
 
+end_num = df.behavior.max() + Behavior_j
 
 # plt.show()
 
 
 ##### TICKS #####
-xticks = np.arange(0, 21, 3)
+xticks = np.arange(0, end_num, 3)
 xticks_labels = pd.date_range(df.DOB.min(), end=df.Behavior_end.max()).strftime("%m/%d")
-xticks_minor = np.arange(0, 21, 1)
+xticks_minor = np.arange(0, end_num+3, 1)
 ax.set_xticks(xticks)
 
 ax.set_xticks(xticks_minor, minor=True)
@@ -82,11 +99,10 @@ ax.set_xticklabels(xticks_labels[::3])
 
 plt.show()
 
+"""
 
-
-
-
-fig = px.timeline(df, x_start="Start", x_end="Finish", y="Task")
+"""
+fig = x.timeline(df, x_start="Start", x_end="Finish", y="Task")
 fig.update_yaxes(autorange="reversed") # otherwise tasks are listed from the bottom up
 fig.show()
 
@@ -114,13 +130,5 @@ Implantation = Injection + datetime.timedelta(days=Delai_Implantation_j)
 Behavior_start = Implantation + datetime.timedelta(days=Delai_Rest_j)
 Behavior_end = Behavior_start + datetime.timedelta(days=Behavior_j)
 
-
-print(f"Naissance : {DOB}")
-print(f"Weaning : {Weaning}")
-print(f"Injection : {Injection}")
-print(f"Implantation : {Implantation}")
-print(f'Behavior from {Behavior_start} to {Behavior_end}')
-
-
-
+"""
 
