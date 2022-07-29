@@ -15,7 +15,7 @@ import numpy as np
 
 
 
-date_of_birth = [("08","08","2022"),("15","08","2022")]
+date_of_birth = [("28","07","2022"),("15","08","2022")]
 
 Delai_Injection_j = 0
 Delai_Implantation_j = 14
