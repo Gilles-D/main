@@ -19,8 +19,8 @@ import os
 """
 Parameters
 """
-experience_list=['06-27']
-folderpath = r'D:\Working_Dir\In vivo Mars 2022\H5' #Folder containing H5 files, with a subdirectory for each experience (day)
+experience_list=['Habituation_1']
+folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1' #Folder containing H5 folder, with a subdirectory for each experience (day)
 
 
 
@@ -119,8 +119,8 @@ if __name__ == '__main__':
     
     
     for experience in experience_list:
-        H5_path=rf'D:\Working_Dir\In vivo Mars 2022\H5\{experience}'
-        RBF_path = rf'D:\Working_Dir\In vivo Mars 2022\RBF\{experience}\raw'
+        H5_path=rf'{folderpath}\H5\{experience}'
+        RBF_path = rf'{folderpath}\RBF\{experience}/raw'
         
         isExist = os.path.exists(RBF_path)
         if not isExist:
