@@ -22,7 +22,7 @@ freq_low = 300
 freq_high = 3000
 order = 2
 
-folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\Habituation_1/raw/' #use /
+folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\14-09\raw/' #use /
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
@@ -41,7 +41,7 @@ for file in list_files:
     
     if file.endswith('.rbf') and not "filtered" in file and not "concatenated" in file:
         name = file.split('\\')[-1].split('/')[-1].split('.rbf')[0]
-        path = file.split('/')[0]
+        path = file.split('/')[0].split('raw')[0]
         
         print ('Filtering ' + file + '...')
         # new_path = rf'{folderpath}{file}'

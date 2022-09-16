@@ -18,13 +18,13 @@ sampling_rate = 20000
 
 # path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
 
-folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\Habituation_1/' #use / at the end
-Animal='0006'
+folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\12-09/' #use / at the end
+Animal='06'
 
 Save=True
 plot_format='png'
 Preprocessed=True
-Indivdual_plots=False
+Indivdual_plots=True
 Autoclose=True
 
 
@@ -81,6 +81,8 @@ for file_to_analyze in files_to_analyse:
             if Preprocessed == True:
                 plt.plot(time_vector,data_filtered[i,:],alpha=0.5)
                 plt.plot(time_vector,data_cmr[i,:])
+                ax = plt.gca()
+                ax.set_ylim(-0.0025,0.0025)
             
             if Save == True:
                 plt.savefig(rf'{plot_save}/{name_file}_{i}.{plot_format}')
