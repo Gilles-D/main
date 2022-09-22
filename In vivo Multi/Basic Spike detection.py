@@ -24,12 +24,12 @@ freq_high = 3000
 order = 2
 
 # Noise parameters
-std_threshold = 7 #Times the std
-noise_window = 1 #window for the noise calculation in sec
+std_threshold = 5 #Times the std
+noise_window = 5 #window for the noise calculation in sec
 distance = 50 # distance between 2 spikes
 
 
-filepath = r'D:/Working_Dir/In vivo Mars 2022/RBF/merged 2209/concatenated/2209_concatenated_raw.rbf'
+filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/06_03_0009_20000Hz.rbf'
 
 
 Plot = True
