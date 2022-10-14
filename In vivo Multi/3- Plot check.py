@@ -18,14 +18,14 @@ sampling_rate = 20000
 
 # path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
 
-folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\12-09/' #use / at the end
-Animal='06'
+folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\10-10/' #use / at the end
+Animal='0004'
 
-Save=True
+Save=False
 plot_format='png'
 Preprocessed=True
-Indivdual_plots=True
-Autoclose=True
+Indivdual_plots=False
+Autoclose=False
 
 
 
@@ -36,7 +36,7 @@ raw_path=rf'{folderpath}/raw/'
 files_to_analyse=[]
 
 for file_name in os.listdir(raw_path):
-    if file_name.endswith('.rbf') and Animal in file_name and not "filtered" in file_name and not "concatenated" in file_name and not "Merge" in file_name:
+    if file_name.endswith('.rbf') and Animal in file_name and not "filtered" in file_name and not "concatenated" in file_name:
         files_to_analyse.append(rf'{raw_path}/{file_name}')
 
 if Save ==True:
@@ -62,8 +62,11 @@ for file_to_analyze in files_to_analyse:
         path_filter = rf"{preprocessed_path}/{name_file}_filtered.rbf"
         path_cmr = rf"{preprocessed_path}/{name_file}_cmr.rbf"
         
-        data_filtered=np.fromfile(path_filter).reshape(16,-1)
+        data_filtered=np.fromfile(path_filter)
+        data_filtered = data_filtered.reshape(int(len(raw_file)/16),-1).transpose()
+        
         data_cmr=np.fromfile(path_cmr).reshape(16,-1)
+        data_cmr=data_cmr.reshape(int(len(raw_file)/16),-1).transpose()
     
     time_vector = np.arange(0,len(data[0])/sampling_rate,1/sampling_rate)
     
