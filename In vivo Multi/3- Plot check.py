@@ -18,8 +18,8 @@ sampling_rate = 20000
 
 # path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
 
-folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\10-10/' #use / at the end
-Animal='0004'
+folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Example_Dataset\RBF\4713/' #use / at the end
+Animal='4713'
 
 Save=False
 plot_format='png'
@@ -63,10 +63,10 @@ for file_to_analyze in files_to_analyse:
         path_cmr = rf"{preprocessed_path}/{name_file}_cmr.rbf"
         
         data_filtered=np.fromfile(path_filter)
-        data_filtered = data_filtered.reshape(int(len(raw_file)/16),-1).transpose()
+        data_filtered = data_filtered.reshape(-1,int(len(raw_file)/16))
         
-        data_cmr=np.fromfile(path_cmr).reshape(16,-1)
-        data_cmr=data_cmr.reshape(int(len(raw_file)/16),-1).transpose()
+        data_cmr=np.fromfile(path_cmr)
+        data_cmr=data_cmr.reshape(-1,int(len(raw_file)/16))
     
     time_vector = np.arange(0,len(data[0])/sampling_rate,1/sampling_rate)
     

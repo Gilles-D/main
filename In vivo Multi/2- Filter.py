@@ -22,7 +22,7 @@ freq_low = 300
 freq_high = 3000
 order = 2
 
-folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-10/raw/' #use /
+folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Example_Dataset/RBF/4713/raw/' #use /
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
