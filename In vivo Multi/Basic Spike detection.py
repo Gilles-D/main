@@ -15,8 +15,8 @@ import scipy.signal as sp
 PARAMETERS
 """
 sampling_rate = 20000
-selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,14,15]
-
+# selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+selected_chan=[7,8,10,12,14,15]
 
 #Filtering parameters
 freq_low = 300
@@ -29,7 +29,7 @@ noise_window = 5 #window for the noise calculation in sec
 distance = 50 # distance between 2 spikes
 
 
-filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/06_03_0009_20000Hz.rbf'
+filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/22-09/raw/0001_surgery_0003_20000Hz.rbf'
 
 
 Plot = True
