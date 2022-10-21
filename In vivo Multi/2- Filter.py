@@ -16,13 +16,15 @@ PARAMETERS
 
 sampling_rate = 20000
 
-selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+selected_chan=[8,10,11,13,14,15]
+# selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+Animal="0004_"
 
 freq_low = 300
 freq_high = 3000
 order = 2
 
-folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Example_Dataset/RBF/4713/raw/' #use /
+folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-20/raw/' #use /
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
@@ -39,7 +41,7 @@ for path, subdirs, files in os.walk(folderpath):
 
 for file in list_files:
     
-    if file.endswith('.rbf') and not "filtered" in file and not "concatenated" in file:
+    if file.endswith('.rbf') and not "filtered" in file and not "concatenated" in file and Animal in file:
         name = file.split('\\')[-1].split('/')[-1].split('.rbf')[0]
         path = file.split('\\')[0].split('raw')[0]
         
@@ -82,14 +84,14 @@ for file in list_files:
         file_save=rf'{save_path}/{name}_filtered.rbf'
         with open(file_save, mode='wb') as file : 
 
-                filtered_signals.tofile(file,sep='')                    
+                filtered_signals.transpose().tofile(file,sep='')                    
             
                 print ('Filter DONE')
         
         file_save=rf'{save_path}/{name}_cmr.rbf'
         with open(file_save, mode='wb') as file : 
 
-                cmr_signals.tofile(file,sep='')                    
+                cmr_signals.transpose().tofile(file,sep='')                    
             
                 print ('CMR DONE')
         

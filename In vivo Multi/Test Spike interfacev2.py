@@ -24,13 +24,13 @@ import probeinterface as pi
 """Setup"""
 
 
-Experience_identifier='4714'
+Experience_identifier='0004'
 
 #Probe path json file : modify this file to exclude channels
 probe_path=r'D:/Working_Dir/Ephy/CM16_Buz_Sparse.prb'
 
 # Working folder path
-working_dir=fr'D:\Working_Dir\Ephy\\Anesthesie\TDC\{Experience_identifier}'
+working_dir=fr'D:\Working_Dir\Ephy\\cohorte1\TDC\{Experience_identifier}'
 
 
 
@@ -41,7 +41,7 @@ sampling_frequency = 20000
 gain_to_uV = 0
 offset_to_uV = 0
 dtype = "float64"
-time_axis = 0
+time_axis = 1
 
 
 #Filtering parameters
@@ -56,7 +56,7 @@ freq_max = 4000
 #Multiple file path
 
 recordings = [  
-    "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Anesthesie/RBF/4713/raw/4713_surgery_0018_20000Hz.rbf"
+    # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Anesthesie/RBF/4713/raw/4713_surgery_0018_20000Hz.rbf"
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/06_03_0011_20000Hz.rbf",
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/06_03_0001_20000Hz.rbf",
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/06_03_0002_20000Hz.rbf",
@@ -99,6 +99,13 @@ recordings = [
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/08_03_0006_20000Hz.rbf",
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/08_03_0007_20000Hz.rbf",
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/08_03_0008_20000Hz.rbf"
+
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0008_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0004_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0005_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0006_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0007_20000Hz.rbf"
+
 ]
 
 

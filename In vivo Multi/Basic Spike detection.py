@@ -16,7 +16,8 @@ PARAMETERS
 """
 sampling_rate = 20000
 # selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-selected_chan=[7,8,10,12,14,15]
+selected_chan=[8,10,11,13,14,15]
+# selected_chan=[11,13,15]
 
 #Filtering parameters
 freq_low = 300
@@ -28,8 +29,10 @@ std_threshold = 5 #Times the std
 noise_window = 5 #window for the noise calculation in sec
 distance = 50 # distance between 2 spikes
 
+#waveform window
+waveform_window=5 #ms
 
-filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/22-09/raw/0001_surgery_0003_20000Hz.rbf'
+filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0008_20000Hz.rbf'
 
 
 Plot = True
@@ -45,7 +48,7 @@ def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_
     return filtered_signal
 
 
-def extract_spike_waveform(signal, spike_idx, left_width=25, right_width=25):
+def extract_spike_waveform(signal, spike_idx, left_width=(waveform_window/1000)*20000/2, right_width=(waveform_window/1000)*20000/2):
     
     '''
     Function to extract spikes waveforms in spike2 recordings
@@ -119,7 +122,7 @@ for signal in cmr_signals:
     
     
     #Detect the spike indexes
-    spike_idx, _ = sp.find_peaks(signal,height=threshold,distance=distance)
+    spike_idx, _ = sp.find_peaks(-signal,height=threshold,distance=distance)
     #Convert to spike times
     spike_times = spike_idx*1./sampling_rate
     #Get spikes peak 
@@ -218,7 +221,7 @@ if Plot == True:
     for i in range(len(selected_chan)):
         std = np.std(cmr_signals[i], axis=0)
         
-        # axs[i].axhline(thresholds[i],color='red')
+        axs[i].axhline(-thresholds[i],color='red')
         
         axs[i].plot(time_vector,cmr_signals[i,:])
         axs[i].get_yaxis().set_visible(False)
@@ -238,8 +241,9 @@ if Plot == True:
     for index,i in np.ndenumerate(waveforms):
         plt.figure()
         plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
+        time_axis=np.array(range(int(-(waveform_window/1000)*20000/2),int(waveform_window/1000*20000/2)))/20000*1000
         for j in i:
-            plt.plot(j*1000)
+            plt.plot(time_axis,j*1000)
         plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
 
 

@@ -1,40 +1,53 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb  3 16:19:38 2022
+Created on Fri Oct 21 15:28:47 2022
 
-@author: MOCAP
+@author: Gilles.DELBECQ
 """
-
 
 import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-
 '''
 Parameters
 '''
 sampling_rate = 20000
+sampling_rate_stim = 52.465
 
-# path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
 
-folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\10-20/' #use / at the end
-Animal='0004'
+signal_file = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-20/preprocessed/0004_06_01_0007_20000Hz_cmr.rbf' #use / at the end
+number_of_channel=6
+
+stim_idx_file=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/stim_idx/10-20/0004_06_01_0007.txt'
 
 Save=True
-plot_format='png'
-
-Preprocessed=True
-Indivdual_plots=False
-
-Autoclose=False
 
 
+signal=np.fromfile(signal_file)
+signal=signal.reshape(int(len(signal)/number_of_channel),-1).transpose()
+
+stim_indexes=np.loadtxt(stim_idx_file)
+stim_times=stim_indexes/sampling_rate_stim/sampling_rate
+
+time_vector = np.arange(0,len(data[0])/sampling_rate,1/sampling_rate)
+
+plt.plot(time_vector,signal[2])
+for i in stim_times:
+    plt.axvline(i)
+
+for i in range(len(stim_times)):
+    if i != 0:
+        print(stim_times[i]-stim_times[i-1])
+
+data_cmr=data_cmr.reshape(int(len(raw_file)/16),-1).transpose()
 
 """
 Setups
 """
 raw_path=rf'{folderpath}/raw/'
+stim_idx_path=rf'{folderpath}/raw/'
+
 files_to_analyse=[]
 
 for file_name in os.listdir(raw_path):
@@ -55,7 +68,11 @@ for file_to_analyze in files_to_analyse:
     
     name_file=file_to_analyze.split('/')[-1].split('.')[0]
     
+    stim_idx_file=
+    
     print(name_file)
+    
+    
     
     data = raw_file.reshape(int(len(raw_file)/16),-1).transpose()
         
