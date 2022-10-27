@@ -32,7 +32,7 @@ distance = 50 # distance between 2 spikes
 #waveform window
 waveform_window=5 #ms
 
-filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0008_20000Hz.rbf'
+filepath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0011_20000Hz.rbf'
 
 
 Plot = True

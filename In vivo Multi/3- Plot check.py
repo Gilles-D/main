@@ -18,8 +18,8 @@ sampling_rate = 20000
 
 # path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
 
-folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\10-20/' #use / at the end
-Animal='0004'
+folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\RBF\10-21/' #use / at the end
+Animal='06'
 
 Save=True
 plot_format='png'
