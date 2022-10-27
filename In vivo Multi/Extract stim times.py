@@ -11,7 +11,7 @@ import numpy as np
 import scipy.signal as sp
 import os
 
-experiments_to_analyse=['10-19']
+experiments_to_analyse=['10-24']
 
 
 
