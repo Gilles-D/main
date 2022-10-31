@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 import probeinterface as pi
+from probeinterface.plotting import plot_probe
 
 # %matplotlib notebook
 
@@ -27,7 +28,7 @@ import probeinterface as pi
 Experience_identifier='0004'
 
 #Probe path json file : modify this file to exclude channels
-probe_path=r'D:/Working_Dir/Ephy/CM16_Buz_Sparse.prb'
+probe_path=r'D:/Working_Dir/Ephy/CM16_Buz_Sparse.json'
 
 # Working folder path
 working_dir=fr'D:\Working_Dir\Ephy\\cohorte1\TDC\{Experience_identifier}'
@@ -100,11 +101,17 @@ recordings = [
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/08_03_0007_20000Hz.rbf",
 # "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/14-09/raw/08_03_0008_20000Hz.rbf"
 
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0008_20000Hz.rbf",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0004_20000Hz.rbf",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0005_20000Hz.rbf",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0006_20000Hz.rbf",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0007_20000Hz.rbf"
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0008_20000Hz.rbf",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0004_20000Hz.rbf",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0005_20000Hz.rbf",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0006_20000Hz.rbf",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-19/raw/0004_05_0007_20000Hz.rbf"
+
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0007_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0008_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0009_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0010_20000Hz.rbf",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0011_20000Hz.rbf"
 
 ]
 
@@ -155,7 +162,7 @@ probe = pi.io.read_probeinterface(probe_path)
 probe = probe.probes[0]
 recording = recording.set_probe(probe)
 
-
+plot_probe(probe)
 
 
 
@@ -167,21 +174,21 @@ sw.plot_timeseries(recording, channel_ids=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 #3 7 11 15 are defective
 
 #Exclude defective sites
-# recording.set_channel_groups(1, [0,2,3,6,7,8,9,11,12,13,14,15])
-# recording = recording.split_by('group')[1]
-# w = sw.plot_timeseries(recording,time_range=[0,30])
+recording.set_channel_groups(1, [8,10,11,13,14,15])
+recording = recording.split_by('group')[1]
+w = sw.plot_timeseries(recording,time_range=[0,150],segment_index=0)
 
 
 
 """Pre Processing"""
 #Bandpass filter
 recording_f = st.bandpass_filter(recording, freq_min=freq_min, freq_max=freq_max)
-w = sw.plot_timeseries(recording_f,time_range=[0,30], segment_index=0)
+w = sw.plot_timeseries(recording_f,time_range=[0,150], segment_index=0)
 
 
 #Median common ref
 recording_cmr = st.common_reference(recording_f, reference='global', operator='median')
-w = sw.plot_timeseries(recording_cmr,time_range=[0,30], segment_index=0)
+w = sw.plot_timeseries(recording_cmr,time_range=[0,150], segment_index=0)
 
 
 

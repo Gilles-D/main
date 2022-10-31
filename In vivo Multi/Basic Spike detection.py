@@ -243,7 +243,7 @@ if Plot == True:
         plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
         time_axis=np.array(range(int(-(waveform_window/1000)*20000/2),int(waveform_window/1000*20000/2)))/20000*1000
         for j in i:
-            plt.plot(time_axis,j*1000)
+            plt.plot(j*1000)
         plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
 
 
