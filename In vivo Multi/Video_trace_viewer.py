@@ -36,7 +36,7 @@ array=np.stack((time_vector,data_cmr_chan3),axis=0).transpose()
 fancy_data =tuple([tuple(row) for row in array])
 """
 
-path_cmr=r"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/Files/RBF/10-24/preprocessed/0004_07_0008_20000Hz_cmr.rbf"
+path_cmr=r"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/Files/RBF/10-19/preprocessed/0004_05_0004_20000Hz_cmr.rbf"
 data_cmr=np.fromfile(path_cmr)*1000
 data_cmr=data_cmr.reshape(int(len(data_cmr)/6),-1).transpose()
 
@@ -74,7 +74,7 @@ def main():
 
     line, = ax.plot([], [], color='blue')
 
-    attach_video_player_to_figure(fig, "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/Files/video/10-24/04_07_0008.avi", on_frame, line=line)
+    attach_video_player_to_figure(fig, "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/Files/video/10-19/0004_05_0004.avi", on_frame, line=line)
 
     plt.show()
 
