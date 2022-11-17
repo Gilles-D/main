@@ -16,15 +16,16 @@ PARAMETERS
 
 sampling_rate = 20000
 
-selected_chan=[8,10,11,13,14,15]
+# selected_chan=[8,10,11,13,14,15]
+selected_chan=[5,8,9,11,12,13,14,15]
 # selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-Animal="06"
+Animal="4713"
 
 freq_low = 300
 freq_high = 3000
 order = 2
 
-folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-21/raw/' #use /
+folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Anesthesie/RBF/4713/raw/' #use /
 
 
 def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
