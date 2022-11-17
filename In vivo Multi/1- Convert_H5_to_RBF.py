@@ -19,7 +19,7 @@ import os
 """
 Parameters
 """
-experience_list=['10-24']
+experience_list=['10-28']
 folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1/' #Folder containing H5 folder, with a subdirectory for each experience (day)
 
 

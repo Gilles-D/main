@@ -35,7 +35,6 @@ working_dir=fr'D:\Working_Dir\Ephy\\cohorte1\TDC\{Experience_identifier}'
 
 
 
-
 # parameters to load the bin/dat format
 num_channels = 16
 sampling_frequency = 20000
@@ -112,6 +111,8 @@ recordings = [
 "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0009_20000Hz.rbf",
 "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0010_20000Hz.rbf",
 "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/RBF/10-24/raw/0004_07_0011_20000Hz.rbf"
+
+
 
 ]
 
