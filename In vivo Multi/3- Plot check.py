@@ -2,7 +2,13 @@
 """
 Created on Thu Feb  3 16:19:38 2022
 
-@author: MOCAP
+Plot rbf files (raw and cmr) to check signals
+Based on folder organisation :
+    {folderpath}/raw/file.rbf'
+    {folderpath}/preprocessed/file_filtered.rbf
+    {folderpath}/preprocessed/file_cmr.rbf
+
+@author: Gilles-D
 """
 
 
@@ -14,12 +20,11 @@ import os
 '''
 Parameters
 '''
+#Recording parameters
 sampling_rate = 20000
-
-# path = r'D:/Working_Dir/In vivo Mars 2022/RBF/06-15/raw/2209_04_0006_20000Hz.rbf'
-
+Animal="4713"
 folderpath = r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Anesthesie\RBF\4713/' #use / at the end
-Animal='4713'
+
 
 Save=False
 plot_format='png'
@@ -37,28 +42,33 @@ Setups
 raw_path=rf'{folderpath}/raw/'
 files_to_analyse=[]
 
+#List files to analyse
 for file_name in os.listdir(raw_path):
     if file_name.endswith('.rbf') and Animal in file_name and not "filtered" in file_name and not "concatenated" in file_name:
         files_to_analyse.append(rf'{raw_path}/{file_name}')
 
+#Create plot folder for the experience if it is not already done
 if Save ==True:
     plot_save = rf"{folderpath}/plots"
     isExist = os.path.exists(plot_save)
     if not isExist:
-        os.makedirs(plot_save) #Create folder for the experience if it is not already done
+        os.makedirs(plot_save) 
 
 
-
+"""
+Main script
+"""
+#Loop on files
 for file_to_analyze in files_to_analyse:
     
     raw_file = np.fromfile(file_to_analyze)
-    
     name_file=file_to_analyze.split('/')[-1].split('.')[0]
-    
     print(name_file)
     
+    #Load raw signal
     data = raw_file.reshape(int(len(raw_file)/16),-1).transpose()
-        
+    
+    #Load preprocessed signals (filtered + cmr)
     if Preprocessed == True:
         preprocessed_path=rf"{file_to_analyze.split('raw')[0]}/preprocessed"
         path_filter = rf"{preprocessed_path}/{name_file}_filtered.rbf"
