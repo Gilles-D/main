@@ -13,17 +13,20 @@ import os
 '''
 Parameters
 '''
+#Recording parameters
 sampling_rate = 20000
-folderpath=r'D:\Working_Dir\In vivo Mars 2022\RBF\merged 2209'
 Animal='2209'
+#Session folder
+folderpath = r'D:\Working_Dir\Ephy\In vivo Mars 2022\RBF\merged 2209'
+
+
 Channels_to_plot=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
-Save=True
+Save_plot=True
 Raw=True
 Preprocessed=True
 
 
 files_to_analyse, record_lengths=[],[]
-
 list_dir = os.listdir(folderpath)
 
 
@@ -41,8 +44,10 @@ if Raw == True:
     
     for index,file in np.ndenumerate(files_to_analyse):
         data = np.fromfile(file).reshape(16,-1)
+        #Append the lenght of the file to compute the concatenated time vector
         record_lengths.append(data.shape[1])
         
+        #Concatenate signals to previous signals, except if it is the first one
         if index[0] == 0:
             big_data = data
         else:
@@ -73,20 +78,19 @@ if Raw == True:
             """
             Save plot
             """  
-    if Save==True:
-        save_path=rf'{folderpath}\concatenated/'
-        isExist = os.path.exists(save_path)
-        if not isExist:
-            os.makedirs(save_path) #Create folder for the experience if it is not already done
-            
-            
-        fig.savefig(rf'{save_path}\{Animal}_concatenated_raw.png')
-        file_save = rf'{save_path}\{Animal}_concatenated_raw.rbf'
     
-        with open(file_save, mode='wb') as file : 
-                big_data.tofile(file,sep='')     
-    
+    save_path=rf'{folderpath}\concatenated/'
+    isExist = os.path.exists(save_path)
+    if not isExist:
+        os.makedirs(save_path) #Create folder for the experience if it is not already done
+        
+    file_save = rf'{save_path}\{Animal}_concatenated_raw.rbf'
 
+    with open(file_save, mode='wb') as file : 
+            big_data.tofile(file,sep='')     
+    
+    if Save_plot==True:
+        fig.savefig(rf'{save_path}\{Animal}_concatenated_raw.png')
 
 
 """
@@ -97,7 +101,7 @@ if Preprocessed==True:
     list_dir = os.listdir(preprocessed_path)
     files_to_analyse, record_lengths=[],[]
     for file in list_dir:
-        if file.endswith('.rbf') and Animal in file and "cmr" in file and not "concatenated" in file:
+        if file.endswith('.rbf') and Animal in file and 'cmr' in file:
             files_to_analyse.append(rf'{preprocessed_path}/{file}')
     
     
@@ -135,16 +139,16 @@ if Preprocessed==True:
             """
             Save plot
             """  
-    if Save==True:
-        save_path=rf'{folderpath}\concatenated/'
-        isExist = os.path.exists(save_path)
-        if not isExist:
-            os.makedirs(save_path) #Create folder for the experience if it is not already done
-            
-        fig.savefig(rf'{save_path}\{Animal}_concatenated_preprocessed.png')
-        file_save = rf'{save_path}\{Animal}_concatenated_preprocessed.rbf'
     
-        with open(file_save, mode='wb') as file : 
-                big_data.tofile(file,sep='')                    
-    
+    save_path=rf'{folderpath}\concatenated/'
+    isExist = os.path.exists(save_path)
+    if not isExist:
+        os.makedirs(save_path) #Create folder for the experience if it is not already done
         
+    file_save = rf'{save_path}\{Animal}_concatenated_preprocessed.rbf'
+
+    with open(file_save, mode='wb') as file : 
+            big_data.tofile(file,sep='')                    
+    
+    if Save_plot==True:
+        fig.savefig(rf'{save_path}\{Animal}_concatenated_preprocessed.png')
