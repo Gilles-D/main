@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import os, re
 from scipy import stats
 import scipy.signal as sp
-
+import pandas as pd
 
 """
 PARAMETERS
@@ -28,10 +28,6 @@ order = 2
 
 folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/Analysis/PCA test/files/preprocessed/' #use / everywhere
 
-whole_cmr_signal=np.array([])
-
-
-
 # Noise parameters
 std_threshold = 5 #Times the std
 noise_window = 5 #window for the noise calculation in sec
@@ -40,11 +36,15 @@ distance = 50 # distance between 2 spikes
 #waveform window
 waveform_window=2 #ms
 
-
 Plot = True
 Plot_raw = True
 Waveforms = True
 
+
+
+
+
+whole_cmr_signal=np.array([])
 
 def extract_spike_waveform(signal, spike_idx, left_width=(waveform_window/1000)*20000/2, right_width=(waveform_window/1000)*20000/2):
     
@@ -86,14 +86,20 @@ for path, subdirs, files in os.walk(folderpath):
         list_files.append(os.path.join(path, name))
 
 for file in list_files:
+    #load signals
     data_cmr=np.fromfile(file)*1000
     data_cmr=data_cmr.reshape(int(len(data_cmr)/6),-1).transpose()
     
+    #select channel 3
     data_cmr_chan3=data_cmr[3]
     
+    #append channel 3 signal
     whole_cmr_signal = np.concatenate((whole_cmr_signal,data_cmr_chan3))
 
+#Time vector on the whole appended signals
 time_vector = np.arange(0,len(whole_cmr_signal)/sampling_rate,1/sampling_rate)
+
+
 
 #Detect the spike indexes
 spike_idx, _ = sp.find_peaks(-whole_cmr_signal,height=threshold(whole_cmr_signal),distance=distance)
@@ -102,25 +108,28 @@ spike_times = spike_idx*1./sampling_rate
 #Get spikes peak 
 spike_y = whole_cmr_signal[spike_idx]
 
-
 #get waveforms
 wfs = extract_spike_waveform(whole_cmr_signal,spike_idx)
 
-#get width
+#get width and half-width
 spike_width=sp.peak_widths(-whole_cmr_signal, spike_idx, rel_height=1)
 spike_halfwidth = sp.peak_widths(-whole_cmr_signal, spike_idx, rel_height=0.5)
-
+#setup the parameters in an array
 parameters = np.column_stack((spike_width[0],spike_width[1],spike_halfwidth[0],spike_halfwidth[1]))
 
 
+#Save arrays as excel files
+waveforms_df = pd.DataFrame(wfs)
+parameters_df = pd.DataFrame(parameters)
 
-import pandas as pd
-test = pd.DataFrame(parameters)
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms.xlsx") as writer:
+    waveforms_df.to_excel(writer)
+    
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\parameters.xlsx") as writer:
+    parameters_df.to_excel(writer)    
 
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\test.xlsx") as writer:
-    test.to_excel(writer)
-    
-    
+
+"""    
 
 fig, axs = plt.subplots(1)
 
@@ -143,3 +152,4 @@ histo = np.histogram(spike_times)
 cumulative_histo_counts = histo[0].cumsum()
 bin_size = histo[1][1]-histo[1][0]
 plt.bar(histo[1][:-1], cumulative_histo_counts, width=bin_size)
+"""
