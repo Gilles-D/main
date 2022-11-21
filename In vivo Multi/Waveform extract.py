@@ -44,7 +44,7 @@ Waveforms = True
 
 
 
-whole_cmr_signal=np.array([])
+whole_cmr_signal3,whole_cmr_signal2=np.array([]),np.array([])
 
 def extract_spike_waveform(signal, spike_idx, left_width=(waveform_window/1000)*20000/2, right_width=(waveform_window/1000)*20000/2):
     
@@ -87,33 +87,38 @@ for path, subdirs, files in os.walk(folderpath):
 
 for file in list_files:
     #load signals
-    data_cmr=np.fromfile(file)*1000
+    data_cmr=np.fromfile(file)*1000 #in mV
     data_cmr=data_cmr.reshape(int(len(data_cmr)/6),-1).transpose()
     
     #select channel 3
     data_cmr_chan3=data_cmr[3]
     
+    data_cmr_chan2=data_cmr[2]
+    
     #append channel 3 signal
-    whole_cmr_signal = np.concatenate((whole_cmr_signal,data_cmr_chan3))
+    whole_cmr_signal3 = np.concatenate((whole_cmr_signal3,data_cmr_chan3))
+    whole_cmr_signal2 = np.concatenate((whole_cmr_signal2,data_cmr_chan2))
 
 #Time vector on the whole appended signals
-time_vector = np.arange(0,len(whole_cmr_signal)/sampling_rate,1/sampling_rate)
+time_vector = np.arange(0,len(whole_cmr_signal3)/sampling_rate,1/sampling_rate)#in seconds
 
 
 
 #Detect the spike indexes
-spike_idx, _ = sp.find_peaks(-whole_cmr_signal,height=threshold(whole_cmr_signal),distance=distance)
+spike_idx, _ = sp.find_peaks(-whole_cmr_signal3,height=threshold(whole_cmr_signal3),distance=distance)
 #Convert to spike times
-spike_times = spike_idx*1./sampling_rate
+spike_times = spike_idx*1./sampling_rate#in seconds
 #Get spikes peak 
-spike_y = whole_cmr_signal[spike_idx]
+spike_y = whole_cmr_signal3[spike_idx]
 
 #get waveforms
-wfs = extract_spike_waveform(whole_cmr_signal,spike_idx)
+wfs = extract_spike_waveform(whole_cmr_signal3,spike_idx)
+
+wfs_2 = extract_spike_waveform(whole_cmr_signal2,spike_idx)
 
 #get width and half-width
-spike_width=sp.peak_widths(-whole_cmr_signal, spike_idx, rel_height=1)
-spike_halfwidth = sp.peak_widths(-whole_cmr_signal, spike_idx, rel_height=0.5)
+spike_width=sp.peak_widths(-whole_cmr_signal3, spike_idx, rel_height=1)
+spike_halfwidth = sp.peak_widths(-whole_cmr_signal3, spike_idx, rel_height=0.5)
 #setup the parameters in an array
 parameters = np.column_stack((spike_width[0],spike_width[1],spike_halfwidth[0],spike_halfwidth[1]))
 
@@ -121,12 +126,32 @@ parameters = np.column_stack((spike_width[0],spike_width[1],spike_halfwidth[0],s
 #Save arrays as excel files
 waveforms_df = pd.DataFrame(wfs)
 parameters_df = pd.DataFrame(parameters)
+spike_times_df= pd.DataFrame(spike_times)
 
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms.xlsx") as writer:
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_1.xlsx") as writer:
     waveforms_df.to_excel(writer)
     
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\parameters.xlsx") as writer:
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\parameters_1.xlsx") as writer:
     parameters_df.to_excel(writer)    
+
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\spike_times_1.xlsx") as writer:
+    spike_times_df.to_excel(writer)   
+
+
+
+
+waveforms2_df = pd.DataFrame(wfs_2)
+
+
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_2.xlsx") as writer:
+    waveforms_df.to_excel(writer)
+
+
+
+wfs_all = np.column_stack((wfs,wfs_2))
+wfs_all_df = pd.DataFrame(wfs_all)
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_all.xlsx") as writer:
+    wfs_all_df.to_excel(writer)
 
 
 """    
@@ -134,8 +159,8 @@ with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis
 fig, axs = plt.subplots(1)
 
 # std = np.std(cmr_signals[i], axis=0)
-plt.axhline(-threshold(whole_cmr_signal),color='red')
-plt.plot(time_vector,whole_cmr_signal)
+plt.axhline(-threshold(whole_cmr_signal3),color='red')
+plt.plot(time_vector,whole_cmr_signal3)
         # spikes = spikes_list[i]
         # spikes_y = spikes_list_y[i]
 plt.scatter(spike_times,spike_y,label='spike detected',color='orange')
