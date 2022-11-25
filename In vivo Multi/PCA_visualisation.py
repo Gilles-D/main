@@ -43,7 +43,8 @@ for cluster in clusters_idx:
     plt.figure()
     plt.title(cluster)
     for wvf in cluster_data:
-        plt.plot(time_vector,wvf)
+        plt.plot(time_vector,wvf,alpha=0.3)
+    plt.plot(time_vector,np.median(cluster_data, axis=0))
     
     mean_wvf.append(np.median(cluster_data, axis=0))
 
