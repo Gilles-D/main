@@ -92,11 +92,12 @@ for file in list_files:
     
     #select channel 3
     data_cmr_chan3=data_cmr[3]
-    
+    #select channel 0
     data_cmr_chan2=data_cmr[2]
     
     #append channel 3 signal
     whole_cmr_signal3 = np.concatenate((whole_cmr_signal3,data_cmr_chan3))
+    #append channel 2 signal
     whole_cmr_signal2 = np.concatenate((whole_cmr_signal2,data_cmr_chan2))
 
 #Time vector on the whole appended signals
@@ -128,13 +129,13 @@ waveforms_df = pd.DataFrame(wfs)
 parameters_df = pd.DataFrame(parameters)
 spike_times_df= pd.DataFrame(spike_times)
 
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_1.xlsx") as writer:
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_chan3.xlsx") as writer:
     waveforms_df.to_excel(writer)
     
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\parameters_1.xlsx") as writer:
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\parameters_chan3.xlsx") as writer:
     parameters_df.to_excel(writer)    
 
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\spike_times_1.xlsx") as writer:
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\spike_times.xlsx") as writer:
     spike_times_df.to_excel(writer)   
 
 
@@ -143,7 +144,7 @@ with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis
 waveforms2_df = pd.DataFrame(wfs_2)
 
 
-with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_2.xlsx") as writer:
+with pd.ExcelWriter(r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Cohorte 1\Analysis\PCA test\waveforms_chan2.xlsx") as writer:
     waveforms_df.to_excel(writer)
 
 
