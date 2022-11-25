@@ -20,12 +20,12 @@ PARAMETERS
 
 #Recording parameters
 sampling_rate = 20000
-Animal="4713"
-folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Anesthesie/RBF/4713/raw/' #use /
+Animal="0006"
+folderpath = r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Cohorte 1/Files/RBF/11-25/' #use /
 
 #Selected channels : allow to exclude failing channels
-# selected_chan=[8,10,11,13,14,15]
-selected_chan=[5,8,9,11,12,13,14,15]
+selected_chan=[8,10,11,13,14,15]
+# selected_chan=[5,8,9,11,12,13,14,15]
 # selected_chan=[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
 
 #Filtering parameters
@@ -55,6 +55,12 @@ def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_
     filtered_signal = scipy.signal.sosfiltfilt(sos_coeff, signal, axis=axis)
     return filtered_signal
 
+#def notch_filter(signal, order=8, sample_rate=20000, freq_low=48, freq_high=52, axis=0):
+#    Wn = [freq_low / (sample_rate / 2), freq_high / (sample_rate / 2)]
+#    notch_coeff = signal.iirfilter(order, Wn, btype="bandstop", ftype="butter", output="sos")
+#    notch_signal = signal.sosfiltfilt(notch_coeff, signal, axis=axis)
+#
+#    return notch_signal
 
 """
 MAIN SCRIPT
