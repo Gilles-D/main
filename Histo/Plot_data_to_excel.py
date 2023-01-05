@@ -19,7 +19,7 @@ for path, subdirs, files in os.walk(folderpath):
         
 all_data=pd.DataFrame()
 
-start=1.92
+start=1.92 # Medio-lat position of 01 slice in cm
 
 #Loop on files
 i=0
