@@ -5,7 +5,7 @@ for (i=0;i<nImages;i++) {
 	title = getTitle;
 	print(title);
     selectImage(i+1);
-    Stack.setChannel(1);
+    Stack.setChannel(2);
 
 	run("Clear Results");
 	profile = getProfile();

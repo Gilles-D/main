@@ -19,6 +19,8 @@ for (i=0;i<nImages;i++) {
       run("Arbitrarily...", "angle="+angle+" interpolate");
      Stack.setChannel(2);
      run("Arbitrarily...", "angle="+angle+" interpolate");
+     Stack.setChannel(3);
+     run("Arbitrarily...", "angle="+angle+" interpolate");
 } 
 
 print("Done")
