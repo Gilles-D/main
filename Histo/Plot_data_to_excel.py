@@ -8,8 +8,9 @@ Created on Tue Dec 20 18:47:13 2022
 
 import pandas as pd
 import os
+import numpy as np
 
-folderpath=r'\\equipe2-nas1\Gilles.DELBECQ\Data\Microscopie\Histo électrodes\Injections Chr2 retro\0001\plot_analysis'
+folderpath=r'\\equipe2-nas1\Gilles.DELBECQ\Data\Microscopie\6567\tiff'
 
 list_files=[]
 for path, subdirs, files in os.walk(folderpath):
@@ -19,7 +20,9 @@ for path, subdirs, files in os.walk(folderpath):
         
 all_data=pd.DataFrame()
 
-start=1.92 # Medio-lat position of 01 slice in cm
+start=-0.24 # Medio-lat position of 01 slice in cm
+microscope_10x_scale=0.65 #µm/px
+
 
 #Loop on files
 i=0
@@ -31,4 +34,7 @@ for file in list_files:
         i=i+1
         all_data[x]=csv_file.iloc[:,[1]]
     
+scaled = (np.array(range(len(all_data)))*microscope_10x_scale).tolist()
+all_data['new_index']=scaled
+all_data=all_data.set_index('new_index')
 all_data.to_excel(rf"{folderpath}/data.xlsx")
