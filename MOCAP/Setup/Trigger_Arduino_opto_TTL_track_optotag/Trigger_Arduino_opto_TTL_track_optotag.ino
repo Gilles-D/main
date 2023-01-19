@@ -56,12 +56,14 @@
 //////////////////////////////////////////////////////////////////////////////////////////
 
 void Triggered(){
-  // The beam is triggered : Turn on opto      20Hz - 20ms pulse
-  for (int i = 0; i <= 100; i++) {
+  // The beam is triggered : Turn on opto
+  for (int i = 0; i <= 500; i++) {
     digitalWrite(TTL_OPTO, HIGH);
-    delay(20);
+  
+    delay(5);
     digitalWrite(TTL_OPTO, LOW);
-    delay(30);
+
+    delay(15);
     Serial.println(i);
   }
 }
@@ -80,7 +82,9 @@ void Triggered(){
       // if it is, the sensorState is LOW:
       if (sensorState == LOW) {
         Serial.println("Broken");
+        digitalWrite(TTL_AMP, HIGH);
         Triggered();
+        digitalWrite(TTL_AMP, LOW);
         delay(2000);
       } 
 
