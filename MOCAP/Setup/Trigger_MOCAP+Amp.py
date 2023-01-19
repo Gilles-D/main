@@ -30,24 +30,22 @@ while 1:
     test.append(arduinoData)
     if str(arduinoData) == 'Start\r\n':
         print("Start Recording")
-        pyautogui.click(2387, 691) #Click start Vicon
+        pyautogui.click(1900, 971) #Click start MOCAP
         Timestamps.append(datetime.fromtimestamp(time.time()))
 
 
     if str(arduinoData) == 'Stop\r\n':
         print("Stop Recording")
-        pyautogui.click(2387, 691) #Click stop Vicon
-        # pyautogui.click(1888, -111)
-        # time.sleep(0.1)#Sleep  
-        # pyautogui.click(1888, -111) #Click stop AMP
-        # time.sleep(0.5)#Sleep    
-        # pyautogui.click(1888, -111) #Click reset AMP
+        pyautogui.click(1900, 971) #Click stop IC capture
+        pyautogui.click(96, 41) #Click stop AMP
+        time.sleep(1.5)#Sleep    
+        pyautogui.click(96, 41) #Click reset AMP
 
     
     elif arduinoData == "Broken\r\n":
         print("Broken. Start Stimulating")
-        pyautogui.click(1475, 118) #Click record on WinWCP
-        time.sleep(3)#Sleep for 60 sec
+        # pyautogui.click(1475, 118) #Click record on WinWCP
+        # time.sleep(3)#Sleep for 60 sec
 
 
 """
