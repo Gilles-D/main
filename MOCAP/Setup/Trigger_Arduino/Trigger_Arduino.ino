@@ -57,7 +57,7 @@
 
 void Triggered(){
   // The beam is triggered : Turn on opto      20Hz - 20ms pulse
-  for (int i = 0; i <= 100; i++) {
+  for (int i = 0; i <= 50; i++) {
     digitalWrite(TTL_OPTO, HIGH);
     delay(20);
     digitalWrite(TTL_OPTO, LOW);
