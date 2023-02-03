@@ -29,6 +29,11 @@ v8 30/01/2023
 """
 
 def Check_Save_Dir(save_path):
+    """
+    Check if the save folder exists
+    If not : creates it
+    
+    """
     import os
     isExist = os.path.exists(save_path)
     if not isExist:
@@ -48,6 +53,9 @@ class MOCAP_file:
     def get_marker_list(self):
         '''
         Gets marker list from MOCAP file 
+        
+        Returns :
+            List of markers
         '''
 
         #Get markers list
@@ -60,15 +68,27 @@ class MOCAP_file:
         return markers
 
     def subject(self):
+        """
+        Returns the subject ID from the filepath
+        """
         return str(self.filepath.split('\\')[-1].split('_')[0])
     
     def session_idx(self):
+        """
+        Returns the session ID from the filepath
+        """
         return self.filepath.split('\\')[-1].split('_')[1]
         
     def trial_idx(self):
+        """
+        Returns the trial ID from the filepath
+        """
         return self.filepath.split('\\')[-1].split('_')[2].split('.')[0]     
 
     def whole_idx(self):
+        """
+        Returns the subject, session, trial IDs from the filepath
+        """
         return self.subject(),self.session_idx(),self.trial_idx()
 
     def new_file_index(self):
@@ -92,7 +112,6 @@ class MOCAP_file:
         return new_file_index
     
     def dataframe(self,header=4):
-        
         '''
         Returns on optimzed dataframe based on architecture of the raw file
         '''
@@ -215,7 +234,12 @@ class MOCAP_file:
         return angle
 
     def speed(self,marker):
+        """
+        Calculate the speed of a marker
         
+        Returns:
+            A list of the speed at each frame
+        """
         
         pos=self.coord(marker)
         speed=[]
@@ -231,8 +255,6 @@ class MOCAP_file:
     
     def flatten(self,marker):
         """
-        
-
         Parameters
         ----------
         marker : TYPE
@@ -314,11 +336,25 @@ class Flat_CSV:
         self.frequency=100 #Hz
 
     def dataframe(self):
+        """
+        Returns
+        -------
+        Dataframe
+
+        """
+        
         return self.df_flat
     
       
 
     def coord(self,marker):
+        """
+        Get coord of a marker
+        
+        Returns
+        3 arrays (x, y, z)
+        
+        """
         x=self.dataframe().filter(like=f'{marker}_X').iloc[:, 0]
         y=self.dataframe().filter(like=f'{marker}_Y').iloc[:, 0]
         z=self.dataframe().filter(like=f'{marker}_Z').iloc[:, 0]
