@@ -31,10 +31,10 @@ sys.path.append(r'D:\Gilles.DELBECQ\GitHub\main\MOCAP\Analysis')
 import MOCAP_analysis_class as MA
 
 #Directory location of raw csvs
-root_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/Raw_CSV_no_completion'
+root_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
 
 #Directory location to save flattened csv
-save_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/Raw_CSV_flat'
+save_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
 
 
 # #Location of the data_info file
