@@ -1,0 +1,30 @@
+// Chemin d'accès du dossier contenant les images
+path = "chemin/vers/dossier/";
+
+// Obtenir la liste des noms de fichiers dans le dossier
+list = getFileList(path);
+
+// Boucle à travers chaque fichier dans la liste
+for (i = 0; i < list.length; i++) {
+    // Vérifier que le fichier est une image
+    if (endsWith(list[i], ".tif") || endsWith(list[i], ".jpg") || endsWith(list[i], ".jpeg") || endsWith(list[i], ".bmp") || endsWith(list[i], ".png")) {
+        // Ouvrir l'image
+        open(path + list[i]);
+        
+        // Séparer les canaux
+        run("Split Channels");
+        
+        // Récupérer le nom de fichier sans l'extension
+        name = substring(list[i], 0, indexOf(list[i], "."));
+        
+        // Enregistrer les canaux séparément en tant que PNG avec un suffixe
+        saveAs("PNG", path + name + "_canal1.png");
+        selectWindow("C2-" + name);
+        saveAs("PNG", path + name + "_canal2.png");
+        selectWindow("C3-" + name);
+        saveAs("PNG", path + name + "_canal3.png");
+        
+        // Fermer toutes les fenêtres d'image ouvertes
+        close("*");
+    }
+}
