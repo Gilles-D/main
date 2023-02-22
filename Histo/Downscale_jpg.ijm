@@ -1,5 +1,7 @@
 // Chemin d'accès du dossier contenant les images
-path = "D:/Margot_dataset/tdtomato/jpg/";
+path = "//equipe2-nas1/Gilles.DELBECQ/Data/Microscopie/6567/Tiff/";
+path_save="//equipe2-nas1/Gilles.DELBECQ/Data/Microscopie/6567/downscaled/";
+
 
 // Obtenir la liste des noms de fichiers dans le dossier
 list = getFileList(path);
@@ -15,9 +17,9 @@ for (i = 0; i < list.length; i++) {
         name = list[i];
 
         run("Scale...", "x=0.25 y=0.25 width=2100 height=1408 interpolation=Bilinear average create");
-        
+        wait(1000)
         name_save = substring(list[i], 0, indexOf(list[i], "."));
-		path_save="D:/Margot_dataset/tdtomato/jpg/downscaled/";
+		
         saveAs("JPG", path_save + name_save + ".jpg");
         
         // Fermer toutes les fenêtres d'image ouvertes
