@@ -71,21 +71,30 @@ for file in Files:
     #Load csv file
     data_MOCAP = MA.MOCAP_file(file)
     
-    #Use class function to flatten the coords for both feet using the 2 reference points on the platform
-    left_foot_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Left_Foot"))
-    right_foot_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Right_Foot"))
+    #Check if it is already flattened
+    save_path=rf"{save_dir}\{data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()}.csv"
+    if os.path.isfile(save_path) == False:
+        
+        
+        #Use class function to flatten the coords for both feet using the 2 reference points on the platform
+        left_foot_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Left_Foot"))
+        right_foot_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Right_Foot"))
+        
+        
+        #Saves it as a dataframe
+        data=np.concatenate((left_foot_flat,right_foot_flat),axis=1)
+        df = pd.DataFrame(data)
+        names=[f"{data_MOCAP.subject()}:Left_Foot_X",f"{data_MOCAP.subject()}:Left_Foot_Y",f"{data_MOCAP.subject()}:Left_Foot_Z",
+               f"{data_MOCAP.subject()}:Right_Foot_X",f"{data_MOCAP.subject()}:Right_Foot_Y",f"{data_MOCAP.subject()}:Right_Foot_Z"]
+        df.columns = names
+        
+        #Saves it in a csv
+        MA.Check_Save_Dir(save_dir)
+        df.to_csv(save_path) 
+        
+        print(f"{i}/{len(Files)}")
+        i=i+1
+        
     
-    
-    #Saves it as a dataframe
-    data=np.concatenate((left_foot_flat,right_foot_flat),axis=1)
-    df = pd.DataFrame(data)
-    names=[f"{data_MOCAP.subject()}:Left_Foot_X",f"{data_MOCAP.subject()}:Left_Foot_Y",f"{data_MOCAP.subject()}:Left_Foot_Z",
-           f"{data_MOCAP.subject()}:Right_Foot_X",f"{data_MOCAP.subject()}:Right_Foot_Y",f"{data_MOCAP.subject()}:Right_Foot_Z"]
-    df.columns = names
-    
-    #Saves it in a csv
-    MA.Check_Save_Dir(save_dir)
-    df.to_csv(rf"{save_dir}\{data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()}.csv") 
-    
-    print(f"{i}/{len(Files)}")
-    i=i+1
+    else:
+        print(rf"File {data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()} already exists")

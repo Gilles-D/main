@@ -278,11 +278,11 @@ class MOCAP_file:
         
         coef_dir = (stop_z-start_z)/(stop_x-start_x)
         
-        print(coef_dir)
-        if coef_dir >= 0:
-            print('+')
-        else:
-            print('-')
+        # print(coef_dir)
+        # if coef_dir >= 0:
+        #     print('+')
+        # else:
+        #     print('-')
         
         x = self.coord(marker)[1]
         y = self.coord(marker)[0]
@@ -374,3 +374,76 @@ class Flat_CSV:
             return peaks  
 
         return peaks(self.coord(marker)[0],self.coord(marker)[1],self.coord(marker)[2])
+    
+    def normalized(self, ref_marker, target_marker):
+        """
+        Calculate the normalized coordinates of target_marker with ref_marker as the reference
+        """
+        ref_x,ref_y,ref_z = self.coord(ref_marker)
+        target_x, target_y,target_z = self.coord(target_marker)
+        norm_x=target_x-ref_x
+        norm_y=target_y-ref_y
+        norm_z=target_z-ref_z
+        
+        return norm_x,norm_y,norm_z
+    
+    def get_marker_list(self):
+        '''
+        Gets marker list from MOCAP file 
+        
+        Returns :
+            List of markers
+        '''
+
+        #Get markers list
+        markers = [x.split(':')[-1] for x in self.df_raw.columns if 'Unnamed' not in x]
+                
+        #Assert all markers are string formated
+        for marker in markers : 
+            assert type(marker) == str, 'Markers are not strings'
+        
+        return markers
+
+    def subject(self):
+        """
+        Returns the subject ID from the filepath
+        """
+        return str(self.filepath.split('\\')[-1].split('_')[0])
+    
+    def session_idx(self):
+        """
+        Returns the session ID from the filepath
+        """
+        return self.filepath.split('\\')[-1].split('_')[1]
+        
+    def trial_idx(self):
+        """
+        Returns the trial ID from the filepath
+        """
+        return self.filepath.split('\\')[-1].split('_')[2].split('.')[0]     
+
+    def whole_idx(self):
+        """
+        Returns the subject, session, trial IDs from the filepath
+        """
+        return self.subject(),self.session_idx(),self.trial_idx()
+
+    def new_file_index(self):
+        '''
+        Creates new index for optimized dataframe, including "Marker1:X","Marker1:Y"...format
+        '''
+        
+        pre_format = ['Frame','SubFrame']
+        
+        positions = ['X','Y','Z']
+        
+        markers = [x for x in self.df_raw.columns if 'Unnamed' not in x]
+
+        marker_index = []
+        for marker in markers :
+            for position in positions : 
+                marker_index.append('{}:{}'.format(marker,position))
+ 
+        new_file_index = pre_format + marker_index
+                   
+        return new_file_index
