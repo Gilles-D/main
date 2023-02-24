@@ -3,7 +3,6 @@
 Created on Tue Mar 22 11:15:08 2022
 @author: Gilles.DELBECQ
 
-
 Uses MOCAP analysis class
 Plot left and right feet of raw csv
 """
@@ -25,8 +24,8 @@ import MOCAP_analysis_class as MA
 
 
 #Directories location
-root_dir='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
-flat_csv_path='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/Raw_CSV_flat'
+root_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
+flat_csv_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
 
 
 # #Location of the data_info file

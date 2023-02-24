@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Feb 22 16:29:05 2023
+Created on Fri Feb 24 13:43:09 2023
+
+Calculate the instaneous speed of a body part
+
+To do : tester de filtrer les données extraites
+
 
 @author: Gilles.DELBECQ
 """
+
 
 import os
 import sys
@@ -38,11 +44,10 @@ data_info_path = 'D:/Gilles.DELBECQ/GitHub/main/MOCAP/Data/Session_Data_Cohorte2
 data_info = MA.DATA_file(data_info_path)
 
 
-savefig_path=r'\\equipe2-nas1\Gilles.DELBECQ\Data\MOCAP\Cohorte 2\Figs\Normalized_trajectory/'
+savefig_path=r'\\equipe2-nas1\Gilles.DELBECQ\Data\MOCAP\Cohorte 2\Figs\Height_steps_med_gap_filled/'
 
-Save = False
+
 saving_extension="png"
-
 
 """
 ------------------------------FILE LOADING------------------------------
@@ -59,8 +64,6 @@ print('Files to analyze : {}'.format(len(Files)))
 i=1
 
 
-
-
 """
 ------------------------------MAIN LOOP------------------------------
 """
@@ -73,21 +76,14 @@ for file in Files:
     idx = data_MOCAP.whole_idx()
     
     #Get coords for each foot
-    left_foot=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Left_Hip", f"{data_MOCAP.subject()}:Left_Foot")
-    right_foot=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Right_Hip", f"{data_MOCAP.subject()}:Right_Foot")
+    left_foot=data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Foot")
+    right_foot=data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Foot")
     
+    test = data_MOCAP.speed(f"{data_MOCAP.subject()}:Back1")
+    plt.figure()
+    plt.plot(test)
+    plt.ylabel("speed in m/s")
+    plt.xlabel("frame")
     
-    #Plot trajectory of each foot
-    figure1 = plt.figure()
-    plt.title(f'Normalized Feet trajectory {data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()}')
-    plt.plot(-left_foot[1],left_foot[2],color='red',label='Left')
-    plt.plot(-right_foot[1],right_foot[2],color='blue',label='Right')
 
     
-    if Save == True:
-        MA.Check_Save_Dir(savefig_path)
-        plt.savefig(f"{savefig_path}/{idx[0]}_{idx[1]}_{idx[2]}.{saving_extension}")
-        plt.close('all')
-    
-    print(f"{i}/{len(Files)}")
-    i=i+1

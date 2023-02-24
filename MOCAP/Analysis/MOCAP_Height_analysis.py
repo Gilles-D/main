@@ -6,6 +6,9 @@ Created on Fri Jul 23 15:54:49 2021
 
 Height of stance analysis
 
+To do :
+    separer baseline trial et before
+
 
 """
 
@@ -34,17 +37,17 @@ import MOCAP_analysis_class as MA
 
 
 #Directories location
-root_dir='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/Raw_CSV_no_completion'
-flat_csv_path='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/Raw_CSV_flat'
+root_dir='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
+flat_csv_path='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
 
 
-data_info_path = '//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/Session_Data.xlsx'
+data_info_path = 'D:/Gilles.DELBECQ/GitHub/main/MOCAP/Data/Session_Data_Cohorte2.xlsx'
 data_info = MA.DATA_file(data_info_path)
 
 
 
 
-savefig_path=r'\\equipe2-nas1\Gilles.DELBECQ\Data\MOCAP\Cohorte 2\Figs\Height_steps_med/'
+savefig_path=r'\\equipe2-nas1\Gilles.DELBECQ\Data\MOCAP\Cohorte 2\Figs\Height_steps_med_gap_filled/'
 
 
 Save_Peak_Detection = True
@@ -185,8 +188,8 @@ for animal in animals:
                 med_left = stat.median(height_before_left)
                 
                 
-                Height_list_left.append([idx,height_before_left,height_after_left])
-                # Height_list_left.append([idx,height_before_left-med_left,height_after_left-med_left])
+                # Height_list_left.append([idx,height_before_left,height_after_left])
+                Height_list_left.append([idx,height_before_left-med_left,height_after_left-med_left])
                 
                 
                 #Right foot
@@ -213,8 +216,8 @@ for animal in animals:
                 #Find the median height for left and right steps to substract it later to each height before beam
                 med_right = stat.median(height_before_right)
                 
-                Height_list_right.append([idx,height_before_right,height_after_right])
-                #Height_list_right.append([idx,height_before_right-med_right,height_after_right-med_right])
+                # Height_list_right.append([idx,height_before_right,height_after_right])
+                Height_list_right.append([idx,height_before_right-med_right,height_after_right-med_right])
                 
                 
                 if Save_Peak_Detection == True:

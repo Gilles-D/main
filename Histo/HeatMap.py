@@ -12,7 +12,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
-file=r'//equipe2-nas1/Gilles.DELBECQ/Data/Microscopie/6567/tiff/v2/data.xlsx'
+file=r'//equipe2-nas1/Gilles.DELBECQ/Data/Microscopie/6567/Heatmap/v3/plot_profiles/data.xlsx'
 folder = os.path.dirname(os.path.dirname(file))
 
 df = pd.read_excel(file,index_col=0)
@@ -20,7 +20,7 @@ df = pd.read_excel(file,index_col=0)
 
 slicing_axis='coronal'
 microscope_10x_scale=0.65*3 #µm/px
-fluo_contour=35
+fluo_contour=50 #Takes above this % of maximum fluo
 
 if slicing_axis == "coronal":
     df = df.transpose()

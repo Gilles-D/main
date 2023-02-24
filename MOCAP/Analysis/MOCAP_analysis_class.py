@@ -240,17 +240,38 @@ class MOCAP_file:
         Returns:
             A list of the speed at each frame
         """
+        import math
+        import numpy as np
+        # pos=self.coord(marker)
+        # speed=[]
+        
+        # for i in range(len(pos[0])):
+        #     if i !=0:
+        #         try:
+        #             speed.append(
+        #                 (
+        #                     (
+        #                         (pos[0][i]-pos[0][i-1])**2)
+        #                     +((pos[1][i]-pos[1][i-1])**2)
+        #                     +((pos[2][i]-pos[2][i-1])**2)
+        #                     )/1000*self.frequency)
+        #         except:
+        #             pass # doing nothing on exception
+        
+        # return speed
         
         pos=self.coord(marker)
         speed=[]
-        
         for i in range(len(pos[0])):
             if i !=0:
                 try:
-                    speed.append((((pos[0][i]-pos[0][i-1])**2)+((pos[1][i]-pos[1][i-1])**2)+((pos[2][i]-pos[2][i-1])**2))/1000*self.frequency)
+                    framepre=(pos[0][i-1],pos[1][i-1],pos[2][i-1])
+                    framepost=(pos[0][i],pos[1][i],pos[2][i])
+                    
+                    vector=math.sqrt(sum((np.array(framepost)-np.array(framepre))**2))#in mm
+                    speed.append(vector*self.frequency/1000)#in m/s with /1000
                 except:
                     pass # doing nothing on exception
-        
         return speed
     
     def flatten(self,marker):
@@ -375,18 +396,6 @@ class Flat_CSV:
 
         return peaks(self.coord(marker)[0],self.coord(marker)[1],self.coord(marker)[2])
     
-    def normalized(self, ref_marker, target_marker):
-        """
-        Calculate the normalized coordinates of target_marker with ref_marker as the reference
-        """
-        ref_x,ref_y,ref_z = self.coord(ref_marker)
-        target_x, target_y,target_z = self.coord(target_marker)
-        norm_x=target_x-ref_x
-        norm_y=target_y-ref_y
-        norm_z=target_z-ref_z
-        
-        return norm_x,norm_y,norm_z
-    
     def get_marker_list(self):
         '''
         Gets marker list from MOCAP file 
@@ -428,22 +437,3 @@ class Flat_CSV:
         """
         return self.subject(),self.session_idx(),self.trial_idx()
 
-    def new_file_index(self):
-        '''
-        Creates new index for optimized dataframe, including "Marker1:X","Marker1:Y"...format
-        '''
-        
-        pre_format = ['Frame','SubFrame']
-        
-        positions = ['X','Y','Z']
-        
-        markers = [x for x in self.df_raw.columns if 'Unnamed' not in x]
-
-        marker_index = []
-        for marker in markers :
-            for position in positions : 
-                marker_index.append('{}:{}'.format(marker,position))
- 
-        new_file_index = pre_format + marker_index
-                   
-        return new_file_index
