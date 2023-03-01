@@ -1,16 +1,15 @@
-#! /bin/env python
-#
-# Michael Gibson 17 July 2015
-# Modified Adrian Foy January 2023
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 28 16:06:17 2023
+
+@author: Gilles.DELBECQ
+"""
 
 import sys, struct, math, os, time
 import numpy as np
+import matplotlib.pyplot as plt
 
-from intanutil.read_header import read_header
-from intanutil.get_bytes_per_data_block import get_bytes_per_data_block
-from intanutil.read_one_data_block import read_one_data_block
-from intanutil.notch_filter import notch_filter
-from intanutil.data_to_result import data_to_result
+import scipy.signal as sp
 
 
 def read_data(filename):
@@ -18,6 +17,12 @@ def read_data(filename):
     
     Data are returned in a dictionary, for future extensibility.
     """
+    from intanutil.read_header import read_header
+    from intanutil.get_bytes_per_data_block import get_bytes_per_data_block
+    from intanutil.read_one_data_block import read_one_data_block
+    from intanutil.notch_filter import notch_filter
+    from intanutil.data_to_result import data_to_result   
+    
 
     tic = time.time()
     fid = open(filename, 'rb')
@@ -199,4 +204,143 @@ def plural(n):
     else:
         return 's'
 
+
+
+path="//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/0004_28_02_230228_145253/0004_28_02_230228_145253.rhd"
+
 reader=read_data(path)
+
+sampling_rate = reader['frequency_parameters']['amplifier_sample_rate']
+time_vector=reader['t_amplifier']
+signal=reader['amplifier_data']
+
+selected_channels=['2','3','4','9','10','11','12','14','15']
+
+#Filtering parameters
+freq_low = 300
+freq_high = 3000
+order = 4
+
+
+# Noise parameters
+std_threshold = 5 #Times the std
+noise_window = 5 #window for the noise calculation in sec
+distance = 50 # distance between 2 spikes
+
+#waveform window
+waveform_window=5 #ms
+Waveforms = True
+
+def extract_spike_waveform(signal, spike_idx, left_width=(waveform_window/1000)*20000/2, right_width=(waveform_window/1000)*20000/2):
+    
+    '''
+    Function to extract spikes waveforms in spike2 recordings
+    
+    INPUTS :
+        signal (1-d array) : the ephy signal
+        spike_idx (1-d array or integer list) : array containing the spike indexes (in points)
+        width (int) = width for spike window
+    
+    OUTPUTS : 
+        SPIKES (list) : a list containg the waveform of each spike 
+    
+    '''
+    
+    SPIKES = []
+    
+    left_width = int(left_width)
+    right_width = int(right_width)
+    
+    for i in range(len(spike_idx)): 
+        index = spike_idx[i]
+
+        spike_wf = signal[index-left_width : index+right_width]
+
+        SPIKES.append(spike_wf)
+    return SPIKES
+
+
+
+
+def filter_signal(signal, order=order, sample_rate=sampling_rate, freq_low=freq_low, freq_high=freq_high, axis=0):
+    """
+    From Théo G.
+    Filtering with scipy
+    
+    inputs raw signal (array)
+    returns filtered signal (array)
+    """
+    
+    import scipy.signal
+    Wn = [freq_low / (sample_rate / 2), freq_high / (sample_rate / 2)]
+    sos_coeff = scipy.signal.iirfilter(order, Wn, btype="band", ftype="butter", output="sos")
+    filtered_signal = scipy.signal.sosfiltfilt(sos_coeff, signal, axis=axis)
+    return filtered_signal
+
+
+# def notch_filter(signal, order=4, sample_rate=20000, freq_low=48, freq_high=52, axis=0):
+#     import scipy.signal
+#     Wn = [freq_low / (sample_rate / 2), freq_high / (sample_rate / 2)]
+#     notch_coeff = scipy.signal.iirfilter(order, Wn, btype="bandstop", ftype="butter", output="sos")
+#     notch_signal = scipy.signal.sosfiltfilt(notch_coeff, signal, axis=axis)
+
+#     return notch_signal
+
+filtered_signals=[]
+
+for i in selected_channels:
+    
+    filtered_signal=filter_signal(signal[int(i),:])
+    filtered_signals.append(filtered_signal)
+    # plt.figure()
+    # # plt.plot(time_vector,signal[0,:])
+    # plt.plot(time_vector,filtered_signal)
+    # plt.title(rf'channel {int(i)}')
+
+filtered_signals = np.array(filtered_signals)
+median = np.median(filtered_signals, axis=0)#compute median on all 
+cmr_signals = filtered_signals-median     #compute common ref removal median on all 
+
+for i in range(len(cmr_signals)):
+    plt.figure()
+    plt.plot(time_vector,cmr_signals[i])
+    plt.title(rf'channel {int(selected_channels[i])}')
+    
+
+"""
+Spike detection
+"""
+thresholds=[]
+spikes_list=[]
+spikes_list_y=[]
+wfs=[]
+waveforms=[]
+for signal in cmr_signals:
+    # Threshold calculation
+    noise = signal[0:int(noise_window*sampling_rate)] #noise window taken from individual channel signal
+    threshold = np.median(noise)+std_threshold*np.std(noise) #threshold calculation for the channel
+    thresholds.append(threshold) #append it to the list regrouping threshold for each channel
+    
+    
+    #Detect the spike indexes
+    spike_idx, _ = sp.find_peaks(-signal,height=threshold,distance=distance)
+    #Convert to spike times
+    spike_times = spike_idx*1./sampling_rate
+    #Get spikes peak 
+    spike_y = signal[spike_idx]
+    
+    #Append spikes times to the list of all channels spikes
+    spikes_list.append(spike_times)
+    spikes_list_y.append(spike_y)
+    
+    if Waveforms == True :
+        wfs = extract_spike_waveform(signal,spike_idx)
+        waveforms.append(wfs)
+
+for index,i in np.ndenumerate(waveforms):
+    plt.figure()
+    # plt.title(rf'waveform_chan_{selected_chan[index[0]]}')
+    time_axis=np.array(range(int(-(waveform_window/1000)*20000/2),int(waveform_window/1000*20000/2)))/20000*1000
+    for j in i:
+        plt.plot(j*1000)
+    # plt.savefig(rf'{save_path}\waveform_chan_{selected_chan[index[0]]}.svg')
