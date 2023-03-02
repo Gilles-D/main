@@ -35,48 +35,34 @@ warnings.simplefilter("ignore")
 ------------------PARAMETERS------------------
 
 """
-probe_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/A1x16-Poly2-5mm-50s-177.json'
-# probe_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Buzsaki16.json'
+# probe_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/A1x16-Poly2-5mm-50s-177.json'
+probe_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Buzsaki16.json'
 
 # Working folder path
-working_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw si/'
+working_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/'
 
-saving_name="Gust_27_02_baseline_fixed2"
+subject_name="Test_0004"
+
+saving_name="0004_28_02_baseline_all_groups__"
 
 freq_min = 300
 freq_max = 6000
 
-
+#Modifier en une boucle sur le dossier itan
 recordings = [  
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_162822/Gustave_27_02_230227_162822.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_162822/Gustave_27_02_230227_162922.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_162822/Gustave_27_02_230227_163022.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_162822/Gustave_27_02_230227_163122.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_162822/Gustave_27_02_230227_163222.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_162822/Gustave_27_02_230227_163322.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_163558/Gustave_27_02_230227_163558.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_163558/Gustave_27_02_230227_163658.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_163558/Gustave_27_02_230227_163758.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_163558/Gustave_27_02_230227_163858.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_163558/Gustave_27_02_230227_163958.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_163558/Gustave_27_02_230227_164058.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_164330/Gustave_27_02_230227_164330.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_164330/Gustave_27_02_230227_164430.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_164330/Gustave_27_02_230227_164530.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_164330/Gustave_27_02_230227_164630.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_Gustave/raw/raw intan/Gustave_27_02_230227_164330/Gustave_27_02_230227_164730.rhd"
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_150353.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145253.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145353.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145453.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145553.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145653.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145753.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145853.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_145953.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_150053.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_150153.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/Février2023/Test_0004/raw/raw intan/0004_28_02_230228_145253/0004_28_02_230228_150253.rhd"]
 
-
-
-
-]
-
-
-
-
-if os.path.exists(working_dir)==False:
-    os.makedirs(working_dir)
-os.chdir(working_dir)
 
 
 
@@ -104,8 +90,10 @@ multirecording = multirecording.set_probe(probe)
 #Check the defective sites
 # sw.plot_timeseries(multirecording, channel_ids=multirecording.get_channel_ids(),time_range=[0,15])
 
-excluded_sites = ['2','3','4','9','10','11','12','14','15']
 
+
+# excluded_sites = ['2','3','4','9','10','11','12','14','15']
+excluded_sites = []
 
 #Exclude defective sites
 # multirecording.set_channel_groups(1, [])
@@ -132,7 +120,7 @@ recording_cmr = spre.common_reference(recording_f, reference='global', operator=
 ------------------Saving------------------
 """
 job_kwargs = dict(n_jobs=4, chunk_duration="1s", progress_bar=False)
-recording_saved = recording_cmr.save(folder=rf"{working_dir}/{saving_name}", **job_kwargs)
+recording_saved = recording_cmr.save(folder=rf"{working_dir}/{subject_name}/raw/raw si/{saving_name}", **job_kwargs)
 recording_saved
 
 

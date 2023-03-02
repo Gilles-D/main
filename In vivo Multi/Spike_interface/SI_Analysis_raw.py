@@ -40,21 +40,46 @@ warnings.simplefilter("ignore")
 working_dir=r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Février2023'
 
 subject_name="Test_0004"
-recording_name='0004_28_02_baseline_all_groups__'
+recording_name='0004_28_02_baseline_all_groups'
 
 
 sorting_saving_dir=rf'{working_dir}/{subject_name}/sorting_output/{recording_name}'
 
 
 
+
+#Load the recordings
+recording_loaded = si.load_extractor(rf"{working_dir}/{subject_name}\raw\raw si\{recording_name}")
+
+
+recording_loaded = recording_loaded.split_by('group')[0]
+
+"""
+---------------------------Preprocessing---------------------------
+
+"""
+
+
+#Bandpass filter
+recording_f = spre.bandpass_filter(recording_loaded, freq_min=freq_min, freq_max=freq_max)
+# w = sw.plot_timeseries(recording_f,time_range=[10,15], segment_index=0)
+
+
+#Median common ref
+recording_cmr = spre.common_reference(recording_f, reference='global', operator='median')
+# w = sw.plot_timeseries(recording_cmr,time_range=[10,15], segment_index=0)
+
+
+
+multirecording=recording_cmr
+
+
 """
 ---------------------------Spike sorting---------------------------
 
 """
-#Load the recordings
-recording_loaded = si.load_extractor(rf"{working_dir}/{subject_name}\raw\raw si\{recording_name}")
 
-multirecording = recording_loaded.split_by('group')[0]
+
 w = sw.plot_timeseries(multirecording,time_range=[10,15], segment_index=0)
 
 print(f'Loaded channels ids: {recording_loaded.get_channel_ids()}')
@@ -65,7 +90,7 @@ print(f'Channel groups after loading: {recording_loaded.get_channel_groups()}')
 #ss.installed_sorters()
 
 sorting_outputs = ss.run_sorters(sorter_list=["tridesclous"],
-                                 recording_dict_or_list={"group0": recording_loaded, "group1": recording_loaded},
+                                 recording_dict_or_list={"group0": multirecording},
                                  working_folder=sorting_saving_dir,
                                  verbose=True,
                                  engine="joblib",
@@ -92,7 +117,7 @@ w_rs = sw.plot_rasters(TDC_output)
 job_kwargs = dict(n_jobs=10, chunk_duration="1s", progress_bar=True)
 
 #Waveform extraction only 500 for each clsuter
-we = si.extract_waveforms(recording_loaded, TDC_output, folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}', 
+we = si.extract_waveforms(multirecording, TDC_output, folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}', 
                           load_if_exists=False, overwrite=True,**job_kwargs)
 print(we)
 
@@ -112,7 +137,7 @@ for unit in TDC_output.get_unit_ids():
     
     
 #Waveform extraction all spikes for each clsuter  
-we_all = si.extract_waveforms(recording_loaded, TDC_output, folder=rf'{working_dir}/{subject_name}/waveform_output_all/{recording_name}', 
+we_all = si.extract_waveforms(multirecording, TDC_output, folder=rf'{working_dir}/{subject_name}/waveform_output_all/{recording_name}', 
                               max_spikes_per_unit=None,
                               overwrite=True,
                               **job_kwargs)
