@@ -1,0 +1,62 @@
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Definitions
+//////////////////////////////////////////////////////////////////////////////////////////
+   
+    #define SENSORPIN 7 // Input/Sensor of the IR Beam
+    #define REMOTEPIN 10 // Input of the remote receiver
+
+    #define TTL_AMP 9
+    #define TTL_OPTO 11
+
+    #define LED_MOCAP 8 //Output LED to sync MOCAP
+    
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Setup
+//////////////////////////////////////////////////////////////////////////////////////////
+     
+    void setup() {
+      // initialize the LED pin as an output:
+      pinMode(LED_MOCAP, OUTPUT);
+      digitalWrite(LED_MOCAP, LOW);  
+
+      // initialize the TTL pin as an output:
+
+      pinMode(TTL_AMP, OUTPUT);
+      digitalWrite(TTL_AMP, LOW);
+      
+      pinMode(TTL_OPTO, OUTPUT);
+      digitalWrite(TTL_OPTO, LOW);
+
+      // initialize the sensor pin as an input:
+      pinMode(SENSORPIN, INPUT);         
+      digitalWrite(SENSORPIN, HIGH);
+      
+      
+    }
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Functions
+//////////////////////////////////////////////////////////////////////////////////////////
+
+void brust(){
+          for (int i = 0; i <= 100; i++) {
+          digitalWrite(TTL_AMP, HIGH);
+          digitalWrite(TTL_OPTO, HIGH);
+          delay(5);
+          digitalWrite(TTL_AMP, LOW);
+          digitalWrite(TTL_OPTO, LOW);
+          delay(50);
+          }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//Loop
+//////////////////////////////////////////////////////////////////////////////////////////   
+    void loop(){
+      brust();
+      delay(10000);
+          
+    }
