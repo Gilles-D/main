@@ -238,7 +238,7 @@ class MOCAP_file:
         Calculate the speed of a marker
         
         Returns:
-            A list of the speed at each frame
+            A list of the speed at each frame in m/s
         """
         import math
         import numpy as np
