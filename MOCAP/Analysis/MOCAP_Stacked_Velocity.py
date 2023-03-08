@@ -20,13 +20,13 @@ import statistics as stat
 ------------------------------PARAMETERS------------------------------
 """
 #Load MOCAP class
-sys.path.append(r'C:\Users\Gil\Documents\GitHub\main\MOCAP\Analysis')
+sys.path.append(r'D:\Gilles.DELBECQ\GitHub\main\MOCAP\Analysis')
 import MOCAP_analysis_class as MA
 
 
 #Directories location
-root_dir=r'D:\Seafile\Seafile\Ma bibliothèque\Data\MOCAP\Cohorte2\CSV_gap_filled'
-flat_csv_path=r'D:\Seafile\Seafile\Ma bibliothèque\Data\MOCAP\Cohorte2\CSV_gap_filled_flat'
+root_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
+flat_csv_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
 
 #Sessions idexes to analyse (as a list)
 sessions_to_analyze = [1,3]
@@ -35,12 +35,12 @@ sessions_to_analyze = [1,3]
 
 
 #Location of the data_info file
-data_info_path = 'C:/Users/Gil/Documents/GitHub/main/MOCAP/Data/Session_Data_Cohorte2.xlsx'
+data_info_path = 'D:/Gilles.DELBECQ/GitHub/main/MOCAP/Data/Session_Data_Cohorte2.xlsx'
 data_info = MA.DATA_file(data_info_path)
 
 
 #Location of the figures to save
-savefig_path=r'D:\Seafile\Seafile\Ma bibliothèque\Data\MOCAP\Cohorte2\Figs/Stacked/'
+savefig_path=r'\\equipe2-nas1\Gilles.DELBECQ\Data\MOCAP\Cohorte 2\Figs/Stacked_velocity/'
 
 Save = False
 Save_extension = "png" #svg or png
@@ -152,7 +152,8 @@ def moving_average(data, window_size=5):
 for animal in animals:
     print(animal)
     figure1=plt.figure()
-    plt.title(rf"{animal} stacked traces")    
+    plt.title(rf"{animal} stacked traces")
+    plt.gca().invert_xaxis()     
     for file in Files:
         data_MOCAP = MA.MOCAP_file(file)
         
@@ -167,10 +168,16 @@ for animal in animals:
                 
                 
                 speed = data_MOCAP.speed(f"{data_MOCAP.subject()}:Back1")
+                Back_coord=data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1")
                 speed_smooth=moving_average(speed)
                 
-                plt.plot(speed, color="blue")
-                
+                if int(data_MOCAP.session_idx()) == 1:
+                    plt.plot(list(Back_coord[1][1:-4]),speed_smooth, color="blue")
+                    # plt.plot(list(Back_coord[1][1:]),speed, color="blue")
+                else:
+                    plt.plot(list(Back_coord[1][1:-4]),speed_smooth, color="red")
+                    # plt.plot(list(Back_coord[1][1:]),speed, color="red")
+                               
                 # if int(data_MOCAP.session_idx()) == 1:
                 #     plt.plot(speed_smooth, color="blue")
                 # else:
