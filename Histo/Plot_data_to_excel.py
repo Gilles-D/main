@@ -10,7 +10,7 @@ import pandas as pd
 import os
 import numpy as np
 
-folderpath=r'\\equipe2-nas1\Gilles.DELBECQ\Data\Microscopie\6567\Heatmap\v3\plot_profiles'
+folderpath=r'//equipe2-nas1/Gilles.DELBECQ/Data/Microscopie/6567/plot_profiles/'
 
 list_files=[]
 for path, subdirs, files in os.walk(folderpath):
@@ -28,6 +28,10 @@ microscope_10x_scale=0.65*3 #µm/px
 i=0
 for file in list_files:
     if file.endswith('.csv'):
+        
+        filename=file.split('Slice')
+        print(filename[-1].split('.')[0])
+        
         x = round(start-(i*0.1),2)
         csv_file=pd.read_csv(file)
         
