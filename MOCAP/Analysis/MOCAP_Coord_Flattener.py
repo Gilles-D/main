@@ -79,13 +79,23 @@ for file in Files:
         #Use class function to flatten the coords for both feet using the 2 reference points on the platform
         left_foot_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Left_Foot"))
         right_foot_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Right_Foot"))
-        
+        left_ankle_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Left_Ankle"))
+        right_ankle_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Right_Ankle"))
+        left_knee_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Left_Knee"))
+        right_knee_flat = np.transpose(data_MOCAP.flatten(f"{data_MOCAP.subject()}:Right_Knee"))        
         
         #Saves it as a dataframe
-        data=np.concatenate((left_foot_flat,right_foot_flat),axis=1)
+        data=np.concatenate((left_foot_flat,right_foot_flat,left_ankle_flat,right_ankle_flat,left_knee_flat,right_knee_flat),axis=1)
         df = pd.DataFrame(data)
         names=[f"{data_MOCAP.subject()}:Left_Foot_X",f"{data_MOCAP.subject()}:Left_Foot_Y",f"{data_MOCAP.subject()}:Left_Foot_Z",
-               f"{data_MOCAP.subject()}:Right_Foot_X",f"{data_MOCAP.subject()}:Right_Foot_Y",f"{data_MOCAP.subject()}:Right_Foot_Z"]
+               f"{data_MOCAP.subject()}:Right_Foot_X",f"{data_MOCAP.subject()}:Right_Foot_Y",f"{data_MOCAP.subject()}:Right_Foot_Z",
+               f"{data_MOCAP.subject()}:Left_Ankle_X",f"{data_MOCAP.subject()}:Left_Ankle_Y",f"{data_MOCAP.subject()}:Left_Ankle_Z",
+               f"{data_MOCAP.subject()}:Right_Ankle_X",f"{data_MOCAP.subject()}:Right_Ankle_Y",f"{data_MOCAP.subject()}:Right_Ankle_Z",
+               f"{data_MOCAP.subject()}:Left_Knee_X",f"{data_MOCAP.subject()}:Left_Knee_Y",f"{data_MOCAP.subject()}:Left_Knee_Z",
+               f"{data_MOCAP.subject()}:Right_Knee_X",f"{data_MOCAP.subject()}:Right_Knee_Y",f"{data_MOCAP.subject()}:Right_Knee_Z"
+               
+               
+               ]
         df.columns = names
         
         #Saves it in a csv
@@ -98,3 +108,4 @@ for file in Files:
     
     else:
         print(rf"File {data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()} already exists")
+        i=i+1
