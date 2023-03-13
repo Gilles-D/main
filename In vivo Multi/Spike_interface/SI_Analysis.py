@@ -39,8 +39,8 @@ warnings.simplefilter("ignore")
 # Working folder path
 working_dir=r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\Février2023'
 
-subject_name="Test_0004"
-recording_name='0004_28_02_baseline_all_groups__'
+subject_name="Test_Gustave"
+recording_name='Gustave_09_03_baseline2'
 
 
 sorting_saving_dir=rf'{working_dir}/{subject_name}/sorting_output/{recording_name}'
@@ -136,19 +136,19 @@ Sparsity
 """
 
 # example: radius
-sparsity_radius = spost.get_template_channel_sparsity(we_all, method="radius", radius_um=50)
+sparsity_radius = spost.get_template_channel_sparsity(we, method="radius", radius_um=50)
 
-sparsity_radius = si.core.ChannelSparsity.from_radius(we_all, radius_um=50, peak_sign='neg')
+sparsity_radius = si.core.ChannelSparsity.from_radius(we, radius_um=50, peak_sign='neg')
 
 
 # example: best
-sparsity_best = spost.get_template_channel_sparsity(we_all, method="best_channels", num_channels=4)
+sparsity_best = spost.get_template_channel_sparsity(we, method="best_channels", num_channels=4)
 
-sparsity_best = si.core.ChannelSparsity.from_best_channels(we_all, num_channels=4, peak_sign='neg')
+sparsity_best = si.core.ChannelSparsity.from_best_channels(we, num_channels=4, peak_sign='neg')
 
 
-sw.plot_unit_templates(we_all, sparsity=sparsity_radius)
-sw.plot_unit_templates(we_all, sparsity=sparsity_best)
+sw.plot_unit_templates(we, sparsity=sparsity_radius)
+sw.plot_unit_templates(we, sparsity=sparsity_best)
 
 """
 PCA scores
@@ -205,8 +205,8 @@ sw.plot_spike_locations(we, max_spikes_per_unit=300)
 Compute correlograms
 """
 ccgs, bins = spost.compute_correlograms(we)
-sw.plot_autocorrelograms(we, unit_ids=sorting.unit_ids[:3])
-sw.plot_crosscorrelograms(we, unit_ids=sorting.unit_ids[:3])
+sw.plot_autocorrelograms(we, unit_ids=sorting.unit_ids[:])
+sw.plot_crosscorrelograms(we, unit_ids=sorting.unit_ids[:])
 
 """
 Compute template similarity
@@ -242,10 +242,10 @@ sw.plot_quality_metrics(we, include_metrics=["amplitude_cutoff", "presence_ratio
 """
 Automatic curation based on quality metrics
 """
-isi_viol_thresh = 0.2
+isi_violations_rate = 0.2
 amp_cutoff_thresh = 0.1
 
-our_query = f"amplitude_cutoff < {amp_cutoff_thresh} & isi_violations_rate < {isi_viol_thresh}"
+our_query = f"amplitude_cutoff < {amp_cutoff_thresh} & isi_violations_rate < {isi_violations_rate}"
 print(our_query)
 
 keep_units = qm.query(our_query)
