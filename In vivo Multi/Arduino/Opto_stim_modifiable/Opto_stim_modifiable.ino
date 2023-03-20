@@ -58,10 +58,10 @@ void brust(int stim_duration,float freq,int pulse_duration){
 //Loop
 //////////////////////////////////////////////////////////////////////////////////////////   
     void loop(){
-      float stim_duration = 5;//in seconds
-      float freq = 50;//in Hz
-      float pulse_duration = 20;//in ms  
-      float time_between_trans = 10000;//in s
+      float stim_duration = 10;//in seconds
+      float freq = 1;//in Hz
+      float pulse_duration = 100;//in ms  
+      float time_between_trans = 1;//in s
       
       brust(stim_duration,freq,pulse_duration);
       delay(time_between_trans);
