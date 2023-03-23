@@ -23,16 +23,18 @@ def make_video(files):
         size = (width,height)
         img_array.append(img)
     a = re.sub(r'\\', '/', subdirs)
+    print(a)
     a = re.split(r'/', a)
-    a = "%s %s" % (a[5], a[6])
+    print(a)
+    a = "%s" % (a[-1])
     a.replace(' ', '_')
     print('Saving...')
-    out = cv2.VideoWriter('{}{}.avi'.format(rootdir, a),cv2.VideoWriter_fourcc(*'DIVX'), 100, size)
+    out = cv2.VideoWriter('{}{}.avi'.format(rootdir, a),cv2.VideoWriter_fourcc(*'DIVX'), 12.5, size)
     for i in range(len(img_array)):
         out.write(img_array[i])
     return(out.release())
 
-rootdir = 'C:/Users/MOCAP/Pictures/IC Express/'
+rootdir = 'D:/DLC/Capture/05_cam1_100%_01/8'
 
 img_array = []
 
