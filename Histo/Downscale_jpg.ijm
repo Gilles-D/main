@@ -17,7 +17,7 @@ for (i = 0; i < list.length; i++) {
         name = list[i];
 
         run("Scale...", "x=0.25 y=0.25 width=2100 height=1408 interpolation=Bilinear average create");
-        wait(1000)
+        wait(1000);
         name_save = substring(list[i], 0, indexOf(list[i], "."));
 		
         saveAs("JPG", path_save + name_save + ".jpg");

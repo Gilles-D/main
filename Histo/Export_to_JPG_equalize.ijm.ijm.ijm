@@ -1,5 +1,5 @@
 // Chemin d'accès du dossier contenant les images
-path = "D:/Margot_dataset/";
+path = "D:/Working_Dir/Microscopie/SOD/1230/tif/";
 
 // Obtenir la liste des noms de fichiers dans le dossier
 list = getFileList(path);
@@ -18,15 +18,28 @@ for (i = 0; i < list.length; i++) {
         name = list[i];
         
         // Enregistrer les canaux séparément en tant que PNG avec un suffixe
+        selectWindow("C1-" + name);
+        
+        resetMinAndMax();
+        run("Enhance Contrast...", "saturated=0.15");
+        
+        wait(1000);
+        name_save = substring(list[i], 0, indexOf(list[i], "."));
+		path_save="D:/Working_Dir/Microscopie/SOD/1224/jpeg/GFP/";
+        saveAs("JPG", path_save + name_save + ".jpg");
+        
+        // Enregistrer les canaux séparément en tant que PNG avec un suffixe
         selectWindow("C2-" + name);
         
         resetMinAndMax();
-        run("Enhance Contrast...", "saturated=0.35 equalize");
+        run("Enhance Contrast...", "saturated=0.35");
         
-        
+        wait(1000);
         name_save = substring(list[i], 0, indexOf(list[i], "."));
-		path_save="D:/Margot_dataset/tdtomato/";
+		path_save="D:/Working_Dir/Microscopie/SOD/1230/jpeg/tdtomato/";
         saveAs("JPG", path_save + name_save + ".jpg");
+        
+        
         
         // Fermer toutes les fenêtres d'image ouvertes
         close("*");
