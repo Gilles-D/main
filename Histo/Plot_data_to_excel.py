@@ -10,7 +10,7 @@ import pandas as pd
 import os
 import numpy as np
 
-folderpath=r'//equipe2-nas1/Gilles.DELBECQ/Data/Microscopie/6567/plot_profiles/'
+folderpath=r'F:\Data\Microscopie\SOD\1226\Tiff\mapping'
 
 list_files=[]
 for path, subdirs, files in os.walk(folderpath):
@@ -20,8 +20,8 @@ for path, subdirs, files in os.walk(folderpath):
         
 all_data=pd.DataFrame()
 
-start=-0.34 # Medio-lat / AP position of 01 slice in cm
-microscope_10x_scale=0.65*3 #µm/px
+start=0.7 # Medio-lat / AP position of 01 slice in cm
+microscope_10x_scale=0.65*2 #µm/px
 
 
 #Loop on files
