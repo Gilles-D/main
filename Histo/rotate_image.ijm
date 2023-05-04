@@ -10,7 +10,13 @@
       if (x1==-1)
            exit("This macro requires a straight line selection");
       angle = (180.0/PI)*atan2(y1-y2, x2-x1);
-      run("Arbitrarily...", "angle="+angle+" interpolate");
+     Stack.setChannel(1);
+     run("Arbitrarily...", "angle="+angle+" interpolate");
+     Stack.setChannel(2);
+     run("Arbitrarily...", "angle="+angle+" interpolate");
+     //Stack.setChannel(3);
+     //run("Arbitrarily...", "angle="+angle+" interpolate");
+
   }
 
 

@@ -10,7 +10,7 @@ import pandas as pd
 import os
 import numpy as np
 
-folderpath=r'F:\Data\Microscopie\SOD\1226\Tiff\mapping'
+folderpath=r'I:\Data\Microscopie\SOD\1222\Tif\mapping'
 
 list_files=[]
 for path, subdirs, files in os.walk(folderpath):
