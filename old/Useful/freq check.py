@@ -4,7 +4,7 @@ Created on Wed Mar 15 10:21:08 2023
 
 @author: MOCAP
 """
-import cv2
+# import cv2
 import numpy as np
 import glob
 import os
@@ -12,7 +12,7 @@ import re
 
 
 
-rootdir = 'D:/DLC/Capture/05_cam1_100%_01/6'
+rootdir = r'D:\SOD_2023\1226\1226'
 
 
 test=[]
