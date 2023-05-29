@@ -46,17 +46,18 @@ saving_dir=r"D:\ePhy\SI_Data"
 
 subject_name="0012"
 
-saving_name="0012_Baseline_Ref_Hardware_15_05_test"
+saving_name="0012_19_05_01"
 
 freq_min = 300
 freq_max = 6000
 
 #Modifier en une boucle sur le dossier itan
-recordings = [  
-"D:/ePhy/Intan_Data/0012/0012_15_05_230515_172650/0012_15_05_230515_172650.rhd",
-"D:/ePhy/Intan_Data/0012/0012_15_05_230515_172650/0012_15_05_230515_172750.rhd",
-"D:/ePhy/Intan_Data/0012/0012_15_05_230515_172650/0012_15_05_230515_172850.rhd"]
+# recordings = [  
+# "D:/ePhy/Intan_Data/0012/0012_15_05_230515_172650/0012_15_05_230515_172650.rhd",
+# "D:/ePhy/Intan_Data/0012/0012_15_05_230515_172650/0012_15_05_230515_172750.rhd",
+# "D:/ePhy/Intan_Data/0012/0012_15_05_230515_172650/0012_15_05_230515_172850.rhd"]
 
+recording = r"D:/ePhy/Intan_Data/0012/0012_19_05_230519_165017/0012_19_05_01.rhd"
 
 sorting_saving_dir=rf'{working_dir}/{subject_name}/sorting_output/{saving_name}'
 
@@ -64,22 +65,22 @@ param_sorter = {
     # 'kilosort3': {
     #                                 'detect_threshold': 6,
     #                                 'projection_threshold': [9, 9],
-    #                                 'preclust_threshold': 8,
-    #                                 'car': True,
-    #                                 'minFR': 0.2,
-    #                                 'minfr_goodchannels': 0.2,
-    #                                 'nblocks': 5,
-    #                                 'sig': 20,
-    #                                 'freq_min': 300,
-    #                                 'sigmaMask': 30,
-    #                                 'nPCs': 3,
-    #                                 'ntbuff': 64,
-    #                                 'nfilt_factor': 4,
-    #                                 'do_correction': True,
-    #                                 'NT': None,
-    #                                 'wave_length': 61,
-    #                                 'keep_good_only': False,
-    #                             },
+                                #     'preclust_threshold': 8,
+                                #     'car': True,
+                                #     'minFR': 0.2,
+                                #     'minfr_goodchannels': 0.2,
+                                #     'nblocks': 5,
+                                #     'sig': 20,
+                                #     'freq_min': 300,
+                                #     'sigmaMask': 30,
+                                #     'nPCs': 3,
+                                #     'ntbuff': 64,
+                                #     'nfilt_factor': 4,
+                                #     'do_correction': True,
+                                #     'NT': None,
+                                #     'wave_length': 61,
+                                #     'keep_good_only': False,
+                                # },
                 'mountainsort4': {
                                     'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
                                     'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
@@ -128,15 +129,17 @@ param_sorter = {
 
 
 
-#Concatenate all the recording files
-recordings_list=[]
-for recording_file in recordings:
-    recording = se.read_intan(recording_file,stream_id='0')
-    recording.annotate(is_filtered=False)
-    recordings_list.append(recording)
+# #Concatenate all the recording files
+# recordings_list=[]
+# for recording_file in recordings:
+#     recording = se.read_intan(recording_file,stream_id='0')
+#     recording.annotate(is_filtered=False)
+#     recordings_list.append(recording)
 
 
-multirecording = si.concatenate_recordings(recordings_list)
+# multirecording = si.concatenate_recordings(recordings_list)
+
+multirecording=se.read_intan(recording,stream_id='0')
 
 
 #Set the probe
@@ -191,19 +194,10 @@ print(f'Loaded channels ids: {recording_loaded.get_channel_ids()}')
 print(f'Channel groups after loading: {recording_loaded.get_channel_groups()}')
 
 
-#Sorting
-#ss.installed_sorters()
-
-# sorting_outputs = ss.run_sorters(sorter_list=["kilosort3"],
-#                                  recording_dict_or_list={"group0": recording_loaded, "group1": recording_loaded},
-#                                  working_folder=sorting_saving_dir,
-#                                  verbose=True,
-#                                  engine="joblib",
-#                                  engine_kwargs={'n_jobs': 1},
-#                                  docker_images=True)
 
 sorter_list = []
 sorter_name_list = []
+
 for sorter_name, sorter_param in param_sorter.items():
     print(sorter_name)
     sorter_list.append(ss.run_sorter(sorter_name,

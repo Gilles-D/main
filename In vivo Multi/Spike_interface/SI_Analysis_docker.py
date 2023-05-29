@@ -29,6 +29,8 @@ from pathlib import Path
 import warnings
 warnings.simplefilter("ignore")
 
+import docker
+
 
 """
 ---------------------------PARAMETERS---------------------------
@@ -38,33 +40,34 @@ warnings.simplefilter("ignore")
 use_docker = True
 
 # Working folder path
-working_dir=r'C:\Users\MOCAP\Desktop\datasi'
+working_dir=r'D:\ePhy\SI_Data'
 
-subject_name="Test_Gustave"
-recording_name='Gustave_09_03_baseline2'
+subject_name="0012"
+recording_name='0012_22_05_01'
 
 
 sorting_saving_dir=rf'{working_dir}/{subject_name}/sorting_output/{recording_name}'
 
-param_sorter = {'kilosort3': {
-                                    'detect_threshold': 6,
-                                    'projection_threshold': [9, 9],
-                                    'preclust_threshold': 8,
-                                    'car': True,
-                                    'minFR': 0.2,
-                                    'minfr_goodchannels': 0.2,
-                                    'nblocks': 5,
-                                    'sig': 20,
-                                    'freq_min': 300,
-                                    'sigmaMask': 30,
-                                    'nPCs': 3,
-                                    'ntbuff': 64,
-                                    'nfilt_factor': 4,
-                                    'do_correction': True,
-                                    'NT': None,
-                                    'wave_length': 61,
-                                    'keep_good_only': False,
-                                },
+param_sorter = {
+    # 'kilosort3': {
+    #                                 'detect_threshold': 6,
+    #                                 'projection_threshold': [9, 9],
+    #                                 'preclust_threshold': 8,
+    #                                 'car': True,
+    #                                 'minFR': 0.2,
+    #                                 'minfr_goodchannels': 0.2,
+    #                                 'nblocks': 5,
+    #                                 'sig': 20,
+    #                                 'freq_min': 300,
+    #                                 'sigmaMask': 30,
+    #                                 'nPCs': 3,
+    #                                 'ntbuff': 64,
+    #                                 'nfilt_factor': 4,
+    #                                 'do_correction': True,
+    #                                 'NT': None,
+    #                                 'wave_length': 61,
+    #                                 'keep_good_only': False,
+    #                             },
                 'mountainsort4': {
                                     'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
                                     'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
@@ -79,17 +82,17 @@ param_sorter = {'kilosort3': {
                                     'tempdir': None
                                 },
                 'tridesclous': {
-                                    'freq_min': 400.,
-                                    'freq_max': 5000.,
+                                    'freq_min': 300.,
+                                    'freq_max': 6000.,
                                     'detect_sign': -1,
-                                    'detect_threshold': 5,
-                                    'common_ref_removal': False,
+                                    'detect_threshold': 3,
+                                    'common_ref_removal': True,
                                     'nested_params': None,
                                 },
                 'spykingcircus': {
                                     'detect_sign': -1,  # -1 - 1 - 0
                                     'adjacency_radius': 100,  # Channel neighborhood adjacency radius corresponding to geom file
-                                    'detect_threshold': 6,  # Threshold for detection
+                                    'detect_threshold': 3,  # Threshold for detection
                                     'template_width_ms': 3,  # Spyking circus parameter
                                     'filter': True,
                                     'merge_spikes': True,
@@ -105,7 +108,7 @@ param_sorter = {'kilosort3': {
 
 """
 #Load the recordings
-recording_loaded = si.load_extractor(rf"{working_dir}/{subject_name}\raw\raw si\{recording_name}")
+recording_loaded = si.load_extractor(rf"{working_dir}/{subject_name}\{recording_name}")
 
 multirecording = recording_loaded.split_by('group')[0]
 w = sw.plot_timeseries(multirecording,time_range=[10,15], segment_index=0)
@@ -114,20 +117,10 @@ print(f'Loaded channels ids: {recording_loaded.get_channel_ids()}')
 print(f'Channel groups after loading: {recording_loaded.get_channel_groups()}')
 
 
-#Sorting
-#ss.installed_sorters()
-
-# sorting_outputs = ss.run_sorters(sorter_list=["kilosort3"],
-#                                  recording_dict_or_list={"group0": recording_loaded, "group1": recording_loaded},
-#                                  working_folder=sorting_saving_dir,
-#                                  verbose=True,
-#                                  engine="joblib",
-#                                  engine_kwargs={'n_jobs': 1},
-#                                  docker_images=True)
-
 sorter_list = []
 sorter_name_list = []
 for sorter_name, sorter_param in param_sorter.items():
+    print(sorter_name)
     sorter_list.append(ss.run_sorter(sorter_name,
         recording=multirecording,
         output_folder=f"{sorting_saving_dir}/{sorter_name}",
@@ -135,12 +128,34 @@ for sorter_name, sorter_param in param_sorter.items():
         **sorter_param))
     sorter_name_list.append(sorter_name)
 
-# cmp_HS_TDC = sc.compare_two_sorters(
-#     sorting1=sorting,
-#     sorting2=sorting_1,
-#     sorting1_name='kilo',
-#     sorting2_name='mountain',
-# )
+
+ss.run_sorter('kilosort3', recording=multirecording,output_folder=f"{sorting_saving_dir}/kilosort3",docker_image=True,skip_kilosort_preprocessing = True)
+
+
+"""
+Export to PHY
+"""
+
+
+job_kwargs = dict(n_jobs=10, chunk_duration="1s", progress_bar=True)
+
+
+for i in range(len(sorter_list)):
+    we = si.extract_waveforms(recording_loaded, sorter_list[i], folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}/{sorter_name_list[i]}', 
+                              load_if_exists=False, overwrite=True,**job_kwargs)
+    
+    sexp.export_to_phy(we, output_folder=rf'{working_dir}/{subject_name}/export_phy/{recording_name}/{sorter_name_list[i]}', 
+                       compute_amplitudes=False, compute_pc_features=False, copy_binary=True,
+                       **job_kwargs)
+    
+
+
+"""
+Comparison
+
+"""
+
+
 mcmp = sc.compare_multiple_sorters(
     sorting_list=sorter_list,
     name_list=sorter_name_list,
@@ -148,10 +163,29 @@ mcmp = sc.compare_multiple_sorters(
 )
 agr_2 = mcmp.get_agreement_sorting(minimum_agreement_count=2)
 
-# sw.plot_agreement_matrix(cmp_HS_TDC)
+
+we = si.extract_waveforms(recording_loaded, agr_2, folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}/agreement', 
+                          load_if_exists=False, overwrite=True,**job_kwargs)
+
+sexp.export_to_phy(we, output_folder=rf'{working_dir}/{subject_name}/export_phy/{recording_name}/agreement', 
+                   compute_amplitudes=False, compute_pc_features=False, copy_binary=True,
+                   **job_kwargs)
+
+
+
+# cmp_1 = sc.compare_two_sorters(
+#     sorting1=sorter_list[0],
+#     sorting2=sorter_list[2],
+#     sorting1_name='mountain',
+#     sorting2_name='circus',
+# )
+
+# sw.plot_agreement_matrix(cmp_1)
+
+
 
 #Remove empty units
-TDC_output = sorting_outputs[('group0','tridesclous')]
+TDC_output = sorter_list[1]
 TDC_output = TDC_output.remove_empty_units()
 print(f'Sorter found {len(TDC_output.get_unit_ids())} non-empty units')
 
@@ -168,37 +202,68 @@ w_rs = sw.plot_rasters(TDC_output)
 
 """
 
-job_kwargs = dict(n_jobs=10, chunk_duration="1s", progress_bar=True)
+we_all_sorters=[]
+
+for i in range(len(sorter_list)):
+    print(sorter_name_list[i])
+    
+    
+    we = si.extract_waveforms(recording_loaded, sorter_list[i], folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}/{sorter_name_list[i]}', 
+                              load_if_exists=False, overwrite=True,**job_kwargs)
+    
+    we_all_sorters.append(we)
+
+    w = sw.plot_unit_templates(we)
+    
+    # example: radius
+    sparsity_radius = spost.get_template_channel_sparsity(we, method="radius", radius_um=50)
+
+    sparsity_radius = si.core.ChannelSparsity.from_radius(we, radius_um=50, peak_sign='neg')
+
+
+    # example: best
+    sparsity_best = spost.get_template_channel_sparsity(we, method="best_channels", num_channels=4)
+
+    sparsity_best = si.core.ChannelSparsity.from_best_channels(we, num_channels=4, peak_sign='neg')
+
+
+    sw.plot_unit_templates(we, sparsity=sparsity_radius)
+    sw.plot_unit_templates(we, sparsity=sparsity_best)
+    
+    
+    
+    
+    
 
 #Waveform extraction only 500 for each clsuter
-we = si.extract_waveforms(recording_loaded, TDC_output, folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}', 
+we = si.extract_waveforms(recording_loaded, sorter_list[0], folder=rf'{working_dir}/{subject_name}/waveform_output_test/{recording_name}', 
                           load_if_exists=False, overwrite=True,**job_kwargs)
 print(we)
 
-waveforms0 = we.get_waveforms(unit_id=0)
+waveforms0 = we.get_waveforms(unit_id=1)
 print(f"Waveforms shape: {waveforms0.shape}")
-template0 = we.get_template(unit_id=0)
+template0 = we.get_template(unit_id=1)
 print(f"Template shape: {template0.shape}")
 all_templates = we.get_all_templates()
 print(f"All templates shape: {all_templates.shape}")
 
 w = sw.plot_unit_templates(we)
 
-for unit in TDC_output.get_unit_ids():
+for unit in sorter_list[0].get_unit_ids():
     waveforms = we.get_waveforms(unit_id=unit)
-    spiketrain = TDC_output.get_unit_spike_train(unit)
+    spiketrain = sorter_list[0].get_unit_spike_train(unit)
     print(f"Unit {unit} - num waveforms: {waveforms.shape[0]} - num spikes: {len(spiketrain)}")
     
     
 #Waveform extraction all spikes for each clsuter  
-we_all = si.extract_waveforms(recording_loaded, TDC_output, folder=rf'{working_dir}/{subject_name}/waveform_output_all/{recording_name}', 
+we_all = si.extract_waveforms(recording_loaded, sorter_list[0], folder=rf'{working_dir}/{subject_name}/waveform_output_all/{recording_name}', 
                               max_spikes_per_unit=None,
                               overwrite=True,
                               **job_kwargs)
 
-for unit in TDC_output.get_unit_ids():
+for unit in sorter_list[0].get_unit_ids():
     waveforms = we_all.get_waveforms(unit_id=unit)
-    spiketrain = TDC_output.get_unit_spike_train(unit)
+    spiketrain = sorter_list[0].get_unit_spike_train(unit)
     print(f"Unit {unit} - num waveforms: {waveforms.shape[0]} - num spikes: {len(spiketrain)}")
     
 
@@ -207,7 +272,7 @@ for unit in TDC_output.get_unit_ids():
 ---------------------------Post processing---------------------------
 
 """
-sorting = TDC_output
+sorting = sorter_list[0]
 
 
 """
@@ -239,7 +304,7 @@ pc = spost.compute_principal_components(we, n_components=3,
                                         n_jobs=job_kwargs["n_jobs"], 
                                         progress_bar=job_kwargs["progress_bar"])
 
-pc0 = pc.get_projections(unit_id=0)
+pc0 = pc.get_projections(unit_id=1)
 print(f"PC scores shape: {pc0.shape}")
 all_labels, all_pcs = pc.get_all_projections()
 print(f"All PC scores shape: {all_pcs.shape}")

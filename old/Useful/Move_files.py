@@ -13,7 +13,7 @@ import os
 import re
 import shutil
 
-rootdir = 'C:/Users/MOCAP/Pictures/IC Express/'
+rootdir = r'D:\SOD_2023\_7_24_05'
 
 img_array = []
 

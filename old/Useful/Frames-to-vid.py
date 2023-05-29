@@ -29,12 +29,12 @@ def make_video(files):
     a = "%s" % (a[-1])
     a.replace(' ', '_')
     print('Saving...')
-    out = cv2.VideoWriter('{}{}.avi'.format(rootdir, a),cv2.VideoWriter_fourcc(*'DIVX'), 35, size)
+    out = cv2.VideoWriter('{}{}.avi'.format(rootdir, a),cv2.VideoWriter_fourcc(*'DIVX'), 70, size)
     for i in range(len(img_array)):
         out.write(img_array[i])
     return(out.release())
 
-rootdir = r'D:\SOD_2023\1226\1226'
+rootdir = r'D:\SOD_2023\0014_24_05\1'
 
 img_array = []
 
