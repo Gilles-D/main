@@ -566,10 +566,10 @@ for spiketrain_name,spiketrain in enumerate(spiketrains_list):
     plt.figure(dpi=150)
     
     # plotting the original spiketrain
-    plt.plot(spiketrain, [0]*len(spiketrain), 'r', marker=2, ms=25, markeredgewidth=2, lw=0, label='poisson spike times')
+    # plt.plot(spiketrain, [0]*len(spiketrain), 'r', marker=2, ms=25, markeredgewidth=2, lw=0, label='poisson spike times')
     
     # mean firing rate
-    plt.hlines(mean_firing_rate(spiketrain), xmin=spiketrain.t_start, xmax=spiketrain.t_stop, linestyle='--', label='mean firing rate')
+    plt.hlines(mean_firing_rate(spiketrain,t_stop=400*s), xmin=spiketrain.t_start, xmax=spiketrain.t_stop, linestyle='--', label='mean firing rate')
     
     # time histogram
     plt.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
@@ -621,8 +621,237 @@ for spiketrain_name,spiketrain in enumerate(spiketrains_list):
     plt.title(rf'Spiketrain {spiketrain_name+1}')
     plt.show()
     
-    plt.savefig(rf"{savefig_folder}/spiketrain_{spiketrain_name+1}.svg")
+    # plt.savefig(rf"{savefig_folder}/spiketrain_{spiketrain_name+1}.svg")
     
+
+#%%Slicing activity
+#Behavior phases
+starts=np.array([23,52,79,109])
+starts2=np.array([15,72,103,133])+131.3152
+starts3=np.array([9,54,80,107])+281.0944
+
+starts=np.concatenate((starts, starts2, starts3))
+
+stops=np.array([29,59,85,114])
+stops2=np.array([26,77,110,140])+131.3152
+stops3=np.array([30,62,90,112])+281.0944
+
+stops=np.concatenate((stops, stops2, stops3))
+
+activity_times=list(zip(starts,stops))
+
+spiketrains_activity=[]
+
+for cluster in selected_spike_times:
+    spike_times=cluster
+    
+    # Sélectionner les temps de potentiel d'action dans les phases d'activité
+    activity_spikes = []
+    for debut, fin in activity_times:
+        mask = np.logical_and(spike_times >= debut, spike_times <= fin)
+        temps_phase = spike_times[mask]
+        activity_spikes.extend(temps_phase)
+
+    # Convertir la liste en array
+    activity_spikes = np.array(activity_spikes)
+
+    # Afficher les temps de potentiel d'action sélectionnés
+    print(activity_spikes)
+    
+    spiketrains_activity.append(activity_spikes)
+    
+    
+    
+
+spiketrain_activity3 = SpikeTrain(spiketrains_activity[2]*s, t_stop=410)
+spiketrain_activity4 = SpikeTrain(spiketrains_activity[3]*s, t_stop=410)
+spiketrain_activity5 = SpikeTrain(spiketrains_activity[4]*s, t_stop=410)
+
+print("The mean firing rate of spiketrain3 is", mean_firing_rate(spiketrain_activity3))
+print("The mean firing rate of spiketrain4 is", mean_firing_rate(spiketrain_activity4))
+print("The mean firing rate of spiketrain5 is", mean_firing_rate(spiketrain_activity5))
+
+
+
+
+
+#%%Slicing wait
+
+downs=np.array([21,45,76,105])
+downs2=np.array([14,43,89,124])+131.3152
+downs3=np.array([8,41,76,96])+281.0944
+
+downs=np.concatenate((downs, downs2, downs3))
+
+
+starts=np.array([23,52,79,109])
+starts2=np.array([15,72,103,133])+131.3152
+starts3=np.array([9,54,80,107])+281.0944
+
+starts=np.concatenate((starts, starts2, starts3))
+
+
+wait_times=list(zip(downs,starts))
+
+spiketrains_wait=[]
+
+for cluster in selected_spike_times:
+    spike_times=cluster
+    
+    # Sélectionner les temps de potentiel d'action dans les phases d'activité
+    wait_spikes = []
+    for debut, fin in wait_times:
+        mask = np.logical_and(spike_times >= debut, spike_times <= fin)
+        temps_phase = spike_times[mask]
+        wait_spikes.extend(temps_phase)
+
+    # Convertir la liste en array
+    wait_spikes = np.array(wait_spikes)
+
+    # Afficher les temps de potentiel d'action sélectionnés
+    print(wait_spikes)
+    
+    spiketrains_wait.append(wait_spikes)
+    
+    
+    
+
+spiketrain_activity3 = SpikeTrain(spiketrains_wait[2]*s, t_stop=410)
+spiketrain_activity4 = SpikeTrain(spiketrains_wait[3]*s, t_stop=410)
+spiketrain_activity5 = SpikeTrain(spiketrains_wait[4]*s, t_stop=410)
+
+print("The mean firing rate of spiketrain3 is", mean_firing_rate(spiketrain_activity3))
+print("The mean firing rate of spiketrain4 is", mean_firing_rate(spiketrain_activity4))
+print("The mean firing rate of spiketrain5 is", mean_firing_rate(spiketrain_activity5))
+
+
+
+#%% Lift activity
+
+lifts=np.array([7,36,70,94])
+lifts2=np.array([7,36,84,118])+131.3152
+lifts3=np.array([4,34,68,91])+281.0944
+
+lifts=np.concatenate((lifts, lifts2, lifts3))
+
+downs=np.array([21,45,76,105])
+downs2=np.array([14,43,89,124])+131.3152
+downs3=np.array([8,41,76,96])+281.0944
+
+downs=np.concatenate((downs, downs2, downs3))
+
+
+lift_times=list(zip(lifts,downs))
+
+spiketrains_lift=[]
+
+for cluster in selected_spike_times:
+    spike_times=cluster
+    
+    # Sélectionner les temps de potentiel d'action dans les phases d'activité
+    lift_spikes = []
+    for debut, fin in lift_times:
+        mask = np.logical_and(spike_times >= debut, spike_times <= fin)
+        temps_phase = spike_times[mask]
+        lift_spikes.extend(temps_phase)
+
+    # Convertir la liste en array
+    lift_spikes = np.array(lift_spikes)
+
+    # Afficher les temps de potentiel d'action sélectionnés
+    print(lift_spikes)
+    
+    spiketrains_lift.append(lift_spikes)
+    
+    
+    
+
+spiketrain_activity3 = SpikeTrain(spiketrains_lift[2]*s, t_stop=410)
+spiketrain_activity4 = SpikeTrain(spiketrains_lift[3]*s, t_stop=410)
+spiketrain_activity5 = SpikeTrain(spiketrains_lift[4]*s, t_stop=410)
+
+print("The mean firing rate of spiketrain3 is", mean_firing_rate(spiketrain_activity3))
+print("The mean firing rate of spiketrain4 is", mean_firing_rate(spiketrain_activity4))
+print("The mean firing rate of spiketrain5 is", mean_firing_rate(spiketrain_activity5))
+
+#%%Histogram mean rate by phase
+
+means_by_phase=[]
+for i in range(len(spiketrains_activity)):
+    mean_activity=mean_firing_rate(SpikeTrain(spiketrains_activity[i]*s, t_stop=410))
+    mean_wait=mean_firing_rate(SpikeTrain(spiketrains_wait[i]*s, t_stop=410))
+    mean_lift=mean_firing_rate(SpikeTrain(spiketrains_lift[i]*s, t_stop=410))
+    
+    means_by_phase.append((mean_activity,mean_wait,mean_lift))
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+data = means_by_phase
+# Nombre de trains et de phases
+num_trains = len(data)
+num_phases = len(data[0])
+
+# Configuration des paramètres pour le tracé
+width = 0.2  # Largeur des barres pour chaque train
+x = np.arange(num_phases)  # Position des barres pour chaque phase
+
+# Création de la figure et des sous-graphiques
+fig, ax = plt.subplots()
+
+# Parcours de chaque train
+for i in range(num_trains):
+    # Récupération des valeurs de chaque phase pour le train courant
+    values = [data[i][j] for j in range(num_phases)]
+    
+    # Tracé des barres pour chaque train
+    ax.bar(x + i * width, values, width, label=f"Train {i+1}")
+
+# Configuration des axes, des légendes et du titre
+ax.set_xticks(x + width * (num_trains - 1) / 2)
+ax.set_xticklabels(["Phase 1", "Phase 2", "Phase 3"])
+ax.legend()
+ax.set_xlabel("Phases")
+ax.set_ylabel("Valeur")
+ax.set_title("Histogramme des valeurs de chaque train par phase")
+
+# Affichage de la figure
+plt.show()
+
+
+data = means_by_phase
+# Nombre de trains et de phases
+num_trains = len(data)
+num_phases = len(data[0])
+
+# Configuration des paramètres pour le tracé
+width = 0.2  # Largeur des barres pour chaque train
+x = np.arange(num_trains)  # Position des barres pour chaque phase
+
+# Création de la figure et des sous-graphiques
+fig, ax = plt.subplots()
+
+# Parcours de chaque train
+for i in range(num_phases):
+    # Récupération des valeurs de chaque phase pour le train courant
+    values = [data[j][i] for j in range(num_trains)]
+    
+    # Tracé des barres pour chaque train
+    ax.bar(x + i * width, values, width, label=f"phase {i+1}")
+
+# Configuration des axes, des légendes et du titre
+ax.set_xticks(x + width * (num_phases - 1) / 2)
+ax.set_xticklabels(["train 1", "train 2", "train 3","train 4","train 5"])
+ax.legend()
+ax.set_ylabel("Mean rate")
+ax.set_title("Histogramme des valeurs de chaque train par phase")
+
+# Affichage de la figure
+plt.show()
+
+
+
 
 #%% Coefficient of variation
 from elephant.statistics import isi, cv
