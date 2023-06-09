@@ -33,8 +33,8 @@ import docker
 
 #%% RHD file loading
 
-#probe_path=r'D:/ePhy/SI_Data/A1x16-Poly2-5mm-50s-177.json   #INTAN Optrode
-probe_path = 'D:/ePhy/SI_Data/CM16_Buz_Sparse_Fede.json'
+probe_path=r'D:/ePhy/SI_Data/A1x16-Poly2-5mm-50s-177.json'   #INTAN Optrode
+# probe_path = 'D:/ePhy/SI_Data/Buzsaki16.json' #INTAN Buzsaki16
 
 
 freq_min = 300
@@ -46,22 +46,60 @@ working_dir=r'D:\ePhy\Intan_Data'
 # Saving Folder path
 saving_dir=r"D:\ePhy\SI_Data"
 
-subject_name="_7"
+subject_name="0012"
 
-saving_name="fedetest"
+saving_name="0012_06_08"
 
 #Modifier en une boucle sur le dossier itan
-recordings = [
-    "D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-03-15McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-03-25McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-03-35McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-03-44McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-03-55McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-04-05McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-04-15McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-04-25McsRecording_1600um_6456_T5-1_20000Hz.rbf",
-"D:/ePhy/Old 2022/raw/old_raw/fede h5/RBF/fede h5/raw/2021-03-09T10-04-35McsRecording_1600um_6456_T5-1_20000Hz.rbf"]
+#Modifier en une boucle sur le dossier itan
+# recordings = [  
+# "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_163229/0014_24_05_230524_163229.rhd",
+# "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_163605/0014_24_05_230524_163605.rhd",
+# "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_163928/0014_24_05_230524_163928.rhd",
+# "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_164414/0014_24_05_230524_164414.rhd"]
 
+
+recordings=['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd'
+    
+    
+    
+    
+    
+    ]
+
+
+
+"""
+["D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_154139.rhd",
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153639.rhd",
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153739.rhd",
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153839.rhd",
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153939.rhd",
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_154039.rhd",
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155941/0012_08_06_230608_155941.rhd',
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',
+
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161806/0012_08_06_230608_162808.rhd",
+"D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161806/0012_08_06_230608_161806.rhd",
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd',
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_165232/0012_08_06_230608_165232.rhd',
+
+'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_165941/0012_08_06_230608_165941.rhd']
+"""
 
 
 
@@ -69,34 +107,10 @@ recordings = [
 recordings_list=[]
 for recording_file in recordings:
     recording = se.read_intan(recording_file,stream_id='0')
-    recording = se.read
     recording.annotate(is_filtered=False)
     recordings_list.append(recording)
 
 multirecording = si.concatenate_recordings(recordings_list)
-
-
-
-num_channels = 16
-sampling_frequency = 20000
-gain_to_uV = 0
-offset_to_uV = 0
-dtype = "float64"
-time_axis = 1
-
-recordings_list=[]
-for recording_file in recordings:
-    recording = si.read_binary(recording_file, num_chan=16, sampling_frequency=20000,
-                                dtype=dtype, gain_to_uV=gain_to_uV, offset_to_uV=offset_to_uV, 
-                                time_axis=time_axis)
-    recording.annotate(is_filtered=False)
-    recordings_list.append(recording)
-
-
-multirecording = si.concatenate_recordings(recordings_list)
-
-
-
 
 #Set the probe
 probe = pi.io.read_probeinterface(probe_path)
@@ -111,8 +125,10 @@ multirecording = multirecording.set_probe(probe)
 
 
 
-#excluded_sites = ['2','3','4','9','10','11','12','14','15']
-excluded_sites = []
+#excluded_sites = ['2','4','9','10','11','12','14','15']
+# excluded_sites = ['6','7','9','10','11','14','15']
+excluded_sites = ['6','7','9','10','11']
+#excluded_sites = []
 
 #Exclude defective sites
 # multirecording.set_channel_groups(1, [])
@@ -135,9 +151,7 @@ recording_cmr = spre.common_reference(recording_f, reference='global', operator=
 # w = sw.plot_timeseries(recording_cmr,time_range=[10,15], segment_index=0)
 
 
-rec_binary = recording_cmr.save(folder=rf'C:\Users\MOCAP\Desktop\temp\{saving_name}\binary_ff', n_jobs=1, progress_bar=True, chunk_duration='1s')
-
-
+rec_binary = recording_cmr.save(folder=rf'C:\Users\MOCAP\Desktop\temp\{saving_name}_test', n_jobs=1, progress_bar=True, chunk_duration='1s')
 
 #%% Section 1
 
@@ -175,19 +189,6 @@ param_sorter = {
     #                                 'wave_length': 61,
     #                                 'keep_good_only': False,
     #                             },
-                'mountainsort4': {
-                                    'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
-                                    'adjacency_radius': -1,  # # Radius in um to build channel neighborhood (-1 to include all channels in every neighborhood)
-                                    'freq_min': 300,  # 'High-pass filter cutoff frequency'
-                                    'freq_max': 6000, #'Low-pass filter cutoff frequency'
-                                    'filter': True, 
-                                    'whiten': True,  # Whether to do channel whitening as part of preprocessing
-                                    'num_workers': 1, 
-                                    'clip_size': 50, #'Number of samples per waveform',
-                                    'detect_threshold': 3,
-                                    'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel
-                                    'tempdir': None #'Temporary directory for mountainsort (available for ms4 >= 1.0.2)s'
-                                },
                 'tridesclous': {
                                     'freq_min': 300.,   #'High-pass filter cutoff frequency'
                                     'freq_max': 6000.,#'Low-pass filter cutoff frequency'
@@ -196,116 +197,116 @@ param_sorter = {
                                     'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
                                     'common_ref_removal': True,     #'remove common reference with median',
                                 },
-                'spykingcircus': {
-                                    'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
-                                    'adjacency_radius': 100,  # Radius in um to build channel neighborhood
-                                    'detect_threshold': 6,  # Threshold for detection
-                                    'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
-                                    'filter': True, # Enable or disable filter
-                                    'merge_spikes': True, #Enable or disable automatic mergind
-                                    'auto_merge': 0.75, #Automatic merging threshold
-                                    'num_workers': None, #Number of workers (if None, half of the cpu number is used)
-                                    'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
-                                    'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
-                                },
-                'waveclus':  {
-                                    'detect_threshold': 5,
-                                    'detect_sign': -1,
-                                    'feature_type': 'wav',
-                                    'scales': 4,
-                                    'min_clus': 20,
-                                    'maxtemp': 0.251,
-                                    'template_sdnum': 3,
-                                    'enable_detect_filter': True,
-                                    'enable_sort_filter': True,
-                                    'detect_filter_fmin': 300,
-                                    'detect_filter_fmax': 6000,
-                                    'detect_filter_order': 4,
-                                    'sort_filter_fmin': 300,
-                                    'sort_filter_fmax': 6000,
-                                    'sort_filter_order': 2,
-                                    'mintemp': 0,
-                                    'w_pre': 20,
-                                    'w_post': 44,
-                                    'alignment_window': 10,
-                                    'stdmax': 50,
-                                    'max_spk': 40000,
-                                    'ref_ms': 1.5,
-                                    'interpolation': True,
-                                    'keep_good_only': True,
-                                    'chunk_memory': '500M'},
+                # 'spykingcircus': {
+                #                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
+                #                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
+                #                     'detect_threshold': 6,  # Threshold for detection
+                #                     'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
+                #                     'filter': True, # Enable or disable filter
+                #                     'merge_spikes': True, #Enable or disable automatic mergind
+                #                     'auto_merge': 0.75, #Automatic merging threshold
+                #                     'num_workers': None, #Number of workers (if None, half of the cpu number is used)
+                #                     'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
+                #                     'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
+                #                 },
+                # 'waveclus':  {
+                #                     'detect_threshold': 5,
+                #                     'detect_sign': -1,
+                #                     'feature_type': 'wav',
+                #                     'scales': 4,
+                #                     'min_clus': 20,
+                #                     'maxtemp': 0.251,
+                #                     'template_sdnum': 3,
+                #                     'enable_detect_filter': True,
+                #                     'enable_sort_filter': True,
+                #                     'detect_filter_fmin': 300,
+                #                     'detect_filter_fmax': 6000,
+                #                     'detect_filter_order': 4,
+                #                     'sort_filter_fmin': 300,
+                #                     'sort_filter_fmax': 6000,
+                #                     'sort_filter_order': 2,
+                #                     'mintemp': 0,
+                #                     'w_pre': 20,
+                #                     'w_post': 44,
+                #                     'alignment_window': 10,
+                #                     'stdmax': 50,
+                #                     'max_spk': 40000,
+                #                     'ref_ms': 1.5,
+                #                     'interpolation': True,
+                #                     'keep_good_only': True,
+                #                     'chunk_memory': '500M'},
                 
-                'ironclust':  {
-                                    'detect_sign': -1,
-                                    'adjacency_radius': 50,
-                                    'adjacency_radius_out': 100,
-                                    'detect_threshold': 3.5,
-                                    'prm_template_name': '',
-                                    'freq_min': 300,
-                                    'freq_max': 6000,
-                                    'merge_thresh': 0.985,
-                                    'pc_per_chan': 9,
-                                    'whiten': False,
-                                    'filter_type': 'bandpass',
-                                    'filter_detect_type': 'none',
-                                    'common_ref_type': 'trimmean',
-                                    'batch_sec_drift': 300,
-                                    'step_sec_drift': 20,
-                                    'knn': 30,
-                                    'min_count': 30,
-                                    'fGpu': True,
-                                    'fft_thresh': 8,
-                                    'fft_thresh_low': 0,
-                                    'nSites_whiten': 16,
-                                    'feature_type': 'gpca',
-                                    'delta_cut': 1,
-                                    'post_merge_mode': 1,
-                                    'sort_mode': 1,
-                                    'fParfor': False,
-                                    'filter': True,
-                                    'clip_pre': 0.25,
-                                    'clip_post': 0.75,
-                                    'merge_thresh_cc': 1,
-                                    'nRepeat_merge': 3,
-                                    'merge_overlap_thresh': 0.95,
-                                    'n_jobs': 8,
-                                    'chunk_duration': '1s',
-                                    'progress_bar': True},
+                # 'ironclust':  {
+                #                     'detect_sign': -1,
+                #                     'adjacency_radius': 50,
+                #                     'adjacency_radius_out': 100,
+                #                     'detect_threshold': 3.5,
+                #                     'prm_template_name': '',
+                #                     'freq_min': 300,
+                #                     'freq_max': 6000,
+                #                     'merge_thresh': 0.985,
+                #                     'pc_per_chan': 9,
+                #                     'whiten': False,
+                #                     'filter_type': 'bandpass',
+                #                     'filter_detect_type': 'none',
+                #                     'common_ref_type': 'trimmean',
+                #                     'batch_sec_drift': 300,
+                #                     'step_sec_drift': 20,
+                #                     'knn': 30,
+                #                     'min_count': 30,
+                #                     'fGpu': True,
+                #                     'fft_thresh': 8,
+                #                     'fft_thresh_low': 0,
+                #                     'nSites_whiten': 16,
+                #                     'feature_type': 'gpca',
+                #                     'delta_cut': 1,
+                #                     'post_merge_mode': 1,
+                #                     'sort_mode': 1,
+                #                     'fParfor': False,
+                #                     'filter': True,
+                #                     'clip_pre': 0.25,
+                #                     'clip_post': 0.75,
+                #                     'merge_thresh_cc': 1,
+                #                     'nRepeat_merge': 3,
+                #                     'merge_overlap_thresh': 0.95,
+                #                     'n_jobs': 8,
+                #                     'chunk_duration': '1s',
+                #                     'progress_bar': True},
                 
-                'herdingspikes':   {
-                                    'clustering_bandwidth': 5.5,
-                                    'clustering_alpha': 5.5,
-                                    'clustering_n_jobs': -1,
-                                    'clustering_bin_seeding': True,
-                                    'clustering_min_bin_freq': 16,
-                                    'clustering_subset': None,
-                                    'left_cutout_time': 0.3,
-                                    'right_cutout_time': 1.8,
-                                    'detect_threshold': 20,
-                                    'probe_masked_channels': [],
-                                    'probe_inner_radius': 70,
-                                    'probe_neighbor_radius': 90,
-                                    'probe_event_length': 0.26,
-                                    'probe_peak_jitter': 0.2,
-                                    't_inc': 100000,
-                                    'num_com_centers': 1,
-                                    'maa': 12,
-                                    'ahpthr': 11,
-                                    'out_file_name': 'HS2_detected',
-                                    'decay_filtering': False,
-                                    'save_all': False,
-                                    'amp_evaluation_time': 0.4,
-                                    'spk_evaluation_time': 1.0,
-                                    'pca_ncomponents': 2,
-                                    'pca_whiten': True,
-                                    'freq_min': 300.0,
-                                    'freq_max': 6000.0,
-                                    'filter': True,
-                                    'pre_scale': True,
-                                    'pre_scale_value': 20.0,
-                                    'filter_duplicates': True}
+                # 'herdingspikes':   {
+                #                     'clustering_bandwidth': 5.5,
+                #                     'clustering_alpha': 5.5,
+                #                     'clustering_n_jobs': -1,
+                #                     'clustering_bin_seeding': True,
+                #                     'clustering_min_bin_freq': 16,
+                #                     'clustering_subset': None,
+                #                     'left_cutout_time': 0.3,
+                #                     'right_cutout_time': 1.8,
+                #                     'detect_threshold': 20,
+                #                     'probe_masked_channels': [],
+                #                     'probe_inner_radius': 70,
+                #                     'probe_neighbor_radius': 90,
+                #                     'probe_event_length': 0.26,
+                #                     'probe_peak_jitter': 0.2,
+                #                     't_inc': 100000,
+                #                     'num_com_centers': 1,
+                #                     'maa': 12,
+                #                     'ahpthr': 11,
+                #                     'out_file_name': 'HS2_detected',
+                #                     'decay_filtering': False,
+                #                     'save_all': False,
+                #                     'amp_evaluation_time': 0.4,
+                #                     'spk_evaluation_time': 1.0,
+                #                     'pca_ncomponents': 2,
+                #                     'pca_whiten': True,
+                #                     'freq_min': 300.0,
+                #                     'freq_max': 6000.0,
+                #                     'filter': True,
+                #                     'pre_scale': True,
+                #                     'pre_scale_value': 20.0,
+                #                     'filter_duplicates': True}
                 
-            }
+             }
 
 
 
@@ -371,7 +372,7 @@ for i in sorters_empty:
     print(rf'{sorter_name_list[i[0]]} is empty and deleted')
     sorter_name_list.remove(sorter_name_list[i[0]])
 
-
+sorter_list_cleaned
 
 #%% Section 2
 
@@ -412,7 +413,7 @@ for i in range(len(sorter_list_cleaned)):
         print(rf'{sorter_name_list[i]} export skipped (no units?)')
         pass
     
-print("Exporting to Phy done")
+print("Exporting to Phy done") 
 
 
 
@@ -450,10 +451,10 @@ else:
     
     print("Exporting to Phy comparison")
     
-    we = si.extract_waveforms(recording_loaded, agr_2, folder=rf'{working_dir}/{subject_name}/waveform_output/{recording_name}/agreement', 
+    we = si.extract_waveforms(recording_cmr, agr_2, folder=rf'{working_dir}/{subject_name}/waveform_output/{saving_name}/agreement', 
                               load_if_exists=False, overwrite=True,**job_kwargs)
     
-    sexp.export_to_phy(we, output_folder=rf'{working_dir}/{subject_name}/export_phy/{recording_name}/agreement', 
+    sexp.export_to_phy(we, output_folder=rf'{working_dir}/{subject_name}/export_phy/{saving_name}/agreement', 
                        compute_amplitudes=False, compute_pc_features=False, copy_binary=True,
                        **job_kwargs)
     
