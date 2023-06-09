@@ -12,7 +12,7 @@ import re
 import matplotlib.pyplot as plt
 
 
-rootdir = r'D:\SOD_2023\0014_24_05\1'
+rootdir = r'D:\SOD_2023\0014_24_05\5'
 
 
 test=[]
@@ -25,8 +25,9 @@ for subdirs, dirs, files in os.walk(rootdir):
             
 toast = [j-i for i, j in zip(test[:-1], test[1:])]
 a = 1/np.array(toast)
-for i in toast:
-    print(1/i)
+# for i in toast:
+#     print(1/i)
     
 plt.plot(a)
  
+print(rf'Fréquence moyenne = {np.average(a)}')
