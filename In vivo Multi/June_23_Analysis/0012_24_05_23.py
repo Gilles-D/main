@@ -365,8 +365,8 @@ linelengths1 = [0.1, 0.1,0.1,0.1,0.1,0.1,0.1]
 colors1 = ['C{}'.format(i) for i in range(len(selected_spike_times))]
 plt.eventplot(selected_spike_times,colors=colors1, linelengths=1, lineoffsets=1, linewidths=1)
 
-number_spike_cum = np.arange(len(selected_spike_times[3])) + 1
-plt.plot(selected_spike_times[3], number_spike_cum, marker='o')
+# number_spike_cum = np.arange(len(selected_spike_times[3])) + 1
+# plt.plot(selected_spike_times[3], number_spike_cum, marker='o')
 
 
 #%% waveforms
@@ -382,6 +382,8 @@ for cluster in clusters_idx:
         plt.figure()
         plt.plot(all_mean_wvfs[chan])
         plt.title(rf'Cluster : {cluster} Channel :{selected_chan[chan]}')
+        plt.savefig(rf'{savefig_folder}/wf/wf_cluster_{cluster}_chan_{selected_chan[chan]}.svg')
+        plt.close()
  
 
 selected_positions = [pos for pos in channel_positions if pos[0] in selected_chan]
@@ -962,7 +964,8 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     # Afficher la figure
     plt.show()
     
-    plt.savefig(rf"{savefig_folder}/optotag_{spiketrain_name+1}.svg")
+    print(rf"{savefig_folder}/optotag_{spiketrain_index}.svg")
+    plt.savefig(rf"{savefig_folder}/optotag_{spiketrain_index}.svg")
     
     
     

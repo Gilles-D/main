@@ -48,7 +48,7 @@ saving_dir=r"D:\ePhy\SI_Data"
 
 subject_name="0012"
 
-saving_name="0012_06_08"
+saving_name="0012_06_08_circus"
 
 #Modifier en une boucle sur le dossier itan
 #Modifier en une boucle sur le dossier itan
@@ -189,26 +189,26 @@ param_sorter = {
     #                                 'wave_length': 61,
     #                                 'keep_good_only': False,
     #                             },
-                'tridesclous': {
-                                    'freq_min': 300.,   #'High-pass filter cutoff frequency'
-                                    'freq_max': 6000.,#'Low-pass filter cutoff frequency'
-                                    'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
-                                    'detect_threshold': 5, #'Threshold for spike detection',
-                                    'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
-                                    'common_ref_removal': True,     #'remove common reference with median',
-                                },
-                # 'spykingcircus': {
-                #                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
-                #                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
-                #                     'detect_threshold': 6,  # Threshold for detection
-                #                     'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
-                #                     'filter': True, # Enable or disable filter
-                #                     'merge_spikes': True, #Enable or disable automatic mergind
-                #                     'auto_merge': 0.75, #Automatic merging threshold
-                #                     'num_workers': None, #Number of workers (if None, half of the cpu number is used)
-                #                     'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
-                #                     'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
+                # 'tridesclous': {
+                #                     'freq_min': 300.,   #'High-pass filter cutoff frequency'
+                #                     'freq_max': 6000.,#'Low-pass filter cutoff frequency'
+                #                     'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
+                #                     'detect_threshold': 5, #'Threshold for spike detection',
+                #                     'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
+                #                     'common_ref_removal': True,     #'remove common reference with median',
                 #                 },
+                'spykingcircus': {
+                                    'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
+                                    'adjacency_radius': 100,  # Radius in um to build channel neighborhood
+                                    'detect_threshold': 6,  # Threshold for detection
+                                    'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
+                                    'filter': True, # Enable or disable filter
+                                    'merge_spikes': True, #Enable or disable automatic mergind
+                                    'auto_merge': 0.75, #Automatic merging threshold
+                                    'num_workers': None, #Number of workers (if None, half of the cpu number is used)
+                                    'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
+                                    'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
+                                },
                 # 'waveclus':  {
                 #                     'detect_threshold': 5,
                 #                     'detect_sign': -1,

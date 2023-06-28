@@ -281,22 +281,21 @@ Load the different files
 
 
 #Exported from tridesclou export (by spikeinterface to phy)
-spike_times = np.load('C:/Users/MOCAP/Desktop/temp/0012_06_08/phy_export/tridesclous/spike_times.npy')
-spike_cluster = np.load('C:/Users/MOCAP/Desktop/temp/0012_06_08/phy_export/tridesclous/spike_clusters.npy')
-spike_templates = np.load('C:/Users/MOCAP/Desktop/temp/0012_06_08/phy_export/tridesclous/similar_templates.npy')
+spike_times = np.load('C:/Users/MOCAP/Desktop/temp/0012_24_05_all_01_06/phy_export/tridesclous/spike_times.npy')
+spike_cluster = np.load('C:/Users/MOCAP/Desktop/temp/0012_24_05_all_01_06/phy_export/tridesclous/spike_clusters.npy')
+spike_templates = np.load('C:/Users/MOCAP/Desktop/temp/0012_24_05_all_01_06/phy_export/tridesclous/similar_templates.npy')
 
 
 
 #List of recordings rhd files
-recordings=['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',#2 Baseline
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',#3 Passage sanns obst
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',#5 Obst moyen
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',#7 Cage Roue
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd'#8 Opto
-    ]
+recordings=[
+    "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_163229/0014_24_05_230524_163229.rhd",#1 passage sans obst
+    "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_163605/0014_24_05_230524_163605.rhd",#2 passage petit obst
+    "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_163928/0014_24_05_230524_163928.rhd",#3 passage moyen obst
+    "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_164414/0014_24_05_230524_164414.rhd"]#4 passage opto 100ms 1hz
 
 
-savefig_folder=r"C:\Users\MOCAP\Desktop\Spikesorting_0012_08_06"
+savefig_folder=r"C:\Users\MOCAP\Desktop\Spikesorting_0012_24_05"
 
 
 
@@ -337,6 +336,8 @@ frequency=reader['frequency_parameters']['amplifier_sample_rate']
 
 #Get spikes for each cluster 
 clusters_idx = np.unique(spike_cluster)#Index of all clusters
+clusters_idx=clusters_idx[2:]#exclude stim artefacts
+
 
 selected_spike_times,selected_spike_indexes=[],[]
 for cluster in clusters_idx:#Loop on each cluster to get the spike of the cluster
@@ -368,12 +369,16 @@ channel_order=[12, 13, 14, 15, 11, 10, 9, 8, 7, 6, 5, 4, 0, 1, 2, 3]
 
 channel_positions=list(zip(channel_order,sites_positions))
 
+
 #%%Camera delay
 """
 Calculate delay in seconds between the start of ephy recording, and camera recording
 """
 
 frame_start_delay=np.array(frame_start_delay)/frequency#Delays in seconds
+
+
+
 
 
 #%%Phase timestamps
@@ -386,30 +391,35 @@ recordings_lengths_cumsum=np.cumsum(np.array(recordings_lengths)/frequency)
 
 
 #Behavior phases
-#Phases of the second file
-starts=np.array([28,56,92,120,170,219,261])+recordings_lengths_cumsum[0]+frame_start_delay[1]
-stops=np.array([34,65,100,140,183,234,267])+recordings_lengths_cumsum[0]+frame_start_delay[1]
+starts=np.array([23,52,79,109])+frame_start_delay[0]
+starts2=np.array([15,72,103,133])+recordings_lengths_cumsum[0]+frame_start_delay[1]
+starts3=np.array([9,54,80,107])+recordings_lengths_cumsum[1]+frame_start_delay[2]
 
-#Phases of the third file
-starts2=np.array([24,100,140,205,235,265,297,329,370])+recordings_lengths_cumsum[1]+frame_start_delay[2]
-stops2=np.array([50,126,160,211,242,269,303,334,376])+recordings_lengths_cumsum[1]+frame_start_delay[2]
-
-
-starts=np.concatenate((starts, starts2))
-stops=np.concatenate((stops, stops2))
+stops=np.array([29,59,85,114])+frame_start_delay[0]
+stops2=np.array([26,77,110,140])+recordings_lengths_cumsum[0]+frame_start_delay[1]
+stops3=np.array([30,62,90,112])+recordings_lengths_cumsum[1]+frame_start_delay[2]
 
 
-    # lifts=np.array([7,36,70,94])
-    # lifts2=np.array([7,36,84,118])+131.3152
-    # lifts3=np.array([4,34,68,91])+281.0944
-    
-    # lifts=np.concatenate((lifts, lifts2, lifts3))
-    
-    # downs=np.array([21,45,76,105])
-    # downs2=np.array([14,43,89,124])+131.3152
-    # downs3=np.array([8,41,76,96])+281.0944
-    
-    # downs=np.concatenate((downs, downs2, downs3))
+starts=np.concatenate((starts, starts2,starts3))
+stops=np.concatenate((stops, stops2,stops3))
+
+
+
+
+lifts=np.array([7,36,70,94])+frame_start_delay[0]
+lifts2=np.array([7,36,84,118])+recordings_lengths_cumsum[0]+frame_start_delay[1]
+lifts3=np.array([4,34,68,91])+recordings_lengths_cumsum[1]+frame_start_delay[2]
+lifts=np.concatenate((lifts, lifts2, lifts3))
+
+downs=np.array([21,45,76,105])+frame_start_delay[0]
+downs2=np.array([14,43,89,124])+recordings_lengths_cumsum[0]+frame_start_delay[1]
+downs3=np.array([8,41,76,96])+recordings_lengths_cumsum[1]+frame_start_delay[2]
+
+downs=np.concatenate((downs, downs2, downs3))
+
+
+
+
 
 
 
@@ -467,8 +477,8 @@ Get the waveform of each spiketrain, for each selected channel
 """
 
 
-for cluster in clusters_idx:
-    spike_idx=selected_spike_indexes[cluster]#Select spikes for the cluster
+for idx,cluster in enumerate(clusters_idx):
+    spike_idx=selected_spike_indexes[idx]#Select spikes for the cluster
     all_mean_wvfs=[]
     for channel in range(len(selected_chan)):
         wvfs = extract_spike_waveform(cmr_signals[channel],spike_idx)#Extract all the wf spikes for the channel
@@ -616,7 +626,7 @@ for index,spiketrain in enumerate(selected_spike_times):
 print(rf"There are {len(elephant_spiketrains)} spiketrains in this analysis")
 for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
     
-    print(rf"The mean firing rate of spiketrain{spiketrain_name+1} on whole session is", mean_firing_rate(spiketrain))
+    print(rf"The mean firing rate of spiketrain{spiketrain_name+2} on whole session is", mean_firing_rate(spiketrain))
     
     
     
@@ -678,13 +688,12 @@ for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
     plt.xlim(spiketrain.t_start, spiketrain.t_stop)   
     #plt.xlim(0, 572.9232) #Use this to focus on phases you want using recordings_lengths_cumsum
     
-    plt.ylim(0,100)
     
     plt.legend()
-    plt.title(rf'Spiketrain {spiketrain_name+1}')
+    plt.title(rf'Spiketrain {spiketrain_name+2}')
     plt.show()
     
-    plt.savefig(rf"{savefig_folder}/Figure2_spiketrain_{spiketrain_name+1}.svg")
+    plt.savefig(rf"{savefig_folder}/Figure2_spiketrain_{spiketrain_name+2}.svg")
     
 #%%Figure 2b : Superimposed spiketrains
 print('Figure 2b - Superimposed spiketrains')
@@ -708,20 +717,32 @@ plt.savefig(rf"{savefig_folder}/Figure2b_superimposed_spiketrains.svg")
 #%%Phase dependent activity (mean_firing_rate)
 
 """
-Baseline activity
+Waiting period
 """
-#File #2 for baseline
-#index 0 here
-baseline_start=0*s
-baseline_stop=recordings_lengths_cumsum[0]*s
+waiting_times=list(zip(downs,starts))
 
-mean_baseline=[]
-for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
-        mean_rate = mean_firing_rate(spiketrain,t_start=baseline_start,t_stop=baseline_stop)
-        print(rf"The mean firing rate of spiketrain{spiketrain_name+1} during baseline activity is", mean_rate)
-        # inst_rate=instantaneous_rate(spiketrain,t_start=baseline_start,t_stop=baseline_stop, sampling_period=1*ms, kernel='auto')
-        # plt.plot(inst_rate)
-        mean_baseline.append(mean_rate)
+#Get spike times in the activity period
+spiketrains_waiting=[]
+for cluster in selected_spike_times:
+    spike_times=cluster
+    
+    # Sélectionner les temps de potentiel d'action dans les phases d'activité
+    waiting_spikes = []
+    for debut, fin in waiting_times:
+        mask = np.logical_and(spike_times >= debut, spike_times <= fin)
+        temps_phase = spike_times[mask]
+        waiting_spikes.extend(temps_phase)
+
+    # Convertir la liste en array
+    waiting_spikes = np.array(waiting_spikes)
+    
+    spiketrains_waiting.append(waiting_spikes)
+
+mean_waiting=[]    
+for index,spiketrain in enumerate(spiketrains_waiting):
+    mean_rate=mean_firing_rate(spiketrain)
+    print(rf"The mean firing rate of spiketrain{index+2} during waiting activity is", mean_rate)
+    mean_waiting.append(mean_rate)
 
 
 """
@@ -752,7 +773,7 @@ for cluster in selected_spike_times:
 mean_activity=[]    
 for index,spiketrain in enumerate(spiketrains_activity):
     mean_rate=mean_firing_rate(spiketrain)
-    print(rf"The mean firing rate of spiketrain{index+1} during crossing activity is", mean_rate)
+    print(rf"The mean firing rate of spiketrain{index+2} during crossing activity is", mean_rate)
     mean_activity.append(mean_rate)
 
 
@@ -760,19 +781,37 @@ for index,spiketrain in enumerate(spiketrains_activity):
 """
 Lifting period
 """
+lifting_times=list(zip(starts,stops))
 
+#Get spike times in the activity period
+spiketrains_activity=[]
+for cluster in selected_spike_times:
+    spike_times=cluster
+    
+    # Sélectionner les temps de potentiel d'action dans les phases d'activité
+    activity_spikes = []
+    for debut, fin in lifting_times:
+        mask = np.logical_and(spike_times >= debut, spike_times <= fin)
+        temps_phase = spike_times[mask]
+        activity_spikes.extend(temps_phase)
 
+    # Convertir la liste en array
+    activity_spikes = np.array(activity_spikes)
+    
+    spiketrains_activity.append(activity_spikes)
 
-"""
-Waiting period
-"""
+mean_lifting=[]    
+for index,spiketrain in enumerate(spiketrains_activity):
+    mean_rate=mean_firing_rate(spiketrain)
+    print(rf"The mean firing rate of spiketrain{index+2} during lifting activity is", mean_rate)
+    mean_lifting.append(mean_rate)
 
 
 #%%Figure 3 : Histogram mean rate by phase
 print('Figure 3 - Histogram mean rate by phase')
 means_by_phase=[]
-for i in clusters_idx:
-    means_by_phase.append((mean_baseline[i],mean_activity[i]))
+for i,_ in enumerate(clusters_idx):
+    means_by_phase.append((mean_waiting[i],mean_activity[i],mean_lifting[i]))
 
 
 data = means_by_phase
@@ -809,65 +848,6 @@ plt.savefig(rf"{savefig_folder}/Figure3_Mean_rates_by_phase.svg")
 #%%Figure 3b : Raster activity
 print('Figure 3b - Raster activity')
 
-# def raster_plot(spiketrains, starts, stops):
-#     # Création de la figure et de l'axe
-#     fig, ax = plt.subplots()
-
-#     # Parcours de chaque phase
-#     for i, (start, stop) in enumerate(zip(starts, stops)):
-#         # Sélection des temps de spike dans la plage de temps de la phase
-#         phase_spikes = spiketrains[(spiketrains >= start) & (spiketrains <= stop)]
-        
-#         # Création d'un tableau de 1 avec les indices correspondants aux temps de spike
-#         spike_indices = [1] * len(phase_spikes)
-        
-#         # Tracé du raster plot pour la phase
-#         ax.scatter(phase_spikes, [i+1] * len(phase_spikes), marker='|', color='black')
-        
-#     # Configuration des axes et des labels
-#     ax.set_xlabel('Temps')
-#     ax.set_ylabel('Phase')
-#     ax.set_title('Raster Plot')
-    
-#     # Affichage du raster plot
-#     plt.show()
-
-# def raster_plot(spiketrains, starts, stops):
-#     # Création de la figure et de l'axe
-#     fig, ax = plt.subplots()
-
-#     # Parcours de chaque phase
-#     for i, (start, stop) in enumerate(zip(starts, stops)):
-#         # Sélection des temps de spike dans la plage de temps de la phase
-#         phase_spikes = spiketrains[(spiketrains >= start) & (spiketrains <= stop)]
-        
-#         # Normalisation des temps de spike par rapport à la phase
-#         normalized_spikes = phase_spikes - start
-        
-#         # Création d'un tableau de 1 avec les indices correspondants aux temps de spike
-#         spike_indices = [1] * len(normalized_spikes)
-        
-#         # Tracé du raster plot pour la phase
-#         ax.scatter(normalized_spikes, [i+1] * len(normalized_spikes), marker='|', color='black')
-        
-#     # Configuration des axes et des labels
-#     ax.set_xlabel('Temps (normalisé)')
-#     ax.set_ylabel('Phase')
-#     ax.set_title('Raster Plot')
-    
-#     # Affichage du raster plot
-#     plt.show()
-
-
-# for train in spiketrains_activity:
-    
-#     raster_plot(train, starts, stops)
-
-
-
-
-
-
 for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     # Durée avant et après la stimulation pour la fenêtre de sélection (en secondes)
@@ -878,7 +858,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     total_duration = pre_stim_duration + post_stim_duration
     
     # Nombre de bins pour l'histogramme
-    num_bins = int(total_duration * 40)  # par exemple, 10 bins par seconde
+    num_bins = int(total_duration * 10)  # par exemple, 10 bins par seconde
     
     # Création des limites des bins pour l'histogramme
     bin_edges = np.linspace(-pre_stim_duration, post_stim_duration, num_bins + 1)
@@ -914,7 +894,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     # Créer la figure et les sous-graphiques
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [2, 1]})
-    ax1.set_title(rf"Rasterplot Spiketrain {spiketrain_index+1}")
+    ax1.set_title(rf"Rasterplot Spiketrain {spiketrain_index+2}")
     
     # Tracer l'histogramme péri-stimulus sur le subplot du bas
     histograms, _ = np.histogram(action_potential_times - starts[:, None], bins=bin_edges)
@@ -922,7 +902,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     ax2.bar(bin_centers, histograms, width=total_duration/num_bins, align='center')
     ax2.set_ylabel('Number of spikes')
     ax2.set_title('Peri-Stimulus Histogram')
-    print('bibite')
+    
     
     
     # Tracer le raster plot sur le subplot du haut
@@ -937,35 +917,12 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     ax2.set_xlabel('Time (s) from start')
     ax2.axvspan(0,0.001,color='blue',alpha=0.3)
     
-    ax2.set_xlim(-6,6)
-    
     # Ajuster les espaces entre les sous-graphiques
     plt.subplots_adjust(hspace=0.3)
     
     # Afficher la figure
     plt.show()
-    plt.savefig(rf"{savefig_folder}/Figure3b_Raster_activity_spiketrain_{spiketrain_index+1}_6s.svg")
-
-#%% Coefficient of variation
-"""
-from elephant.statistics import isi, cv
-cv_list = [cv(isi(spiketrain)) for spiketrain in spiketrains_list]
-
-
-plt.figure(dpi=150)
-plt.eventplot([st.magnitude for st in spiketrains_list], linelengths=0.75, linewidths=0.75, color='black')
-plt.xlabel("Time, s")
-plt.ylabel("Neuron id")
-plt.xlim([0, 10]);
-
-# let's plot the histogram of CVs
-plt.figure(dpi=100)
-plt.hist(cv_list)
-plt.xlabel('CV')
-plt.ylabel('count')
-plt.title("Coefficient of Variation of homogeneous Poisson process")
-plt.savefig(rf"{savefig_folder}/CV.svg")
-"""
+    plt.savefig(rf"{savefig_folder}/Figure3b_Raster_activity_spiketrain_{spiketrain_name+2}.svg")
 
 #%%Figure 4 : Optotag
 print('Figure 4 - Optotag')
@@ -984,8 +941,8 @@ stimulation_times=real_stim_idx/frequency
 for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     # Durée avant et après la stimulation pour la fenêtre de sélection (en secondes)
-    pre_stim_duration = 0.01
-    post_stim_duration = 0.1
+    pre_stim_duration = 0.5
+    post_stim_duration = 1
     
     # Calcul de la durée totale
     total_duration = pre_stim_duration + post_stim_duration
@@ -1027,7 +984,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     # Créer la figure et les sous-graphiques
     fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, gridspec_kw={'height_ratios': [2, 1]})
-    ax1.set_title(rf"Rasterplot Spiketrain {spiketrain_index+1}")
+    ax1.set_title(rf"Rasterplot Spiketrain {spiketrain_index+2}")
     
     # Tracer l'histogramme péri-stimulus sur le subplot du bas
     histograms, _ = np.histogram(action_potential_times - real_stim_times[:, None], bins=bin_edges)
@@ -1041,14 +998,14 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     # Tracer le raster plot sur le subplot du haut
     ax1.eventplot(selected_potentials_normalized, lineoffsets=0.5, linelengths=0.5, color='k')
     ax1.set_ylabel('Stimulation')
-    ax1.axvspan(0,0.001,color='blue',alpha=0.3)
+    ax1.axvspan(0,0.1,color='blue',alpha=0.3)
     
     # Normaliser l'axe des x pour le PSTH
     ax2.set_xlim(-pre_stim_duration, post_stim_duration)
     
     # Ajouter des labels pour l'axe des x
     ax2.set_xlabel('Time (s) from stimulation')
-    ax2.axvspan(0,0.001,color='blue',alpha=0.3)
+    ax2.axvspan(0,0.1,color='blue',alpha=0.3)
     
     # Ajuster les espaces entre les sous-graphiques
     plt.subplots_adjust(hspace=0.3)
@@ -1057,7 +1014,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     plt.show()
 
 
-    plt.savefig(rf"{savefig_folder}/Figure4_optotag_{spiketrain_index}.svg")
+    plt.savefig(rf"{savefig_folder}/Figure4_optotag_{spiketrain_index+2}.svg")
 
     first_event_times_normalized = []
 
@@ -1103,36 +1060,11 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     plt.xlabel("Normalized time of apparition (s)")
     plt.ylabel("Probability")
-    plt.title(rf"Distribution Histogram - Spiketrain {spiketrain_index+1}")
+    plt.title(rf"Distribution Histogram - Spiketrain {spiketrain_index+2}")
     
     # Afficher le graphique
     plt.show()
-    plt.savefig(rf"{savefig_folder}/Figure4_optotag_distrib_{spiketrain_index}.svg")
+    plt.savefig(rf"{savefig_folder}/Figure4_optotag_distrib_{spiketrain_index+2}.svg")
         
 
     
-
-
-#%%SPADE
-import numpy as np
-import quantities as pq
-import neo
-import elephant
-import viziphant
-np.random.seed(4542)
-
-spiketrains = elephant.spike_train_generation.compound_poisson_process(
-   rate=5*pq.Hz, A=[0]+[0.98]+[0]*8+[0.02], t_stop=10*pq.s)
-len(spiketrains)
-
-spiketrains=elephant_spiketrains
-
-for i in range(90):
-    spiketrains.append(elephant.spike_train_generation.homogeneous_poisson_process(
-        rate=5*pq.Hz, t_stop=10*pq.s))
-
-patterns = elephant.spade.spade(
-    spiketrains=elephant_spiketrains, binsize=1*pq.ms, winlen=1, min_spikes=3,
-    n_surr=100,dither=5*pq.ms,
-    psr_param=[0,0,0],
-    output_format='patterns')['patterns']

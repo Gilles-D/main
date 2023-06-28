@@ -281,9 +281,9 @@ Load the different files
 
 
 #Exported from tridesclou export (by spikeinterface to phy)
-spike_times = np.load('C:/Users/MOCAP/Desktop/temp/0012_06_08/phy_export/tridesclous/spike_times.npy')
-spike_cluster = np.load('C:/Users/MOCAP/Desktop/temp/0012_06_08/phy_export/tridesclous/spike_clusters.npy')
-spike_templates = np.load('C:/Users/MOCAP/Desktop/temp/0012_06_08/phy_export/tridesclous/similar_templates.npy')
+spike_times = np.load(r'C:\Users\MOCAP\Desktop\temp\0012_06_08_circus\phy_export\spykingcircus\spike_times.npy')
+spike_cluster = np.load(r'C:\Users\MOCAP\Desktop\temp\0012_06_08_circus\phy_export\spykingcircus\spike_clusters.npy')
+spike_templates = np.load(r'C:\Users\MOCAP\Desktop\temp\0012_06_08_circus\phy_export\spykingcircus\similar_templates.npy')
 
 
 
@@ -296,7 +296,7 @@ recordings=['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_2
     ]
 
 
-savefig_folder=r"C:\Users\MOCAP\Desktop\Spikesorting_0012_08_06"
+savefig_folder=r"C:\Users\MOCAP\Desktop\Spikesorting_0012_08_06_circus"
 
 
 
@@ -878,7 +878,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     total_duration = pre_stim_duration + post_stim_duration
     
     # Nombre de bins pour l'histogramme
-    num_bins = int(total_duration * 40)  # par exemple, 10 bins par seconde
+    num_bins = int(total_duration * 10)  # par exemple, 10 bins par seconde
     
     # Création des limites des bins pour l'histogramme
     bin_edges = np.linspace(-pre_stim_duration, post_stim_duration, num_bins + 1)
@@ -922,7 +922,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     ax2.bar(bin_centers, histograms, width=total_duration/num_bins, align='center')
     ax2.set_ylabel('Number of spikes')
     ax2.set_title('Peri-Stimulus Histogram')
-    print('bibite')
+    
     
     
     # Tracer le raster plot sur le subplot du haut
@@ -937,14 +937,12 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     ax2.set_xlabel('Time (s) from start')
     ax2.axvspan(0,0.001,color='blue',alpha=0.3)
     
-    ax2.set_xlim(-6,6)
-    
     # Ajuster les espaces entre les sous-graphiques
     plt.subplots_adjust(hspace=0.3)
     
     # Afficher la figure
     plt.show()
-    plt.savefig(rf"{savefig_folder}/Figure3b_Raster_activity_spiketrain_{spiketrain_index+1}_6s.svg")
+    plt.savefig(rf"{savefig_folder}/Figure3b_Raster_activity_spiketrain_{spiketrain_name+1}.svg")
 
 #%% Coefficient of variation
 """
