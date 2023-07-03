@@ -48,7 +48,7 @@ saving_dir=r"D:\ePhy\SI_Data"
 
 subject_name="0012"
 
-saving_name="0012_06_08_circus"
+saving_name="0012_29_06"
 
 #Modifier en une boucle sur le dossier itan
 #Modifier en une boucle sur le dossier itan
@@ -59,17 +59,24 @@ saving_name="0012_06_08_circus"
 # "D:/ePhy/Intan_Data/0012/05_24/0014_24_05_230524_164414/0014_24_05_230524_164414.rhd"]
 
 
-recordings=['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',
-            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd'
+recordings=['D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_170325/0012_28_06_230628_170325.rhd',#2
+'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_171510/0012_28_06_230628_171510.rhd',#4
+'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_172006/0012_28_06_230628_172006.rhd',#5
+'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_173325/0012_28_06_230628_173325.rhd',#6
+'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_174731/0012_28_06_230628_174731.rhd']#8
+
+
+# ['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd'
     
     
     
     
     
-    ]
+#     ]
 
 
 
@@ -189,14 +196,14 @@ param_sorter = {
     #                                 'wave_length': 61,
     #                                 'keep_good_only': False,
     #                             },
-                # 'tridesclous': {
-                #                     'freq_min': 300.,   #'High-pass filter cutoff frequency'
-                #                     'freq_max': 6000.,#'Low-pass filter cutoff frequency'
-                #                     'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
-                #                     'detect_threshold': 5, #'Threshold for spike detection',
-                #                     'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
-                #                     'common_ref_removal': True,     #'remove common reference with median',
-                #                 },
+                'tridesclous': {
+                                    'freq_min': 300.,   #'High-pass filter cutoff frequency'
+                                    'freq_max': 6000.,#'Low-pass filter cutoff frequency'
+                                    'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
+                                    'detect_threshold': 5, #'Threshold for spike detection',
+                                    'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
+                                    'common_ref_removal': True,     #'remove common reference with median',
+                                },
                 'spykingcircus': {
                                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
                                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
@@ -208,6 +215,19 @@ param_sorter = {
                                     'num_workers': None, #Number of workers (if None, half of the cpu number is used)
                                     'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
                                     'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
+                                },
+                'mountainsort4': {
+                                    'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
+                                    'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
+                                    'freq_min': 300,  # Use None for no bandpass filtering
+                                    'freq_max': 6000,
+                                    'filter': True,
+                                    'whiten': True,  # Whether to do channel whitening as part of preprocessing
+                                    'num_workers': 1,
+                                    'clip_size': 50,
+                                    'detect_threshold': 3,
+                                    'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel
+                                    'tempdir': None
                                 },
                 # 'waveclus':  {
                 #                     'detect_threshold': 5,
