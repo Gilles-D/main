@@ -30,7 +30,7 @@ while 1:
     test.append(arduinoData)
     if str(arduinoData) == 'Start\r\n':
         print("Start Recording")
-        pyautogui.click(2387, 691) #Click start Vicon
+        pyautogui.click(2388, 692) #Click start Vicon
         Timestamps.append(datetime.fromtimestamp(time.time()))
 
 
@@ -46,8 +46,8 @@ while 1:
     
     elif arduinoData == "Broken\r\n":
         print("Broken. Start Stimulating")
-        pyautogui.click(1475, 118) #Click record on WinWCP
-        time.sleep(3)#Sleep for 60 sec
+        # pyautogui.click(1475, 118) #Click record on WinWCP
+        # time.sleep(3)#Sleep for 60 sec
 
 
 """
