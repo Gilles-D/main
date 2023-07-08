@@ -281,21 +281,54 @@ Load the different files
 
 
 #Exported from tridesclou export (by spikeinterface to phy)
-spike_times = np.load('C:/Users/MOCAP/Desktop/temp/0012_29_06/phy_export/tridesclous/spike_times.npy')
-spike_cluster = np.load('C:/Users/MOCAP/Desktop/temp/0012_29_06/phy_export/tridesclous/spike_clusters.npy')
-spike_templates = np.load('C:/Users/MOCAP/Desktop/temp/0012_29_06/phy_export/tridesclous/similar_templates.npy')
+spike_times = np.load('C:/Users/MOCAP/Desktop/temp/0012_03_07/phy_export/tridesclous/spike_times.npy')
+spike_cluster = np.load('C:/Users/MOCAP/Desktop/temp/0012_03_07/phy_export/tridesclous/spike_clusters.npy')
+spike_templates = np.load('C:/Users/MOCAP/Desktop/temp/0012_03_07/phy_export/tridesclous/similar_templates.npy')
 
 
 
 #List of recordings rhd files
-recordings=['D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_170325/0012_28_06_230628_170325.rhd',#2
-'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_171510/0012_28_06_230628_171510.rhd',#4
-'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_172006/0012_28_06_230628_172006.rhd',#5
-'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_173325/0012_28_06_230628_173325.rhd',#6
-'D:/ePhy/Intan_Data/0012/06_28/0012_28_06_230628_174731/0012_28_06_230628_174731.rhd']#8
+recordings=["D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_173450/0012_03_07_230703_173950.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_173450/0012_03_07_230703_173450.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_173450/0012_03_07_230703_173550.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_173450/0012_03_07_230703_173650.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_173450/0012_03_07_230703_173750.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_173450/0012_03_07_230703_173850.rhd",#1 Baseline
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174736.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174036.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174136.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174236.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174336.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174436.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174536.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_174036/0012_03_07_230703_174636.rhd",#2
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175107/0012_03_07_230703_175607.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175107/0012_03_07_230703_175107.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175107/0012_03_07_230703_175207.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175107/0012_03_07_230703_175307.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175107/0012_03_07_230703_175407.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175107/0012_03_07_230703_175507.rhd",#3
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_175944.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180044.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180144.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180244.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180344.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180444.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180544.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_175944/0012_03_07_230703_180644.rhd",#5
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_180829/0012_03_07_230703_180829.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_180829/0012_03_07_230703_180929.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_180829/0012_03_07_230703_181029.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_180829/0012_03_07_230703_181129.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_180829/0012_03_07_230703_181229.rhd",
+"D:/ePhy/Intan_Data/0012/07_03/0012_03_07_230703_180829/0012_03_07_230703_181329.rhd"#6
+]
 
 
-savefig_folder=r"C:\Users\MOCAP\Desktop\Spikesorting_0012_29_06"
+savefig_folder=r"C:\Users\MOCAP\Desktop\Spikesorting_0012_03_07"
+
+baseline_duration = 310.9312 #in second
+
 
 
 
@@ -323,29 +356,30 @@ for record in recordings:
         frame_start_delay.append(0)
         multi_frame_idx.append(np.array([]))
 
-concatenated_signal = np.hstack(multi_recordings)#Signal concatenated from all the files
-concatenated_stim_idx=np.hstack(multi_stim_idx)#Digital data for stim concatenated from all the files
-# concatenated_frame_idx=np.hstack(multi_frame_idx)#Index where TTL is on concatenated for all files
 
-
+anaglog_signal_concatenated = np.hstack(multi_recordings)    #Signal concatenated from all the files
+digital_stim_signal_concatenated=np.hstack(multi_stim_idx)   #Digital data for stim concatenated from all the files
 
 #Get sampling freq
-frequency=reader['frequency_parameters']['amplifier_sample_rate']
-
-
+sampling_rate=reader['frequency_parameters']['amplifier_sample_rate']
 
 #Get spikes for each cluster 
 clusters_idx = np.unique(spike_cluster)#Index of all clusters
-# clusters_idx=clusters_idx[2:]#exclude stim artefacts
 
 
-selected_spike_times,selected_spike_indexes=[],[]
-for cluster in clusters_idx:#Loop on each cluster to get the spike of the cluster
+clustered_spike_times,clustered_spike_indexes=[],[]
+for cluster in clusters_idx:        #Loop on each cluster to get the spike of the cluster
     array_idx = np.where(spike_cluster==cluster)[0]
     selected_spike_idx = np.take(spike_times,array_idx)#Spikes from the cluster
     
-    selected_spike_indexes.append(selected_spike_idx)#All the spikes index by cluster
-    selected_spike_times.append(selected_spike_idx/frequency) #All the spikes times in seconds by cluster
+    clustered_spike_indexes.append(selected_spike_idx)#All the spikes index by cluster
+    clustered_spike_times.append(selected_spike_idx/sampling_rate) #All the spikes times in seconds by cluster
+    
+
+
+
+
+
 
 #%%Electrode Shape
 sites_positions=[[0.0, 250.0],
@@ -369,35 +403,27 @@ channel_order=[12, 13, 14, 15, 11, 10, 9, 8, 7, 6, 5, 4, 0, 1, 2, 3]
 
 channel_positions=list(zip(channel_order,sites_positions))
 
+#%% Vidéo
+for frame_idx in multi_frame_idx:
+    
+    frame_ttl=(np.where(frame_idx == True))[0]
 
-#%%Camera delay
-"""
-Calculate delay in seconds between the start of ephy recording, and camera recording
-"""
+    # Calculer la différence entre les éléments consécutifs
+    diff_indices = np.diff(frame_ttl)
 
-frame_start_delay=np.array(frame_start_delay)/frequency#Delays in seconds
+    # Trouver les indices où la différence n'est pas égale à 1
+    phase_indices = np.where(diff_indices != 1)[0]-1
 
-
-
-
-
-#%%Phase timestamps
-"""
-List of the different activity and rest phases, manually entered from the video observation
-"""
-#Cumulative sum of all the recordings
-
-recordings_lengths_cumsum=np.cumsum(np.array(recordings_lengths)/frequency)
+    # Extraire le premier index de chaque phase
+    screenshot_idexes = frame_ttl[phase_indices]
+    
+    print(screenshot_idexes)
 
 
-delay=23/100#s
-starts_cam=np.array([33.631, 115.7513,185.79585,234.28575])+recordings_lengths_cumsum[0]#s
+video_files = get_file_names(r'D:\SOD_2023\0014_24_05')
 
 
-starts=(np.array([231,1399,632,1435])/100)+starts_cam#in s
-stops=(np.array([745,1776,1630,2715])/100)+starts_cam#in s
-
-
+plt.eventplot(screenshot_idexes/frequency,linelengths=1, lineoffsets=1, linewidths=1)
 
 
 
@@ -411,9 +437,9 @@ selected_chan=[0,1,2,3,4,5,8,12,13]
 
 
 filtered_signals=[]
-for i in range(len(concatenated_signal)):
+for i in range(len(anaglog_signal_concatenated)):
     if i in selected_chan:
-        signal_filtered = filter_signal(concatenated_signal[i]) #Filter the signal
+        signal_filtered = filter_signal(anaglog_signal_concatenated[i]) #Filter the signal
         filtered_signals.append(signal_filtered) #Append it in list
         
         
@@ -431,7 +457,7 @@ cmr_signals = filtered_signals-median
 
 #%% Figure 1 : Raster plot
 print('Figure 1 - Raster plot')
-num_events = len(selected_spike_times)
+num_events = len(clustered_spike_times)
 y_values = list(range(1, num_events + 1))
 
 lineoffsets1 = np.array(y_values)
@@ -439,7 +465,7 @@ linelengths1 = [0.1] * num_events
 
 plt.figure()
 colors1 = ['C{}'.format(i) for i in range(num_events)]
-plt.eventplot(selected_spike_times, colors=colors1, linelengths=1, lineoffsets=lineoffsets1, linewidths=1)
+plt.eventplot(clustered_spike_times, colors=colors1, linelengths=1, lineoffsets=lineoffsets1, linewidths=1)
 
 plt.yticks(y_values)
 plt.ylabel('SpikeTrains')  # Nom de l'axe Y
@@ -455,7 +481,7 @@ Get the waveform of each spiketrain, for each selected channel
 
 
 for idx,cluster in enumerate(clusters_idx):
-    spike_idx=selected_spike_indexes[idx]#Select spikes for the cluster
+    spike_idx=clustered_spike_indexes[idx]#Select spikes for the cluster
     all_mean_wvfs=[]
     for channel in range(len(selected_chan)):
         wvfs = extract_spike_waveform(cmr_signals[channel],spike_idx)#Extract all the wf spikes for the channel
@@ -478,128 +504,19 @@ for i, t in enumerate(selected_positions):
     new_tuple = t + (all_mean_wvfs[i],)
     waveform_positions.append(new_tuple)
 
-
-
-
-
-"""
-
-
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Liste de tuples contenant l'identifiant du canal, les coordonnées (x, y) et les waveforms moyennes
-canal_data = [(1, (2, 3), np.array([0.1, 0.2, 0.3, 0.2, 0.1])),
-              (2, (5, 6), np.array([-0.2, -0.1, 0.0, -0.1, -0.2])),
-              (3, (8, 9), np.array([0.3, 0.4, 0.5, 0.4, 0.3]))]
-
-# Tracer les positions des canaux
-x_coords = [coord[0] for _, coord, _ in waveform_positions]
-y_coords = [coord[1] for _, coord, _ in waveform_positions]
-plt.scatter(x_coords, y_coords)
-
-# Ajouter les identifiants des canaux à leurs positions respectives
-for canal_id, coord, waveform in waveform_positions:
-    plt.annotate(str(canal_id), xy=coord, xytext=(5, -5),
-                 textcoords='offset points', ha='right', va='bottom')
-
-    # Créer un nouvel axe pour la waveform
-    waveform_ax = plt.axes([coord[0] + 0.2, coord[1] + 0.2, 0.3, 0.3])  # Définir la position et la taille de l'axe
-
-    # Tracer la waveform moyenne
-    waveform_ax.plot(waveform, color='r')
-
-    # Configurer les limites de l'axe x de la waveform
-    waveform_ax.set_xlim(0, len(waveform) - 1)
-
-# Configurer les labels des axes et le titre
-plt.xlabel('Coordonnée x')
-plt.ylabel('Coordonnée y')
-plt.title('Position des canaux avec les waveforms moyennes')
-
-# Afficher la figure
-plt.show()
-"""
-
-"""
-# Liste de tuples contenant l'identifiant du canal, les coordonnées (x, y) et les waveforms moyennes
-canal_data = [(1, (2, 3), np.array([0.1, 0.2, 0.3, 0.2, 0.1])),
-              (2, (5, 6), np.array([-0.2, -0.1, 0.0, -0.1, -0.2])),
-              (3, (8, 9), np.array([0.3, 0.4, 0.5, 0.4, 0.3]))]
-
-# Tracer les positions des canaux
-x_coords = [coord[0] for _, coord, _ in waveform_positions]
-y_coords = [coord[1] for _, coord, _ in waveform_positions]
-plt.scatter(x_coords, y_coords)
-
-# Ajouter les identifiants des canaux à leurs positions respectives
-for canal_id, coord, waveform in waveform_positions:
-    plt.annotate(str(canal_id), xy=coord, xytext=(5, -5),
-                 textcoords='offset points', ha='right', va='bottom')
-
-    # Tracer la waveform moyenne à côté du canal
-    waveform_x = coord[0] + 0.5  # Décalage horizontal
-    waveform_y = coord[1]  # Même position verticale
-    plt.plot(waveform_x + np.arange(len(waveform)), waveform + waveform_y, color='r')
-
-    # Changer l'échelle en x des waveforms
-    waveform_xlim = (waveform_x, waveform_x + len(waveform) - 1)
-    plt.xlim(waveform_xlim)
-
-# Masquer les axes pour les waveforms
-plt.gca().get_xaxis().set_visible(False)
-plt.gca().get_yaxis().set_visible(False)
-
-# Configurer les labels des axes et le titre
-plt.xlabel('Coordonnée x')
-plt.ylabel('Coordonnée y')
-plt.title('Position des canaux avec les waveforms moyennes')
-
-# Afficher la figure
-plt.show()
-
-"""
-
-
-
-
-
-
-    
+   
 "Select channels, or plot everything"
-
- #%% Vidéo
-
-# frame_ttl=(np.where(multi_frame_idx[1] == True))[0]
-
-# # Calculer la différence entre les éléments consécutifs
-# diff_indices = np.diff(frame_ttl)
-
-# # Trouver les indices où la différence n'est pas égale à 1
-# phase_indices = np.where(diff_indices != 1)[0]
-
-# # Extraire le premier index de chaque phase
-# screenshot_idexes = frame_ttl[phase_indices]/20000
-# screenshot_idexes.insert(0,frame_ttl[0])
-
-
-# video_files = get_file_names(r'D:\SOD_2023\0014_24_05')
-
-
-# selected_spike_times.append()
-
-# plt.eventplot(screenshot_idexes/frequency,linelengths=1, lineoffsets=1, linewidths=1)
 
 #%% Figure 2 : Elephant Spike Train Analysis
 print('Figure 2 - Elephant Spike Train Analysis')
-last_spike_time = max(np.concatenate(selected_spike_times).tolist())
+last_spike_time = max(np.concatenate(clustered_spike_times).tolist())
 
 t_stop = last_spike_time+1#stop 1 sec after last spike
 
 elephant_spiketrains = []
-for index,spiketrain in enumerate(selected_spike_times):
+for index,spiketrain in enumerate(clustered_spike_times):
     elephant_spiketrains.append(SpikeTrain(spiketrain*s, t_stop=t_stop))
+
 
 
 print(rf"There are {len(elephant_spiketrains)} spiketrains in this analysis")
@@ -640,8 +557,10 @@ for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
     
     
     # Mean firing rate for the baseline phase
-    baseline_stop = recordings_lengths_cumsum[0]
+    baseline_stop = baseline_duration
     plt.hlines(mean_firing_rate(spiketrain,t_stop=baseline_stop*s), xmin=spiketrain.t_start, xmax=spiketrain.t_stop, linestyle='--', label='mean firing rate')
+    plt.axvspan(0, baseline_duration, alpha=0.25, color='grey')
+
     
     # time histogram
     plt.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
@@ -652,10 +571,10 @@ for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
     
     
     #Length of each recordings
-    [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]
+    # [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]
     
-    for i in range(len(starts)):
-        plt.axvspan(starts[i]-delay, stops[i]-delay, alpha=0.5, color='red')
+    # for i in range(len(starts)):
+    #     plt.axvspan(starts[i]-delay, stops[i]-delay, alpha=0.5, color='red')
     # for i in range(len(lifts)):
     #     plt.axvspan(lifts[i], downs[i], alpha=0.5, color='grey')
     
@@ -905,12 +824,12 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
 
 #%%Figure 4 : Optotag
 print('Figure 4 - Optotag')
-concatenated_stim_idx_on=(np.where(concatenated_stim_idx == True))[0] #Where the stim is on
-stim_starts=np.where(np.diff(concatenated_stim_idx_on)!=1)[0]+1 #The start of each stim
+digital_stim_signal_concatenated_on=(np.where(digital_stim_signal_concatenated == True))[0] #Where the stim is on
+stim_starts=np.where(np.diff(digital_stim_signal_concatenated_on)!=1)[0]+1 #The start of each stim
 stim_starts=np.insert(stim_starts,0,0)
 
 
-real_stim_idx=concatenated_stim_idx_on[stim_starts]
+real_stim_idx=digital_stim_signal_concatenated_on[stim_starts]
 real_stim_times=real_stim_idx/frequency
 
 stimulation_times=real_stim_idx/frequency          
