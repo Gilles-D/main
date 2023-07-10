@@ -42,10 +42,10 @@
 
 void brust(int stim_duration,float freq,int pulse_duration){
           for (int i = 1; i <= stim_duration*freq; i++) {
-          digitalWrite(TTL_AMP, HIGH);
+          //digitalWrite(TTL_AMP, HIGH);
           digitalWrite(TTL_OPTO, HIGH);
           delay(pulse_duration);
-          digitalWrite(TTL_AMP, LOW);
+          //digitalWrite(TTL_AMP, LOW);
           digitalWrite(TTL_OPTO, LOW);
           float off_time = 1/freq*1000;
           //Serial.println(off_time-pulse_duration);
