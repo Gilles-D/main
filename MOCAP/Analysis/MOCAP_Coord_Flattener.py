@@ -27,14 +27,14 @@ import numpy as np
 ------------------------------PARAMETERS------------------------------
 """
 #Load MOCAP class
-sys.path.append(r'D:\Gilles.DELBECQ\GitHub\main\MOCAP\Analysis')
+sys.path.append(r'C:\Users\Gil\Documents\GitHub\main\MOCAP\Analysis')
 import MOCAP_analysis_class as MA
 
 #Directory location of raw csvs
-root_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
+root_dir=r'D:\Seafile\Seafile\Data\ePhy\3_Mocap_data\0012'
 
 #Directory location to save flattened csv
-save_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
+save_dir=r'D:\Seafile\Seafile\Data\ePhy\3_Mocap_data\0012\flatte'
 
 
 # #Location of the data_info file
@@ -70,7 +70,7 @@ i=1
 for file in Files:
     #Load csv file
     data_MOCAP = MA.MOCAP_file(file)
-    
+    print(file)
     #Check if it is already flattened
     save_path=rf"{save_dir}\{data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()}.csv"
     if os.path.isfile(save_path) == False:
