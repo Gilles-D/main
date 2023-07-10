@@ -17,6 +17,7 @@ import spikeinterface as si
 import sys, struct, math, os, time
 import numpy as np
 
+#load intan class
 sys.path.append(r"D:\Gilles.DELBECQ\GitHub\main\In vivo Multi")
 
 from intanutil.read_header import read_header
@@ -275,86 +276,6 @@ def get_file_names(directory):
 
 
 
-"""
-MOCAP
-"""
-#Load MOCAP class
-sys.path.append(r'D:\Gilles.DELBECQ\GitHub\main\MOCAP')
-import MOCAP_analysis_class as MA
-
-
-#%% files loading
-"""
-Load the different files
-
-"""
-
-
-#Exported from tridesclou export (by spikeinterface to phy)
-spike_times = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/spike_times.npy')
-spike_cluster = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/spike_clusters.npy')
-spike_templates = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/similar_templates.npy')
-
-
-
-#List of recordings rhd files
-recordings=["//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_01.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_02.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_03.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_05.rhd",]
-
-
-savefig_folder=r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23/Output/Spikesorting_0012_03_07"
-
-baseline_duration = 310.9312 #in second
-
-mocap_frequency=200#Hz
-
-
-#RHD file reading
-
-multi_recordings,recordings_lengths,multi_stim_idx,multi_frame_idx,frame_start_delay=[],[],[],[],[]
-
-#Concatenate recordings
-for record in recordings:
-    reader=read_data(record)
-    signal = reader['amplifier_data'] 
-    recordings_lengths.append(len(signal[0]))
-    multi_recordings.append(signal)  
-    
-    stim_idx=reader['board_dig_in_data'][0]#Digital data for stim of the file
-    multi_stim_idx.append(stim_idx)#Digital data for stim of all the files
-    
-    frame_idx=reader['board_dig_in_data'][1]#Get digital data for mocap ttl
-    multi_frame_idx.append(frame_idx)#Digital data for mocap ttl of all the files
-    
-
-
-
-
-anaglog_signal_concatenated = np.hstack(multi_recordings)    #Signal concatenated from all the files
-digital_stim_signal_concatenated=np.hstack(multi_stim_idx)   #Digital data for stim concatenated from all the files
-digital_mocap_signal_concatenated=np.hstack(multi_frame_idx) 
-
-#Get sampling freq
-sampling_rate=reader['frequency_parameters']['amplifier_sample_rate']
-
-recordings_lengths_cumsum=np.cumsum(np.array(recordings_lengths)/sampling_rate)
-
-#Get spikes for each cluster 
-clusters_idx = np.unique(spike_cluster)#Index of all clusters
-
-
-clustered_spike_times,clustered_spike_indexes=[],[]
-for cluster in clusters_idx:        #Loop on each cluster to get the spike of the cluster
-    array_idx = np.where(spike_cluster==cluster)[0]
-    selected_spike_idx = np.take(spike_times,array_idx)#Spikes from the cluster
-    
-    clustered_spike_indexes.append(selected_spike_idx)#All the spikes index by cluster
-    clustered_spike_times.append(selected_spike_idx/sampling_rate) #All the spikes times in seconds by cluster
-
-#%%Mocap file loading
-
 def calculate_angle(p1, p2, p3):
     # Calcul des vecteurs entre les points
     v1 = p1 - p2
@@ -390,22 +311,294 @@ def peaks(x,y,z):
     peaks=find_peaks(z,prominence=5)[0]
     return peaks  
 
+
+def Mocap_start_ttl_detection(mocap_starts_idx):
+    # Calculer la différence entre les éléments consécutifs
+    diff_indices = np.diff(mocap_starts_idx)
+    phase_indices = np.where(diff_indices != 1)[0]-1
+    start_idexes = mocap_starts_idx[phase_indices]
+    start_times=start_idexes/sampling_rate
+    
+    return start_times
+
+#Load MOCAP class
+sys.path.append(r'D:\Gilles.DELBECQ\GitHub\main\MOCAP')
+import MOCAP_analysis_class as MA
+
+
+
+#%% Parameters
+"""
+---------------------- Parameters to change -----------------------------------
+"""
+
+savefig_folder=r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23/Output/Spikesorting_0012_03_07"
+
+#Set the selected channels for the nalysis during spike sorting
+selected_chan=[0,1,2,3,4,5,8,12,13]
+
+#Maybe useless ?
+baseline_duration = 310.9312 #in second
+
+mocap_frequency=200#Hz
+
+
+
+"""
+---------------------- Files location -----------------------------------------
+"""
+#List of recordings rhd files
+recordings=["//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_01.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_02.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_03.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_05.rhd",]
+
+
+#Exported from tridesclou export (by spikeinterface to phy)
+spike_times = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/spike_times.npy')
+spike_cluster = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/spike_clusters.npy')
+spike_templates = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/similar_templates.npy')
+
+
 #Mocap files location
 mocap_folder=r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/3_Mocap_data\0012'
 
+
+
+
+"""
+---------------------- Electrode shape ----------------------------------------
+"""
+sites_positions=[[0.0, 250.0],
+  [0.0, 300.0],
+  [0.0, 350.0],
+  [0.0, 200.0],
+  [0.0, 150.0],
+  [0.0, 100.0],
+  [0.0, 50.0],
+  [0.0, 0.0],
+  [43.3, 25.0],
+  [43.3, 75.0],
+  [43.3, 125.0],
+  [43.3, 175.0],
+  [43.3, 225.0],
+  [43.3, 275.0],
+  [43.3, 325.0],
+  [43.3, 375.0]]
+
+channel_order=[12, 13, 14, 15, 11, 10, 9, 8, 7, 6, 5, 4, 0, 1, 2, 3]
+
+channel_positions=list(zip(channel_order,sites_positions))
+
+#%% 1- Ephy files loading
+"""
+Load the different files
+
+Output : 
+    anaglog_signal_concatenated         #Signal concatenated from all the files
+    digital_stim_signal_concatenated    #Digital data for stim ttl concatenated from all the files
+    digital_mocap_signal_concatenated   #Digital data for mocap ttl concatenated from all the files
+    sampling_rate                       #Sampling rate of raw ephy data
+    recordings_lengths_cumsum           #cumulated sum of lengths the ephy recordings (to get the times of each start)
+    
+    clusters_idx                        #array with the number and index of spike clusters/units
+    clustered_spike_times               #list of n cluster array, with the spike times for each cluster
+    clustered_spike_indexes             #list of n cluster array, with the spike indexes for each cluster
+"""
+
+#RHD file reading
+multi_recordings,recordings_lengths,multi_stim_idx,multi_frame_idx,frame_start_delay=[],[],[],[],[]
+
+#Concatenate recordings
+for record in recordings:
+    reader=read_data(record)
+    signal = reader['amplifier_data'] 
+    recordings_lengths.append(len(signal[0]))
+    multi_recordings.append(signal)  
+    
+    stim_idx=reader['board_dig_in_data'][0]#Digital data for stim of the file
+    multi_stim_idx.append(stim_idx)#Digital data for stim of all the files
+    
+    frame_idx=reader['board_dig_in_data'][1]#Get digital data for mocap ttl
+    multi_frame_idx.append(frame_idx)#Digital data for mocap ttl of all the files
+    
+
+anaglog_signal_concatenated = np.hstack(multi_recordings)    #Signal concatenated from all the files
+digital_stim_signal_concatenated=np.hstack(multi_stim_idx)   #Digital data for stim concatenated from all the files
+digital_mocap_signal_concatenated=np.hstack(multi_frame_idx) 
+
+#Get sampling freq
+sampling_rate=reader['frequency_parameters']['amplifier_sample_rate']
+
+recordings_lengths_cumsum=np.cumsum(np.array(recordings_lengths)/sampling_rate)
+
+#Get spikes for each cluster 
+clusters_idx = np.unique(spike_cluster)#Index of all clusters
+
+
+clustered_spike_times,clustered_spike_indexes=[],[]
+for cluster in clusters_idx:        #Loop on each cluster to get the spike of the cluster
+    array_idx = np.where(spike_cluster==cluster)[0]
+    selected_spike_idx = np.take(spike_times,array_idx)#Spikes from the cluster
+    
+    clustered_spike_indexes.append(selected_spike_idx)#All the spikes index by cluster
+    clustered_spike_times.append(selected_spike_idx/sampling_rate) #All the spikes times in seconds by cluster
+
+#%% 2- Mocap files loading and ttl detecting
+"""
+Get the list of mocap files (csv)
+Get the ttl times of mocap starts (csv)
+
+Output :
+    - mocap_files             #list of mocap csv filepaths
+    - mocap_starts_idx          #idx of ttl trigger mocap
+    - mocap_starts_times        #times of ttl trigger mocap
+"""
+
 #First Loop : loop on all csv files to list them in the list "Files"
-Files = []
+mocap_files = []
 for r, d, f in os.walk(mocap_folder):
 # r=root, d=directories, f = files
     for filename in f:
         if '.csv' in filename:
-            Files.append(os.path.join(r, filename))
+            mocap_files.append(os.path.join(r, filename))
             
-print('Files to analyze : {}'.format(len(Files)))
-i=1
+print('Files to analyze : {}'.format(len(mocap_files)))
+
+
+mocap_trial_lengths=[]
+for file in mocap_files:
+    data_MOCAP = MA.MOCAP_file(file)
+    mocap_trial_lengths.append(len(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Foot")[0])/mocap_frequency)
 
 
 
+
+mocap_starts_idx=(np.where(digital_mocap_signal_concatenated == True))[0] #Where TTL is true
+mocap_starts_times = Mocap_start_ttl_detection(mocap_starts_idx)
+
+
+
+#%% Figure 1 : Whole SpikeTrain Analysis
+print('Figure 1 - Elephant Spike Train Analysis')
+
+#Get time of last spike (for spiketrain t_stop)
+last_spike_time = max(np.concatenate(clustered_spike_times).tolist())
+t_stop = last_spike_time+1#stop 1 sec after last spike
+
+#Transform each spike cluster into elephant spiketrain
+elephant_spiketrains = []
+for index,spiketrain in enumerate(clustered_spike_times):
+    elephant_spiketrains.append(SpikeTrain(spiketrain*s, t_stop=t_stop))
+
+print(rf"There are {len(elephant_spiketrains)} units in this analysis")
+
+#Loop on each spiketrain
+for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
+    
+    print(rf"The mean firing rate of unit {spiketrain_name+1} on whole session is", mean_firing_rate(spiketrain))
+    
+    plt.figure()    
+
+    histogram_count = time_histogram([spiketrain], 0.5*s)
+    histogram_rate = time_histogram([spiketrain],  0.5*s, output='rate')  
+    
+    inst_rate = instantaneous_rate(spiketrain, sampling_period=50*ms)
+    
+
+    # plotting the original spiketrain (rasterplot)
+    # plt.plot(spiketrain, [0]*len(spiketrain), 'r', marker=2, ms=25, markeredgewidth=2, lw=0, label='poisson spike times')
+    
+    
+    # Mean firing rate for the baseline phase
+    baseline_stop = baseline_duration
+    plt.hlines(mean_firing_rate(spiketrain,t_stop=baseline_stop*s), xmin=spiketrain.t_start, xmax=spiketrain.t_stop, linestyle='--', label='mean firing rate')
+    
+    
+    # time histogram
+    plt.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
+            align='edge', alpha=0.3, label='time histogram (rate)',color='black')
+       
+    # Instantaneous rate
+    plt.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+    
+    #Length of each recordings
+    [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]
+    
+    #Mocap ttl
+    [plt.axvline(_x, linewidth=1, color='b') for _x in mocap_starts_times]
+    
+    
+    
+    # axis labels and legend
+    plt.xlabel('time [{}]'.format(spiketrain.times.dimensionality.latex))
+    plt.ylabel('firing rate [{}]'.format(histogram_rate.dimensionality.latex))
+    
+    plt.xlim(spiketrain.t_start, spiketrain.t_stop)   
+    #plt.xlim(0, 572.9232) #Use this to focus on phases you want using recordings_lengths_cumsum
+    
+    
+    plt.legend()
+    plt.title(rf'Spiketrain {spiketrain_name+1}')
+    plt.show()
+    
+    plt.savefig(rf"{savefig_folder}/Figure 1 - Elephant Spike Train Analysis - Unit {spiketrain_name+1}.svg")
+
+#%%Figure 1b : Superimposed spiketrains
+print('Figure 1b - Superimposed spiketrains')
+plt.figure()
+
+for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
+        inst_rate = instantaneous_rate(spiketrain, sampling_period=50*ms)
+        
+        inst_rate_norm= np.divide(inst_rate, max(inst_rate))
+        time_axis = np.array(range(len(inst_rate_norm)))/sampling_rate*1000
+        
+        
+        plt.plot(time_axis,inst_rate_norm, label='instantaneous rate')
+        #Length of each recordings
+        [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]  
+        
+        #Mocap TTL
+        [plt.axvline(_x, linewidth=1, color='b') for _x in mocap_starts_times]  
+        
+        plt.xlim(spiketrain.t_start, spiketrain.t_stop)  
+        plt.ylim(0,1.5)
+
+plt.savefig(rf"{savefig_folder}/Figure 1b - Elephant Spike Train Analysis - Superimposed.svg")
+
+
+
+#%% 3- Split spiketrains by mocap trials
+"""
+Output :
+    - mocap_trials_spikes       #list of n_trials lists of n_units array of spikes
+"""
+
+
+mocap_trials_spikes=[]
+
+for trial_index in range(len(mocap_starts_times)):
+    try:
+        
+        start_time=mocap_starts_times[trial_index]
+        stop_time=mocap_starts_times[trial_index]+mocap_trial_lengths[trial_index]
+        
+        print(rf'Mocap trial {trial_index+1} comprised between {start_time}s and {stop_time}s')       
+        
+        #Select spikes in the window
+        mocap_trial_spikes = [event[(event >= start_time) & (event <= stop_time)] for event in clustered_spike_times]
+        mocap_trials_spikes.append(mocap_trial_spikes)
+ 
+    except:
+        print(rf'{trial_index} out of lengths list range')
+
+
+
+
+
+
+#%% TO MOVE : Mocap calculations
 mocap_trial_lengths=[]
 walking_cycles = []
 
@@ -595,71 +788,19 @@ for file in Files:
     
 
 
-#%%Electrode Shape
-sites_positions=[[0.0, 250.0],
-  [0.0, 300.0],
-  [0.0, 350.0],
-  [0.0, 200.0],
-  [0.0, 150.0],
-  [0.0, 100.0],
-  [0.0, 50.0],
-  [0.0, 0.0],
-  [43.3, 25.0],
-  [43.3, 75.0],
-  [43.3, 125.0],
-  [43.3, 175.0],
-  [43.3, 225.0],
-  [43.3, 275.0],
-  [43.3, 325.0],
-  [43.3, 375.0]]
-
-channel_order=[12, 13, 14, 15, 11, 10, 9, 8, 7, 6, 5, 4, 0, 1, 2, 3]
-
-channel_positions=list(zip(channel_order,sites_positions))
-
-
-#%% Mocap time TTL
-# for frame_idx in multi_frame_idx:
-    
-#     frame_ttl=(np.where(frame_idx == True))[0]
-
-#     # Calculer la différence entre les éléments consécutifs
-#     diff_indices = np.diff(frame_ttl)
-
-#     # Trouver les indices où la différence n'est pas égale à 1
-#     phase_indices = np.where(diff_indices != 1)[0]-1
-
-#     # Extraire le premier index de chaque phase
-#     screenshot_idexes = frame_ttl[phase_indices]
-    
-#     print(screenshot_idexes)
-
-def Mocap_start_ttl_detection(mocap_ttl_list):
-    # Calculer la différence entre les éléments consécutifs
-    diff_indices = np.diff(mocap_ttl_list)
-    phase_indices = np.where(diff_indices != 1)[0]-1
-    start_idexes = mocap_ttl_list[phase_indices]
-    start_times=start_idexes/sampling_rate
-    
-    return start_times
-
-
-mocap_ttl_list=(np.where(digital_mocap_signal_concatenated == True))[0] #Where TTL is true
-
-mocap_starts = Mocap_start_ttl_detection(mocap_ttl_list)
 
 
 
 
 #%% Filtering preprocessing
 """
-Filter signal for each channel
+Filter and CMR signal for each channel
+
+Output :
+    - filtered_signals
+    - cmr_signals
+
 """
-
-#Set the selected channels for the nalysis during spike sorting
-selected_chan=[0,1,2,3,4,5,8,12,13]
-
-
 filtered_signals=[]
 for i in range(len(anaglog_signal_concatenated)):
     if i in selected_chan:
@@ -671,10 +812,12 @@ for i in range(len(anaglog_signal_concatenated)):
 filtered_signals = np.array(filtered_signals) 
 
 # Calculate the median signal from all filtered signals
-median = np.mean(filtered_signals, axis=0)
+mean = np.mean(filtered_signals, axis=0)
 
 # Calculate the cmr signals for each channels
-cmr_signals = filtered_signals-median     
+cmr_signals = filtered_signals-mean     
+
+
 
 
 
@@ -731,119 +874,6 @@ for i, t in enumerate(selected_positions):
    
 "Select channels, or plot everything"
 
-#%% Figure 2 : Elephant Spike Train Analysis
-print('Figure 2 - Elephant Spike Train Analysis')
-last_spike_time = max(np.concatenate(clustered_spike_times).tolist())
-
-t_stop = last_spike_time+1#stop 1 sec after last spike
-
-elephant_spiketrains = []
-for index,spiketrain in enumerate(clustered_spike_times):
-    elephant_spiketrains.append(SpikeTrain(spiketrain*s, t_stop=t_stop))
-
-
-
-print(rf"There are {len(elephant_spiketrains)} spiketrains in this analysis")
-for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
-    
-    print(rf"The mean firing rate of spiketrain{spiketrain_name+1} on whole session is", mean_firing_rate(spiketrain))
-    
-    
-    
-    plt.figure()    
-    
-    histogram_count = time_histogram([spiketrain], 0.5*s)
-    histogram_rate = time_histogram([spiketrain],  0.5*s, output='rate')
-    
-    #Histogram info
-    """
-    print(type(histogram_count), f"of shape {histogram_count.shape}: {histogram_count.shape[0]} samples, {histogram_count.shape[1]} channel")
-    print('sampling rate:', histogram_count.sampling_rate)
-    print('times:', histogram_count.times)
-    print('counts:', histogram_count.T[0])
-    print('times:', histogram_rate.times)
-    print('rate:', histogram_rate.T[0])
-    """   
-    
-    
-    inst_rate = instantaneous_rate(spiketrain, sampling_period=50*ms)
-    
-    #instantaneous rate info
-    """
-    print(type(inst_rate), f"of shape {inst_rate.shape}: {inst_rate.shape[0]} samples, {inst_rate.shape[1]} channel")
-    print('sampling rate:', inst_rate.sampling_rate)
-    print('times (first 10 samples): ', inst_rate.times[:10])
-    print('instantaneous rate (first 10 samples):', inst_rate.T[0, :10])
-    """
-
-    # plotting the original spiketrain
-    # plt.plot(spiketrain, [0]*len(spiketrain), 'r', marker=2, ms=25, markeredgewidth=2, lw=0, label='poisson spike times')
-    
-    
-    # Mean firing rate for the baseline phase
-    baseline_stop = baseline_duration
-    plt.hlines(mean_firing_rate(spiketrain,t_stop=baseline_stop*s), xmin=spiketrain.t_start, xmax=spiketrain.t_stop, linestyle='--', label='mean firing rate')
-    
-
-    
-    # time histogram
-    plt.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
-            align='edge', alpha=0.3, label='time histogram (rate)',color='black')
-    
-    
-    
-    # Instantaneous rate
-    plt.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
-    
-    
-    
-    
-    #Length of each recordings
-    [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]
-    
-    [plt.axvline(_x, linewidth=1, color='b') for _x in mocap_starts]
-    
-    # for i in range(len(starts)):
-    #     plt.axvspan(starts[i]-delay, stops[i]-delay, alpha=0.5, color='red')
-    # for i in range(len(lifts)):
-    #     plt.axvspan(lifts[i], downs[i], alpha=0.5, color='grey')
-    
-    
-    # axis labels and legend
-    plt.xlabel('time [{}]'.format(spiketrain.times.dimensionality.latex))
-    plt.ylabel('firing rate [{}]'.format(histogram_rate.dimensionality.latex))
-    
-    plt.xlim(spiketrain.t_start, spiketrain.t_stop)   
-    #plt.xlim(0, 572.9232) #Use this to focus on phases you want using recordings_lengths_cumsum
-    
-    
-    plt.legend()
-    plt.title(rf'Spiketrain {spiketrain_name+1}')
-    plt.show()
-    
-    plt.savefig(rf"{savefig_folder}/Figure2_spiketrain_{spiketrain_name+1}.svg")
-    
-#%%Figure 2b : Superimposed spiketrains
-print('Figure 2b - Superimposed spiketrains')
-plt.figure()
-for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
-        inst_rate = instantaneous_rate(spiketrain, sampling_period=50*ms)
-        
-        inst_rate_norm= np.divide(inst_rate, max(inst_rate))
-        time_axis = np.array(range(len(inst_rate_norm)))/sampling_rate*1000
-        
-        
-        plt.plot(time_axis,inst_rate_norm, label='instantaneous rate')
-        #Length of each recordings
-        [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]  
-        
-        #Mocap TTL
-        [plt.axvline(_x, linewidth=1, color='b') for _x in mocap_starts]  
-        
-        plt.xlim(spiketrain.t_start, spiketrain.t_stop)  
-        plt.ylim(0,5)
-
-plt.savefig(rf"{savefig_folder}/Figure2b_superimposed_spiketrains.svg")
 
 
 
@@ -851,11 +881,11 @@ plt.savefig(rf"{savefig_folder}/Figure2b_superimposed_spiketrains.svg")
 #%%Split everything by Mocap trial
 mocap_trials_spikes=[]
 
-for i in range(len(mocap_starts)):
+for i in range(len(mocap_starts_times)):
     try:
-        start_time=mocap_starts[i]
+        start_time=mocap_starts_times[i]
         
-        stop_time=mocap_starts[i]+mocap_trial_lengths[i]
+        stop_time=mocap_starts_times[i]+mocap_trial_lengths[i]
         
         print(rf'Mocap trial {i+1} comprised between {start_time}s and {stop_time}s')
            
@@ -875,7 +905,7 @@ for index,trial in enumerate(mocap_trials_spikes):
     #Create elephant spiketrains
     last_spike_time = max(np.concatenate(trial).tolist())
     
-    print(mocap_starts[index], last_spike_time)
+    print(mocap_starts_times[index], last_spike_time)
     
     for _,spiketrain in enumerate(trial):
         mocap_trial_elephant_spiketrains.append(SpikeTrain(spiketrain*s, t_stop=last_spike_time))
@@ -884,7 +914,7 @@ for index,trial in enumerate(mocap_trials_spikes):
 
     plt.figure()
     plt.title(rf'Mocap trial {index+1}')
-    plt.xlim(mocap_starts[index], last_spike_time)  
+    plt.xlim(mocap_starts_times[index], last_spike_time)  
     # plt.ylim(0,1.5)    
 
     for i,spiketrain in enumerate(mocap_trial_elephant_spiketrains):
