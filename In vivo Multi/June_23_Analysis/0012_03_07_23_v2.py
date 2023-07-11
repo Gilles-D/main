@@ -276,7 +276,7 @@ def get_file_names(directory):
 
 
 
-def calculate_angle(p1, p2, p3):
+def calculate_angle_2D(p1, p2, p3):
     # Calcul des vecteurs entre les points
     v1 = p1 - p2
     v2 = p3 - p2
@@ -321,6 +321,17 @@ def Mocap_start_ttl_detection(mocap_starts_idx):
     
     return start_times
 
+def Check_Save_Dir(save_path):
+    """
+    Check if the save folder exists
+    If not : creates it
+    
+    """
+    import os
+    isExist = os.path.exists(save_path)
+    if not isExist:
+        os.makedirs(save_path) #Create folder for the experience if it is not already done
+
 #Load MOCAP class
 sys.path.append(r'D:\Gilles.DELBECQ\GitHub\main\MOCAP')
 import MOCAP_analysis_class as MA
@@ -332,7 +343,7 @@ import MOCAP_analysis_class as MA
 ---------------------- Parameters to change -----------------------------------
 """
 
-savefig_folder=r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23/Output/Spikesorting_0012_03_07"
+savefig_folder=r"\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23/Output/TDC/Spikesorting_0012_03_07v2"
 
 #Set the selected channels for the nalysis during spike sorting
 selected_chan=[0,1,2,3,4,5,8,12,13]
@@ -341,6 +352,7 @@ selected_chan=[0,1,2,3,4,5,8,12,13]
 baseline_duration = 310.9312 #in second
 
 mocap_frequency=200#Hz
+mocap_delay=23/mocap_frequency#Delay in s between TTL and start
 
 
 
@@ -348,16 +360,22 @@ mocap_frequency=200#Hz
 ---------------------- Files location -----------------------------------------
 """
 #List of recordings rhd files
-recordings=["//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_01.rhd",
+# recordings=["//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_01.rhd",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_02.rhd",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_03.rhd",
+# "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_05.rhd",]
+
+recordings=["//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_06.rhd",
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_01.rhd",
 "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_02.rhd",
 "//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_03.rhd",
-"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_05.rhd",]
+"//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/1_raw_intan/0012/07_03/0012_07_03_File_05.rhd"]
 
 
 #Exported from tridesclou export (by spikeinterface to phy)
-spike_times = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/spike_times.npy')
-spike_cluster = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/spike_clusters.npy')
-spike_templates = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07/phy_export/tridesclous/similar_templates.npy')
+spike_times = np.load(r'//equipe2-nas1/Gilles.DELBECQ/Data/ePhy/July_23/2_SI_data/0012_03_07_v2/phy_export/tridesclous/spike_times.npy')
+spike_cluster = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07_v2/phy_export/tridesclous/spike_clusters.npy')
+spike_templates = np.load(r'\\equipe2-nas1\Gilles.DELBECQ\Data\ePhy\July_23\2_SI_data/0012_03_07_v2/phy_export/tridesclous/similar_templates.npy')
 
 
 #Mocap files location
@@ -542,6 +560,7 @@ for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
     plt.title(rf'Spiketrain {spiketrain_name+1}')
     plt.show()
     
+    Check_Save_Dir(savefig_folder)
     plt.savefig(rf"{savefig_folder}/Figure 1 - Elephant Spike Train Analysis - Unit {spiketrain_name+1}.svg")
 
 #%%Figure 1b : Superimposed spiketrains
@@ -564,7 +583,7 @@ for spiketrain_name,spiketrain in enumerate(elephant_spiketrains):
         
         plt.xlim(spiketrain.t_start, spiketrain.t_stop)  
         plt.ylim(0,1.5)
-
+Check_Save_Dir(savefig_folder)
 plt.savefig(rf"{savefig_folder}/Figure 1b - Elephant Spike Train Analysis - Superimposed.svg")
 
 
@@ -598,19 +617,64 @@ for trial_index in range(len(mocap_starts_times)):
 
 
 
-#%% TO MOVE : Mocap calculations
-mocap_trial_lengths=[]
-walking_cycles = []
 
+
+#%% 4- Mocap calculations
+
+walking_cycles = []
 mocap_data_by_trial=[]
 
-for file in Files:
+
+for file in mocap_files:
+    print(rf'File : {file}')
     #Load csv file
     data_MOCAP = MA.MOCAP_file(file)
     
     #Get Trial, session idexes
     idx = data_MOCAP.whole_idx()    
     
+    """
+    Angles calculations
+    """
+    angle_left_hip=moving_average(calculate_angle_2D(np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Hip"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1"))[1:]),5)
+    angle_left_knee=moving_average(calculate_angle_2D(np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Hip"))[1:]),1)
+    angle_left_ankle=moving_average(calculate_angle_2D(np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Foot"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Knee"))[1:]),1)
+    
+    angle_right_hip=moving_average(calculate_angle_2D(np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Hip"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1"))[1:]),5)
+    angle_right_knee=moving_average(calculate_angle_2D(np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Hip"))[1:]),1)
+    angle_right_ankle=moving_average(calculate_angle_2D(np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Foot"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Knee"))[1:]),1)
+    
+    
+    """
+    Instantaneous animal speed
+    """
+    
+    positions = np.array(data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1"))
+    delta_positions = np.diff(positions, axis=1)/1000
+    delta_t = 1/mocap_frequency#s
+    
+    instantaneous_velocity = delta_positions / delta_t
+    norm_velocity = moving_average(np.linalg.norm(instantaneous_velocity, axis=0),50)
+    
+    # plt.figure()
+    # plt.plot(norm_velocity)
+    
+    
+    # Création des séries à partir des listes
+    series1 = pd.Series(angle_left_hip, name='angle_left_hip')
+    series2 = pd.Series(angle_right_hip, name='angle_right_hip')
+    series3 = pd.Series(angle_left_knee, name='angle_left_knee')
+    series4 = pd.Series(angle_right_knee, name='angle_right_knee')    
+    series5 = pd.Series(angle_left_ankle, name='angle_left_ankle')
+    series6 = pd.Series(angle_right_ankle, name='angle_right_ankle')   
+    
+    series7 = pd.Series(norm_velocity, name='instant speed')
+    
+    df = pd.concat([series1,series2,series3,series4,series5,series6,series7], axis=1)
+
+    mocap_data_by_trial.append(df)
+    
+    """
     #Get coords for each foot
     left_foot=data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Foot")
     right_foot=data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Foot")    
@@ -619,10 +683,15 @@ for file in Files:
     
     
     mocap_trial_lengths.append(len(left_foot[0])/mocap_frequency)
+    """
+    
+    
     
     
     """
     Trajectory plotting
+    """
+    
     """
     #Plot trajectory of each foot
     plt.figure()
@@ -641,61 +710,85 @@ for file in Files:
 
     [plt.axvline(i,c='red') for i in -left_foot[1][left_foot_peaks]]
     [plt.axvline(i, c='blue') for i in -right_foot[1][right_foot_peaks]]
-    
-    
     """
-    Angle calculation and plotting
-    """    
-    #Hip angles
-    A,B,C=np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Hip"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1"))[1:]
-    D,E,F=np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Hip"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1"))[1:]
     
-    angles_hip_left= moving_average(calculate_angle(A, B, C),1)
-    angles_hip_right= moving_average(calculate_angle(D, E, F),1)
-   
-    #Knee angles
-    A,B,C=np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Hip"))[1:]
-    D,E,F=np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Knee"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Hip"))[1:]
     
-    angles_knee_left= moving_average(calculate_angle(A, B, C),1)
-    angles_knee_right= moving_average(calculate_angle(D, E, F),1)
-    
-    #Ankle angles
-    A,B,C=np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Foot"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Knee"))[1:]
-    D,E,F=np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Foot"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Ankle"))[1:],np.asarray(data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Knee"))[1:]
+#%% Figure 2 : Combined data by trial
 
-    angles_ankle_left= moving_average(calculate_angle(A, B, C),1)
-    angles_ankle_right= moving_average(calculate_angle(D, E, F),1)
+
+for trial_index, trial in enumerate(mocap_files):
+    
+    mocap_data = mocap_data_by_trial[trial_index]
+    trial_spikes = mocap_trials_spikes[trial_index]
+
+    start_time=mocap_starts_times[trial_index]
+    stop_time=mocap_starts_times[trial_index]+mocap_trial_lengths[trial_index]
+    
+    print(rf'Trial {trial_index+1} from {start_time} to {stop_time}')
+    
     
     
     # Création des sous-graphiques
     fig, (ax1, ax2, ax3) = plt.subplots(3, 1, sharex=True)
+
     
-    ax1.set_title(f'Angle Hip {data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()}')
-    ax1.invert_xaxis()
-    ax1.plot(angles_hip_left, color='red', label='Left')
-    ax1.plot(angles_hip_right, color='blue', label='Right')
+    
+    #Instantenous spiking rate   
+    elephant_spiketrains = []
+    for index,spiketrain in enumerate(trial_spikes):
+        elephant_spiketrains.append(SpikeTrain(spiketrain*s, t_stop=stop_time))
+    
+    
+    
+    ax1.set_title(f'Spiking rate Trial # {trial_index+1}')
+    ax1.set_xlim(start_time-1,stop_time+1)
+
+    for spiketrain_index,spiketrain in enumerate(elephant_spiketrains):
+        try :
+            inst_rate = instantaneous_rate(spiketrain, sampling_period=5*ms)
+            inst_rate_norm= np.divide(inst_rate, max(inst_rate))
+            ax1.plot(inst_rate.times.rescale(s), inst_rate_norm, label=rf'Unit # {spiketrain_index+1}')
+            # ax1.plot(inst_rate.times.rescale(s), inst_rate_norm.rescale(histogram_rate.dimensionality).magnitude.flatten(), label=rf'Unit # {spiketrain_index+1}')
+            
+            
+            histogram_count = time_histogram([spiketrain], 0.1*s)
+            histogram_rate = time_histogram([spiketrain],  0.1*s, output='rate')
+            
+            # time histogram
+            ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
+                    align='edge', alpha=0.3, label='time histogram (rate)')
+            
+            
+        except:
+            print(rf'Spiketrain {spiketrain_index+1} error in inst rate calculation. {len(spiketrain)} spikes in the train')
     
 
-    ax2.set_title('Angles knee')
+    #Angles   
+    angles_knee_hip=mocap_data['angle_left_hip']
+    angles_knee_right=mocap_data['angle_right_hip']
+    
+    time_axis_mocap = np.linspace(start_time-mocap_delay, stop_time-mocap_delay, len(angles_knee_hip))   
+    
+    ax2.set_title('Angles hip')
     ax2.invert_xaxis()
-    ax2.plot(angles_knee_left, color='red', label='Left')
-    ax2.plot(angles_knee_right, color='blue', label='Right')
+    ax2.plot(time_axis_mocap,angles_knee_hip, color='red', label='Left')
+    ax2.plot(time_axis_mocap,angles_knee_right, color='blue', label='Right')
     
 
-    ax3.set_title('Angles ankle')
+    #Speed
+    speed=mocap_data['instant speed']
+    ax3.set_title('Animal speed')
     ax3.invert_xaxis()
-    ax3.plot(angles_ankle_left, color='red', label='Left')
-    ax3.plot(angles_ankle_right, color='blue', label='Right')   
+    ax3.plot(time_axis_mocap,speed, color='black', label='Speed')
     
-    [plt.axvline(i,c='red') for i in left_foot_peaks]
-    [plt.axvline(i, c='blue') for i in right_foot_peaks]
+    # [plt.axvline(i,c='red') for i in left_foot_peaks]
+    # [plt.axvline(i, c='blue') for i in right_foot_peaks]
         
     # Ajouter des labels aux axes
-    ax3.set_xlabel('frame idx')
+    ax3.set_xlabel('time (s)')
     
     # Afficher la légende pour le premier sous-graphique
-    ax1.legend()
+    # ax1.legend()
     
     # Ajuster les marges entre les sous-graphiques
     plt.tight_layout()
@@ -704,34 +797,17 @@ for file in Files:
     plt.show()
     
     # walking_cycles.append(right_foot_peaks)
+    Check_Save_Dir(savefig_folder)
+    plt.savefig(rf"{savefig_folder}/Figure 2 - Combined data by trial - Trial {trial_index+1}.svg")
     
     
-    
-    # Création des séries à partir des listes
-    series3 = pd.Series(angles_hip_left, name='angles_hip_left')
-    series4 = pd.Series(angles_hip_right, name='angles_hip_right')
-    series5 = pd.Series(angles_knee_left, name='angles_knee_left')
-    series6 = pd.Series(angles_knee_right, name='angles_knee_right')    
-    series7 = pd.Series(angles_ankle_left, name='angles_ankle_left')
-    series8 = pd.Series(angles_ankle_right, name='angles_ankle_right')   
-    
-    series10 = pd.Series(left_foot[0], name='left_foot_z')
-    series11 = pd.Series(left_foot[1], name='left_foot_x')
-    series12 = pd.Series(left_foot[2], name='left_foot_y')
-    series13 = pd.Series(right_foot[0], name='right_foot_z')
-    series14 = pd.Series(right_foot[1], name='right_foot_x')
-    series15 = pd.Series(right_foot[2], name='right_foot_y')
-    
-    
-    
-    df = pd.concat([series10,series11,series12,series13,series14,series15,series3, series4, series5, series6, series7, series8], axis=1)
 
+#%% 4- Splitting by cycle
 
-    
-    
-    
     """
     Splitting by cycle
+    """
+    
     """
     # Découper le tableau en utilisant les index
     slices_all = [angles_knee_right[right_foot_peaks[i]:right_foot_peaks[i+1]] for i in range(len(right_foot_peaks)-1)]
@@ -759,8 +835,6 @@ for file in Files:
         aligned_events.append(aligned_event)
     
     
-    
-    
     # Calcul de la moyenne des événements
     mean_event = np.nanmean(aligned_events, axis=0)
         
@@ -785,7 +859,7 @@ for file in Files:
     plt.show()
     
     
-    
+    """
 
 
 
@@ -838,6 +912,7 @@ plt.yticks(y_values)
 plt.ylabel('SpikeTrains')  # Nom de l'axe Y
 plt.xlabel('Time (s)')  # Nom de l'axe X
 plt.title('Figure 1 : Raster plot')
+Check_Save_Dir(savefig_folder)
 plt.savefig(rf"{savefig_folder}/Figure1_Rasterplot.svg")
 
 
@@ -859,6 +934,7 @@ for idx,cluster in enumerate(clusters_idx):
         plt.figure()
         plt.plot(all_mean_wvfs[chan])
         plt.title(rf'Cluster : {cluster} Channel :{selected_chan[chan]}')
+        Check_Save_Dir(rf'{savefig_folder}/wf/')
         plt.savefig(rf'{savefig_folder}/wf/wf_cluster_{cluster}_chan_{selected_chan[chan]}.png')
         plt.close()
 
@@ -932,6 +1008,7 @@ for index,trial in enumerate(mocap_trials_spikes):
         except:
             print(rf'spiketrain {i+1} has no spikes ?')
     plt.legend()
+    Check_Save_Dir(savefig_folder)
     plt.savefig(rf"{savefig_folder}/Figure2c_superimposed_spiketrains_trial_{index+1}.svg")        
          
    
@@ -1082,6 +1159,7 @@ ax.set_title("Mean rate by phase")
 
 # Affichage de la figure
 plt.show()
+Check_Save_Dir(savefig_folder)
 plt.savefig(rf"{savefig_folder}/Figure3_Mean_rates_by_phase.svg")
 
 #%%Figure 3b : Raster activity
@@ -1161,6 +1239,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     # Afficher la figure
     plt.show()
+    Check_Save_Dir(savefig_folder)
     plt.savefig(rf"{savefig_folder}/Figure3b_Raster_activity_spiketrain_{spiketrain_name+1}.svg")
 
 #%%Figure 4 : Optotag
@@ -1252,7 +1331,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     # Afficher la figure
     plt.show()
 
-
+    Check_Save_Dir(savefig_folder)
     plt.savefig(rf"{savefig_folder}/Figure4_optotag_{spiketrain_index+2}.svg")
 
     first_event_times_normalized = []
@@ -1303,6 +1382,7 @@ for spiketrain_index,action_potential_times in enumerate(selected_spike_times):
     
     # Afficher le graphique
     plt.show()
+    Check_Save_Dir(savefig_folder)
     plt.savefig(rf"{savefig_folder}/Figure4_optotag_distrib_{spiketrain_index+2}.svg")
         
 
