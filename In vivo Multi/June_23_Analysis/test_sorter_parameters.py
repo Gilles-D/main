@@ -112,23 +112,24 @@ def plot_maker(sorter, we, save, sorter_name, save_path, delay, mouse):
 
 def run_multiple_sorter(save, nb_of_agreement=0, plot_sorter=True, plot_comp=True):
     # ['173', '174', '176', '6401', '6402', '6409', '6457', '6456', '6924', '6928']
-    for mouse in ['173', '174', '176', '6401', '6402', '6409', '6457', '6456', '6924', '6928']:
-        print('\n', mouse)
-        #['Fixed Delay', 'Random Delay']
-        for delay in ['Fixed_Delay']:
-            print(delay)
-            if delay == 'Fixed_Delay':
-                recording_delay = 'Fixed Delay'
-            elif delay == 'Random_Delay':
-                recording_delay = 'Random Delay'
-            else:
-                raise ValueError(f'Unrecognize Delay({delay})')
+    # for mouse in ['173', '174', '176', '6401', '6402', '6409', '6457', '6456', '6924', '6928']:
+    #     print('\n', mouse)
+    #     #['Fixed Delay', 'Random Delay']
+    #     for delay in ['Fixed_Delay']:
+    #         print(delay)
+    #         if delay == 'Fixed_Delay':
+    #             recording_delay = 'Fixed Delay'
+    #         elif delay == 'Random_Delay':
+    #             recording_delay = 'Random Delay'
+    #         else:
+    #             raise ValueError(f'Unrecognize Delay({delay})')
                 
             recording_path = fr'C:\local_data\Paper\Data\concaneted_recording\{mouse}_{recording_delay}'
             os.chdir(recording_path)
-
+            
             multirecording = si.BinaryFolderRecording(f'{recording_path}/concatenated_recording')
             multirecording.annotate(is_filtered=True)
+            
             print('================================')
             for param_name in sorter_dict.keys():
                 sorter_list = []
@@ -148,6 +149,8 @@ def run_multiple_sorter(save, nb_of_agreement=0, plot_sorter=True, plot_comp=Tru
 
                     sorter_list.append(sorter_result)
                     sorter_name_list.append(sorter_name)
+                    
+                    
                     #save the sorter params
                     with open(f'{spike_folder}\param_dict.pkl', 'wb') as f:
                         pickle.dump(sorter_params, f)
