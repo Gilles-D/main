@@ -35,6 +35,7 @@ from viziphant.rasterplot import rasterplot_rates
 from elephant.statistics import time_histogram
 from neo.core import SpikeTrain
 from quantities import s, ms
+import pandas as pd
 
 
 def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,excluded_sites,freq_min=300,freq_max=6000,Plotting=True):
@@ -85,11 +86,14 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
         if Plotting==True:
             w = sw.plot_timeseries(recording_cmr,time_range=[10,13], segment_index=0)
         
-        
         rec_binary = recording_cmr.save(folder=rf'{saving_dir}/{saving_name}/', n_jobs=1, progress_bar=True, chunk_duration='1s')
     
     #TODO Save infos : excluded chan, probe, frequencies for filtering
-    
+    trial_time_index_df=pd.DataFrame({'concatenated_time':multirecording.get_times()})
+
+
+    with open(rf'{saving_dir}/{saving_name}/concatenated_recording_trial_time_index_df.pickle', 'wb') as file:
+        pickle.dump(trial_time_index_df, file, protocol=pickle.HIGHEST_PROTOCOL)   
 
     return rec_binary
 
@@ -282,9 +286,9 @@ probe_path=r'D:/ePhy/SI_Data/A1x16-Poly2-5mm-50s-177.json'   #INTAN Optrode
 
 # Saving Folder path
 saving_dir=r"D:/ePhy/SI_Data/concatenated_signals"
-saving_name="0012_03_07_allfiles_excluded"
+saving_name="0012_03_07_allfiles_allchan"
 
-excluded_sites = ['6','7','9','10','11']
+excluded_sites = []
 
 
 recordings=["D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_06.rhd",
@@ -301,4 +305,4 @@ spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
 #%%
 recording = concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,excluded_sites,Plotting=True)
 
-spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=False, plot_comp=True)
+spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=True, plot_comp=True)
