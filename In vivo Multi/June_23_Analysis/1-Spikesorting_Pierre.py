@@ -87,8 +87,8 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
             w = sw.plot_timeseries(recording_cmr,time_range=[10,13], segment_index=0)
         
         rec_binary = recording_cmr.save(folder=rf'{saving_dir}/{saving_name}/', n_jobs=1, progress_bar=True, chunk_duration='1s')
-    
-    #TODO Save infos : excluded chan, probe, frequencies for filtering
+     
+       
     trial_time_index_df=pd.DataFrame({'concatenated_time':multirecording.get_times()})
 
 
@@ -276,7 +276,20 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
             plt.savefig(fr'{save_path}\{saving_name}\{sorter_name}\we\Unit_{int(unit_id)}.pdf')
             plt.close()
 
+def save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites,freq_min=300,freq_max=6000):
+    metadata_dict = {
+        "recordings_files" : recordings,
+        "excluded_sites" : excluded_sites,
+        "freq_min" : freq_min,
+        "freq_max" : freq_max,
+        "probe_path" : probe_path
+        }
 
+    with open(rf"{saving_dir}/{saving_name}/metadata.pickle", "wb") as file:
+        # Dump the dictionary into the pickle file
+        pickle.dump(metadata_dict, file)
+    
+    
 
 
 #%%Parameters
@@ -304,5 +317,6 @@ spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
 
 #%%
 recording = concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,excluded_sites,Plotting=True)
+save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites)
 
 spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=True, plot_comp=True)
