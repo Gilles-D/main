@@ -299,17 +299,16 @@ probe_path=r'D:/ePhy/SI_Data/A1x16-Poly2-5mm-50s-177.json'   #INTAN Optrode
 
 # Saving Folder path
 saving_dir=r"D:/ePhy/SI_Data/concatenated_signals"
-saving_name="0012_03_07_allfiles_allchan"
+saving_name="0012_12_07_allfiles_allchan"
 
 excluded_sites = []
 
 
-recordings=["D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_06.rhd",
-"D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_01.rhd",
-"D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_02.rhd",
-"D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_03.rhd",
-"D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_04.rhd",
-"D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_05.rhd"
+recordings=["D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182326/0012_12_07_230712_182326.rhd",
+"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182901/0012_12_07_230712_182901.rhd",
+"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_183657/0012_12_07_230712_183657.rhd",
+"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_184451/0012_12_07_230712_184451.rhd",
+"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_185102/0012_12_07_230712_185102.rhd",
     ]
 
 spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
