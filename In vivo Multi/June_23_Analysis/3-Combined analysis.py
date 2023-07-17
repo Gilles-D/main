@@ -66,7 +66,9 @@ def Get_spikes(session_name,spikesorting_results_path):
         dict: Dictionary containing unit names, spike times array, and spike trains.
 
     """
-
+    
+    print('Reading spikes csv files...')
+    
     # Set the path to the spike times directory
     spike_times_path = rf'{spikesorting_results_path}\{session_name}\spikes'
 
@@ -93,7 +95,9 @@ def Get_spikes(session_name,spikesorting_results_path):
 
     # Create a dictionary containing the unit names, spike times arrays, and spike trains
     spike_times_dict = {'Units': unit_list, 'spike times': spike_times_array, 'spiketrains': elephant_spiketrains}
-
+    
+    print('Done')
+    
     return spike_times_dict
 
 def plural(n):
@@ -106,13 +110,14 @@ def Get_recordings_info(session_name,concatenated_signals_path,spikesorting_resu
     save_path = rf'{spikesorting_results_path}/{session_name}/recordings_info.pickle'
     if os.path.exists(save_path):
         print("Recordings info file exists")
-        
+        print("Loading info file...")
         recordings_info = pickle.load(open(save_path, "rb"))
         
         
         
     else:
         print("Recordings info file does not exist")
+        print("Getting info...")
         #lire le fichier metadata créée lors du concatenate
         path=rf'{concatenated_signals_path}/{session_name}/'
         metadata = pickle.load(open(rf"{path}/metadata.pickle", "rb"))
@@ -161,7 +166,8 @@ def Get_recordings_info(session_name,concatenated_signals_path,spikesorting_resu
         
         
         pickle.dump(recordings_info, open(save_path, "wb"))
-            
+    
+    print('Done')
     return recordings_info
 
 def read_data(filename):
@@ -344,7 +350,7 @@ def read_data(filename):
     return result
 
 
-def plot_waveform(session_name,spikesorting_results_path,unit):
+def plot_waveform(session_name,spikesorting_results_path,sites_location,unit):
     file_pattern = rf"Unit_{unit} *"
     matching_files = glob.glob(rf"{spikesorting_results_path}/{session_name}/waveforms/{file_pattern}")
     
@@ -357,29 +363,105 @@ def plot_waveform(session_name,spikesorting_results_path,unit):
             
             df = pd.read_excel(file_path)
                     
-            num_columns = df.shape[1]
-            num_rows = (num_columns + 1) // 2  # Calculate the number of subplot rows
-            
-            fig, axes = plt.subplots(num_rows, 2, figsize=(10, num_rows), sharex=True)
-        
-            for idx, column in enumerate(df.columns):
-                ax = axes[idx // 2, idx % 2] if num_rows > 1 else axes[idx % 2]  # Select the appropriate subplot
-                ax.plot(df[column])
-                ax.set_title(column)
-                ax.set_aspect(10)  # Set x/y aspect ratio to 10/1
-        
-            # Remove empty subplots if the number of columns is odd
-            if num_columns % 2 != 0:
-                fig.delaxes(axes.flatten()[-1])
-        
-            plt.tight_layout()
-            plt.show()
+            fig1 = plt.figure(figsize=(10, 12))
+            ax1 = fig1.add_subplot(111)
 
-            
+            fig1.suptitle(rf'Average Waveform Unit # {unit}')
+            ax1.set_xlabel('Probe location (micrometers)')
+            ax1.set_ylabel('Probe location (micrometers)')
+
+
+
+            for loc, prob_loc in enumerate(sites_location):
+                x_offset, y_offset = prob_loc[0], prob_loc[1]
+                base_x = np.linspace(-15, 15, num=len(df.iloc[:, loc]))  # Basic x-array for plot, centered
+                # clust_color = 'C{}'.format(cluster)
+
+                wave = df.iloc[:, loc]*10 + y_offset
+                ax1.plot(base_x + 2 * x_offset, wave)
+                # ax1.fill_between(base_x + 2 * x_offset, wave - wf_rms[cluster + delta], wave + wf_rms[cluster + delta], alpha=wf_alpha)
+
+            plt.show()
     else:
         print("No matching file found")
     
     return 
+
+
+def Mocap_start_ttl_detection(mocap_starts_idx,sampling_rate):
+    # Calculer la différence entre les éléments consécutifs
+    diff_indices = np.diff(mocap_starts_idx)
+    phase_indices = np.where(diff_indices != 1)[0]-1
+    start_idexes = mocap_starts_idx[phase_indices]
+    start_times=start_idexes/sampling_rate
+    
+    return start_times
+
+def create_time_periods(times):
+    time_periods = []
+    if len(times) < 2:
+        return time_periods
+    t_start = times[0]
+    for i in range(1, len(times)):
+        t_stop = times[i]
+        time_periods.append((t_start, t_stop))
+        t_start = t_stop
+    return time_periods
+
+def separate_events_by_period(events, time_periods):
+    num_periods = len(time_periods)
+    event_periods = []
+    
+    for i in range(num_periods):
+        t_start, t_stop = time_periods[i]
+        period_events = events[(events >= t_start) & (events < t_stop)]
+        event_periods.append(period_events-t_start)
+    
+    event_periods_dict = {}
+    
+    for i, array in enumerate(event_periods):
+        event_periods_dict[rf'Mocap_Session_{i+1}']=array
+    
+    
+    return event_periods_dict
+
+
+def plot_heatmap(spike_times,bin_size):
+    
+    event_times_list = spike_times.values()
+    event_session_list = spike_times.keys()
+            
+        
+    # Set the bin size and create the time bins
+    max_time = max(max(times) for times in event_times_list)
+    bins = np.arange(0, max_time + bin_size, bin_size)
+
+    # Compute the histograms of event counts for each row
+    histograms = []
+    for event_times in event_times_list:
+        counts, _ = np.histogram(event_times, bins)
+        histograms.append(counts)
+
+    # Check if any histogram has fewer than two bins
+    if any(len(counts) < 2 for counts in histograms):
+        raise ValueError("Insufficient data for heatmap visualization.")
+
+    # Create a 2D array from the histograms for heatmap visualization
+    heatmap = np.array(histograms)
+
+    # Plot the heatmap
+    plt.imshow(heatmap, cmap='hot', aspect='auto')
+    plt.colorbar(label='Event Count')
+    plt.xlabel('Time Bin')
+    plt.ylabel('Event session')
+    
+    # Set the y-axis tick labels to the event_session_list items
+    plt.yticks(range(len(event_session_list)), event_session_list)
+
+    
+    plt.title('Event Heatmap in Line Plot')
+    plt.show()
+
 
 
 
@@ -388,68 +470,145 @@ recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spi
 
 spike_times_dict = Get_spikes(session_name,spikesorting_results_path)
 
-plot_waveform(session_name,spikesorting_results_path,unit=2)
+sampling_rate = 20000
+
+sites_location=[[0.0, 250.0],
+  [0.0, 300.0],
+  [0.0, 350.0],
+  [0.0, 200.0],
+  [0.0, 150.0],
+  [0.0, 100.0],
+  [0.0, 50.0],
+  [0.0, 0.0],
+  [43.3, 25.0],
+  [43.3, 75.0],
+  [43.3, 125.0],
+  [43.3, 175.0],
+  [43.3, 225.0],
+  [43.3, 275.0],
+  [43.3, 325.0],
+  [43.3, 375.0]]
+
+
+
+# plot_waveform(session_name,spikesorting_results_path,sites_location,unit=8)
+
+
 
 
 #%% Figure 1 : Whole SpikeTrain Analysis
 print('Figure 1 - Elephant Spike Train Analysis')
 
-data = pickle.load(open("D:/Seafile/Seafile/Data/ePhy/2_SI_data/concatenated_signals/0012_03_07_allfiles_allchan/concatenated_recording_trial_time_index_df.pickle", "rb"))
-
 for unit in spike_times_dict['Units']:
     print(unit)
     spiketrain = spike_times_dict['spiketrains'][spike_times_dict['Units'].index(unit)]
-
-    print(rf"The mean firing rate of unit {unit} on whole session is", mean_firing_rate(spiketrain))
     
-    plt.figure()    
-
-    histogram_count = time_histogram([spiketrain], 0.5*s)
-    histogram_rate = time_histogram([spiketrain],  0.5*s, output='rate')  
+    # Compute and print the mean firing rate
+    mean_fr = mean_firing_rate(spiketrain)
+    print(f"The mean firing rate of unit {unit} on the whole session is {mean_fr}")
     
-    inst_rate = instantaneous_rate(spiketrain, sampling_period=50*ms)
+    plt.figure()
     
-
-    # plotting the original spiketrain (rasterplot)
-    # plt.plot(spiketrain, [0]*len(spiketrain), 'r', marker=2, ms=25, markeredgewidth=2, lw=0, label='poisson spike times')
+    # Compute the time histogram and rate histogram
+    histogram_count = time_histogram([spiketrain], 0.5 * s)
+    histogram_rate = time_histogram([spiketrain], 0.5 * s, output='rate')
     
+    # Compute the instantaneous rate
+    inst_rate = instantaneous_rate(spiketrain, sampling_period=50 * ms)
     
-    # Mean firing rate for the baseline phase
-    # baseline_stop = baseline_duration
-    # plt.hlines(mean_firing_rate(spiketrain,t_stop=baseline_stop*s), xmin=spiketrain.t_start, xmax=spiketrain.t_stop, linestyle='--', label='mean firing rate')
-    
-    
-    # time histogram
+    # Plot the time histogram (rate)
     plt.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
-            align='edge', alpha=0.3, label='time histogram (rate)',color='black')
-       
-    # Instantaneous rate
-    plt.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+            align='edge', alpha=0.3, label='time histogram (rate)', color='black')
     
-    #Length of each recordings
-    # [plt.axvline(_x, linewidth=1, color='g') for _x in recordings_lengths_cumsum]
+    # Plot the instantaneous rate
+    plt.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(),
+             label='instantaneous rate')
     
-    #Mocap ttl
-    # [plt.axvline(_x, linewidth=1, color='b') for _x in mocap_starts_times]
-    
-    
-    
-    # axis labels and legend
+    # Set the axis labels and legend
     plt.xlabel('time [{}]'.format(spiketrain.times.dimensionality.latex))
     plt.ylabel('firing rate [{}]'.format(histogram_rate.dimensionality.latex))
     
-    plt.xlim(spiketrain.t_start, spiketrain.t_stop)   
-    #plt.xlim(0, 572.9232) #Use this to focus on phases you want using recordings_lengths_cumsum
-    
+    plt.xlim(spiketrain.t_start, spiketrain.t_stop)
     
     plt.legend()
     plt.title(rf'Spiketrain {unit}')
     plt.show()
     
-    # Check_Save_Dir(savefig_folder)
+    # Create the save directory
     savefig_folder = rf'{spikesorting_results_path}/{session_name}/plots/spiking_analysis/'
     Check_Save_Dir(savefig_folder)
-    plt.savefig(rf"{savefig_folder}/Figure 1 - Elephant Spike Train Analysis - {unit}.{plot_format}")
     
-#%% Figure 2 - Split by recording ?
+    # Save the figure
+    plt.savefig(rf"{savefig_folder}/Figure 1 - Elephant Spike Train Analysis - {unit}.{plot_format}")
 
+    
+#%% Split by MOCAP TTL
+
+if not os.path.exists(fr'{spikesorting_results_path}/{session_name}/spike_times_dict.pickle') and os.path.exists(fr'{spikesorting_results_path}/{session_name}/spike_times_by_mocap_session.pickle'):
+    # Detect Mocap start signals
+    mocap_starts_idx = (np.where(recordings_info['digital_mocap_signal_concatenated'] == True))[0]
+    mocap_starts_times = Mocap_start_ttl_detection(mocap_starts_idx, sampling_rate)
+    mocap_session_periods = create_time_periods(mocap_starts_times)
+    
+    # Split spike times by mocap trial
+    spike_times_split_list = []
+    spike_times_by_mocap_session = {}
+    
+    for unit in spike_times_dict['Units']:
+        spike_times = spike_times_dict['spike times'][spike_times_dict['Units'].index(unit)]
+        spike_times_by_session = separate_events_by_period(spike_times, mocap_session_periods)
+        spike_times_split_list.append(spike_times_by_session)
+    
+    for i, dictionary in enumerate(spike_times_split_list):
+        unit = spike_times_dict['Units'][i]
+        spike_times_by_mocap_session[unit] = dictionary
+        
+    del spike_times_split_list, spike_times, spike_times_by_session, mocap_starts_idx, mocap_starts_times
+    
+    #Save the dictionnaries
+    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_dict.pickle', 'wb') as handle:
+        pickle.dump(spike_times_dict, handle)
+    
+    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_by_mocap_session.pickle', 'wb') as handle:
+        pickle.dump(spike_times_by_mocap_session, handle)
+
+else:
+    print('Split spiketimes pickle file already exists. Loading them...')
+    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_dict.pickle', 'rb') as handle:
+        spike_times_dict = pickle.load(handle)
+        
+    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_by_mocap_session.pickle', 'rb') as handle:
+        spike_times_by_mocap_session = pickle.load(handle)
+
+
+
+
+
+#%% Figure 2 - Heatmap spiking by unit, by mocap session
+
+for unit in spike_times_dict['Units']:
+    print(unit)
+    plt.figure()
+    spike_times = spike_times_by_mocap_session[unit]
+    plot_heatmap(spike_times,bin_size = 0.5)
+    
+    
+    # t_stop = None
+
+    # for key, value in spike_times.items():
+    #     if t_stop is None:
+    #         t_stop = np.max(value)
+    #     else:
+    #         t_stop = max(t_stop, np.max(value))
+    
+    # spiketrains=[]
+    
+    # # plt.figure()
+    # # plt.title(rf'Unit # {unit}')
+    
+    # for i,session in enumerate(spike_times.keys()):
+        
+    #     spiketrain = SpikeTrain(spike_times[session]*s, t_stop)
+    #     inst_rate = instantaneous_rate(spiketrain, 5*ms)
+        
+        
