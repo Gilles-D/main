@@ -4,11 +4,9 @@ Created on Thu Jan 19 10:38:24 2023
 
 @author: MOCAP
 """
-import serial
-import time
-from datetime import datetime
+
 import pyautogui
-import numpy as np
+
 from pynput import keyboard
 from pynput import mouse
 
