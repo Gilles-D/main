@@ -89,11 +89,11 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
         rec_binary = recording_cmr.save(folder=rf'{saving_dir}/{saving_name}/', n_jobs=1, progress_bar=True, chunk_duration='1s')
      
        
-    trial_time_index_df=pd.DataFrame({'concatenated_time':multirecording.get_times()})
+        trial_time_index_df=pd.DataFrame({'concatenated_time':multirecording.get_times()})
 
 
-    with open(rf'{saving_dir}/{saving_name}/concatenated_recording_trial_time_index_df.pickle', 'wb') as file:
-        pickle.dump(trial_time_index_df, file, protocol=pickle.HIGHEST_PROTOCOL)   
+        with open(rf'{saving_dir}/{saving_name}/concatenated_recording_trial_time_index_df.pickle', 'wb') as file:
+            pickle.dump(trial_time_index_df, file, protocol=pickle.HIGHEST_PROTOCOL)   
 
     return rec_binary
 
@@ -101,12 +101,12 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
 def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True,nb_of_agreement=2,plot_sorter=True,plot_comp=True,save=True):
     param_sorter = {
                     'tridesclous': {
-                                        'freq_min': 300.,   #'High-pass filter cutoff frequency'
-                                        'freq_max': 6000.,#'Low-pass filter cutoff frequency'
-                                        'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
-                                        'detect_threshold': 5, #'Threshold for spike detection',
-                                        'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
-                                        'common_ref_removal': True,     #'remove common reference with median',
+                                        # 'freq_min': 300.,   #'High-pass filter cutoff frequency'
+                                        # 'freq_max': 6000.,#'Low-pass filter cutoff frequency'
+                                        # 'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
+                                        # 'detect_threshold': 5, #'Threshold for spike detection',
+                                        # 'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
+                                        # 'common_ref_removal': True,     #'remove common reference with median',
                                     },
                     'spykingcircus': {
                                         'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
@@ -297,18 +297,35 @@ def save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites,fr
 probe_path=r'D:/ePhy/SI_Data/A1x16-Poly2-5mm-50s-177.json'   #INTAN Optrode
 # probe_path = 'D:/ePhy/SI_Data/Buzsaki16.json'              #INTAN Buzsaki16
 
+
+
+# # Saving Folder path
+# saving_dir=r"D:/ePhy/SI_Data/concatenated_signals"
+# saving_name="0012_12_07_allfiles_allchan"
+
+# excluded_sites = []
+
+
+# recordings=["D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182326/0012_12_07_230712_182326.rhd",
+# "D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182901/0012_12_07_230712_182901.rhd",
+# "D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_183657/0012_12_07_230712_183657.rhd",
+# "D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_184451/0012_12_07_230712_184451.rhd",
+# "D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_185102/0012_12_07_230712_185102.rhd",
+#     ]
+
+
+
 # Saving Folder path
 saving_dir=r"D:/ePhy/SI_Data/concatenated_signals"
-saving_name="0012_12_07_allfiles_allchan"
+saving_name="0012_08_06_allchan"
 
 excluded_sites = []
 
-
-recordings=["D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182326/0012_12_07_230712_182326.rhd",
-"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182901/0012_12_07_230712_182901.rhd",
-"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_183657/0012_12_07_230712_183657.rhd",
-"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_184451/0012_12_07_230712_184451.rhd",
-"D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_185102/0012_12_07_230712_185102.rhd",
+recordings=['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',#2 Baseline
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',#3 Passage sanns obst
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',#5 Obst moyen
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',#7 Cage Roue
+            'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd'#8 Opto
     ]
 
 spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
