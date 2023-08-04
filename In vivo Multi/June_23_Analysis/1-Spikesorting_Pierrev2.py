@@ -39,23 +39,6 @@ import pandas as pd
 
 
 def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,excluded_sites,freq_min=300,freq_max=6000,Plotting=True):
-    """
-    Concatenate multiple recordings, preprocess them, and save the concatenated recording.
-
-    Parameters:
-        recordings (list): List of paths to individual recording files.
-        saving_dir (str): Directory where the concatenated recording will be saved.
-        saving_name (str): Name of the concatenated recording file (without extension).
-        probe_path (str): Path to the probe description file (e.g., '.prb', '.csv', or '.json').
-        excluded_sites (list): List of site IDs to exclude from the concatenated recording.
-        freq_min (float, optional): Minimum frequency for bandpass filtering. Defaults to 300 Hz.
-        freq_max (float, optional): Maximum frequency for bandpass filtering. Defaults to 6000 Hz.
-        Plotting (bool, optional): Whether to enable plotting during preprocessing. Defaults to True.
-    
-    Returns:
-        rec_binary (spikeinterface.RecordingExtractor): The concatenated and preprocessed recording.
-    """
-    
     if os.path.isdir(rf'{saving_dir}/{saving_name}/'):
         print('Concatenated file already exists')
         rec_binary = si.load_extractor(rf'{saving_dir}/{saving_name}/')
@@ -116,59 +99,43 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
 
 
 def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True,nb_of_agreement=2,plot_sorter=True,plot_comp=True,save=True):
-    """
-    Perform spike sorting using multiple sorters and compare the results.
-
-    Parameters:
-        record (spikeinterface.RecordingExtractor): The recording extractor to be sorted.
-        spikesorting_results_folder (str): Directory where the results of spike sorting will be saved.
-        saving_name (str): Name used for creating subdirectories for each sorter's results.
-        use_docker (bool, optional): Whether to use Docker to run the spike sorters. Defaults to True.
-        nb_of_agreement (int, optional): Minimum number of sorters that must agree to consider a unit as valid. Defaults to 2.
-        plot_sorter (bool, optional): Whether to enable plotting of individual sorter's results. Defaults to True.
-        plot_comp (bool, optional): Whether to enable plotting of comparison results. Defaults to True.
-        save (bool, optional): Whether to save the plot images. Defaults to True.
-
-    Returns:
-        None
-    """
-    
     param_sorter = {
-                    'mountainsort4': {
-                                        'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
-                                        'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
-                                        'freq_min': 300,  # Use None for no bandpass filtering
-                                        'freq_max': 6000,
-                                        'filter': True,
-                                        'whiten': True,  # Whether to do channel whitening as part of preprocessing
-                                        'num_workers': 1,
-                                        'clip_size': 50,
-                                        'detect_threshold': 3,
-                                        'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel
-                                        'tempdir': None
-                                    },
-                    'tridesclous': {
-                                        'freq_min': 300.,   #'High-pass filter cutoff frequency'
-                                        'freq_max': 6000.,#'Low-pass filter cutoff frequency'
-                                        'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
-                                        'detect_threshold': 5, #'Threshold for spike detection',
-                                        'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
-                                        'common_ref_removal': True,     #'remove common reference with median',
-                                    },
-                    'spykingcircus': {
-                                        'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
-                                        'adjacency_radius': 100,  # Radius in um to build channel neighborhood
-                                        'detect_threshold': 6,  # Threshold for detection
-                                        'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
-                                        'filter': True, # Enable or disable filter
-                                        'merge_spikes': True, #Enable or disable automatic mergind
-                                        'auto_merge': 0.75, #Automatic merging threshold
-                                        'num_workers': None, #Number of workers (if None, half of the cpu number is used)
-                                        'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
-                                        'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
-                                    },
+                    # 'tridesclous':   {'detect_sign': -1, # "Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording"
+                    #                     'detect_threshold': 5, # "Threshold for spike detection"
+                    #                 },
+                    # 'spykingcircus': {
+                    #                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
+                    #                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
+                    #                     'detect_threshold': 6,  # Threshold for detection
+                    #                     'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
+                    #                     'filter': True, # Enable or disable filter
+                    #                     'merge_spikes': True, #Enable or disable automatic mergind
+                    #                     'auto_merge': 0.75, #Automatic merging threshold
+                    #                     'num_workers': None, #Number of workers (if None, half of the cpu number is used)
+                    #                     'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
+                    #                     'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
+                    #                 },
+                                               
+                    # 'herdingspikes': {
+                    #                     'detect_threshold': 20,  # 24, #15, "Detection threshold"
+                    #                     'filter': False,
+                    #                 },
 
-                 }
+                    'mountainsort4': {
+                                    'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording "Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording"
+                                    'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood "Radius in um to build channel neighborhood (Use -1 to include all channels in every neighborhood)"
+                                    'freq_min': 300,  # Use None for no bandpass filtering "High-pass filter cutoff frequency"
+                                    'freq_max': 6000,# "Low-pass filter cutoff frequency"
+                                    'filter': False,# "Enable or disable filter"
+                                    'whiten': True,  # Whether to do channel whitening as part of preprocessing "Enable or disable whitening"
+                                    'num_workers': None,# "Number of workers (if None, half of the cpu number is used)"
+                                    'clip_size': 500,# "Number of samples per waveform"
+                                    'detect_threshold': 6,# "Threshold for spike detection"
+                                    'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel "Minimum number of timepoints between events detected on the same channel"
+                                    'tempdir': None# "Temporary directory for mountainsort (available for ms4 >= 1.0.2)s"
+                                    },
+                    
+                    }
     
     print("Spike sorting starting")
 
@@ -181,6 +148,7 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
         
         if os.path.isdir(output_folder):
             print('Sorter folder found, load from folder')
+            print(rf'{output_folder}/in_container_sorting')
             sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{output_folder}/in_container_sorting')
         else:
             sorter_result = ss.run_sorter(sorter_name,recording=record,output_folder=output_folder,docker_image=True,verbose=False,**sorter_param)
@@ -198,14 +166,27 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
             we = si.WaveformExtractor.load_from_folder(f'{output_folder}\we', sorting=sorter_result)
         else:
             we = si.extract_waveforms(record, sorter_result, folder=f'{output_folder}\we')
+            
     
         if plot_sorter:
             print('Plot sorting summary in progress')
             plot_maker(sorter_result, we, save, sorter_name, spikesorting_results_folder,saving_name)
             print('Plot sorting summary finished')
+        
+        
+        print("Exporting spike sorting results to Phy")
+        try:
+            sexp.export_to_phy(we, output_folder=rf'{output_folder}\phy', 
+                       compute_amplitudes=False, compute_pc_features=False, copy_binary=True,remove_if_exists=True,
+                   )
+        except:
+            print("can't export to phy")
         print('================================')
     
+    
     print("Spike sorting done")
+    
+    
     
     
     
@@ -229,8 +210,6 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
             comp_multi.save_to_folder(base_comp_folder)
             # del sorting_list, sorting_name_list
             sorting_agreement = comp_multi.get_agreement_sorting(minimum_agreement_count=nb_of_agreement)
-            sorting_agreement._is_json_serializable = False
-
             sorting_agreement.save_to_folder(f'{base_comp_folder}\sorter')
         
         
@@ -257,35 +236,11 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
     
 
 def load_concatenated_recordings(saving_dir,saving_name):
-    """
-    Load the concatenated recording from the specified directory.
-    Parameters:
-        saving_dir (str): Directory where the concatenated recording is saved.
-        saving_name (str): Name of the concatenated recording file (without extension).
-    Returns:
-        rec_binary (spikeinterface.RecordingExtractor): The loaded concatenated recording.
-    """
-    
     return si.load_extractor(rf'{saving_dir}/{saving_name}/')
 
 
 
 def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
-    """
-    Generate and save plots for an individual sorter's results.
-    
-    Parameters:
-        sorter (spikeinterface.SortingExtractor): The sorting extractor containing the results of a spike sorter.
-        we (spikeinterface.WaveformExtractor): The waveform extractor for the sorting extractor.
-        save (bool): Whether to save the generated plots.
-        sorter_name (str): Name of the spike sorter.
-        save_path (str): Directory where the plots will be saved.
-        saving_name (str): Name of the recording data.
-        
-    Returns:
-        None
-    """
-    
     for unit_id in sorter.get_unit_ids():
         fig = plt.figure(figsize=(25, 13))
         gs = GridSpec(nrows=3, ncols=6)
@@ -303,6 +258,7 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
         ax0.set_title('Autocorrelogram')
         current_spike_train = sorter.get_unit_spike_train(unit_id)/sorter.get_sampling_frequency()
         current_spike_train_list = []
+        
         while len(current_spike_train) > 0: #this loop is to split the spike train into trials with correct duration in seconds
             # Find indices of elements under 9 (9 sec being the duration of the trial)
             indices = np.where(current_spike_train < 9)[0]
@@ -316,10 +272,10 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
         bin_size = 100
         histogram = time_histogram(current_spike_train_list, bin_size=bin_size*ms, output='mean')
         histogram = histogram*(1000/bin_size)
-        ax1.axvspan(0, 0.5, color='green', alpha=0.3)
-        ax1.axvspan(1.5, 2, color='green', alpha=0.3)
-        ax6.axvspan(0, 0.5, color='green', alpha=0.3)
-        ax6.axvspan(1.5, 2, color='green', alpha=0.3)
+        # ax1.axvspan(0, 0.5, color='green', alpha=0.3)
+        # ax1.axvspan(1.5, 2, color='green', alpha=0.3)
+        # ax6.axvspan(0, 0.5, color='green', alpha=0.3)
+        # ax6.axvspan(1.5, 2, color='green', alpha=0.3)
         plot_time_histogram(histogram, units='s', axes=ax1)
         sw.plot_unit_waveforms_density_map(we, unit_ids=[unit_id], ax=ax2)
         template = we.get_template(unit_id=unit_id).copy()
@@ -338,22 +294,6 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
             plt.close()
 
 def save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites,freq_min=300,freq_max=6000):
-    """
-    Save metadata related to the recordings and preprocessing.
-    
-    Parameters:
-        recordings (list): List of paths to individual recording files.
-        saving_dir (str): Directory where the metadata will be saved.
-        saving_name (str): Name of the concatenated recording file (without extension).
-        probe_path (str): Path to the probe description file (e.g., '.prb', '.csv', or '.json').
-        excluded_sites (list): List of site IDs to exclude from the concatenated recording.
-        freq_min (float, optional): Minimum frequency for bandpass filtering. Defaults to 300 Hz.
-        freq_max (float, optional): Maximum frequency for bandpass filtering. Defaults to 6000 Hz.
-        
-    Returns:
-        None
-    """
-    
     metadata_dict = {
         "recordings_files" : recordings,
         "excluded_sites" : excluded_sites,
@@ -367,58 +307,71 @@ def save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites,fr
         pickle.dump(metadata_dict, file)
     
     
-def list_recording_files(path):
-    """
-    List all recording files (.rhd) in the specified directory and its subdirectories.
-    
-    Parameters:
-        path (str): The directory path to search for recording files.
-        
-    Returns:
-        list: A list of paths to all recording files found.
-    """
-    
-    import glob
-    fichiers = [fichier for fichier in glob.iglob(path + '/**/*', recursive=True) if not os.path.isdir(fichier) and fichier.endswith('.rhd')]
-    
-    return fichiers
-
-
-
-
 
 
 #%%Parameters
 
-#####################################################################
-###################### TO CHANGE ####################################
-#####################################################################
-#Folder containing the folders of the session
-rhd_folder = r'D:\ePhy\Intan_Data\0026\0026_01_08'
-saving_name="0026_01_08_allchan_allfiles"
-
-
-
-#####################################################################
-#Verify the following parameters and paths
-
 probe_path=r'D:/ePhy/SI_Data/A1x16-Poly2-5mm-50s-177.json'   #INTAN Optrode
 # probe_path = 'D:/ePhy/SI_Data/Buzsaki16.json'              #INTAN Buzsaki16
 
-
 # Saving Folder path
 saving_dir=r"D:/ePhy/SI_Data/concatenated_signals"
-spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
+saving_name="recording_test"
 
-
-# Sites to exclude
+# excluded_sites = ['4','5','6','7','8','9','10','11','12','13']
 excluded_sites = []
 
 
-#%%
-recordings = list_recording_files(rhd_folder)
+recordings=[
+"D:/ePhy/Intan_Data/0012/06_30/0012_30_06_File_01.rhd",
+# "D:/ePhy/Intan_Data/0012/06_30/0012_30_06_File_02.rhd",
+# "D:/ePhy/Intan_Data/0012/06_30/0012_30_06_File_03.rhd",
+# "D:/ePhy/Intan_Data/0012/06_30/0012_30_06_File_04.rhd",
+# "D:/ePhy/Intan_Data/0012/06_30/0012_30_06_File_05.rhd",
+# "D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_01.rhd",
+# "D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_02.rhd",
+# "D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_03.rhd",
+# "D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_04.rhd",
+# "D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_05.rhd",
+# "D:/ePhy/Intan_Data/0012/07_03/0012_07_03_File_06.rhd",
+# 'D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182326/0012_12_07_230712_182326.rhd',
+# 'D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_182901/0012_12_07_230712_182901.rhd',
+# 'D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_183657/0012_12_07_230712_183657.rhd',
+# 'D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_184451/0012_12_07_230712_184451.rhd',
+# 'D:/ePhy/Intan_Data/0012/07_12/0012_12_07_230712_185102/0012_12_07_230712_185102.rhd'
 
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_174830.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_174930.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_175030.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_175130.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_175230.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_175330.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_175430.rhd",
+# "D:/ePhy/Intan_Data/0012/05_19/0012_19_05_230519_174830/0012_19_05_230519_175530.rhd"
+
+# "D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_154139.rhd",
+# "D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153639.rhd",
+# "D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153739.rhd",
+# "D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153839.rhd",
+# "D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_153939.rhd",
+# "D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_153639/0012_08_06_230608_154039.rhd"
+
+    ]
+
+# recordings=['D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_154253/0012_08_06_230608_154253.rhd',#2 Baseline
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_155001/0012_08_06_230608_155001.rhd',#3 Passage sanns obst
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_161048/0012_08_06_230608_161048.rhd',#5 Obst moyen
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_163818/0012_08_06_230608_163818.rhd',#7 Cage Roue
+#             'D:/ePhy/Intan_Data/0012/06_08/0012_08_06_230608_164712/0012_08_06_230608_164712.rhd'#8 Opto
+#     ]
+
+spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
+
+
+#%%
 recording = concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,excluded_sites,Plotting=True)
 save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites)
 
-spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=False, plot_comp=True)
+spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=True, plot_comp=True)
+
+recording

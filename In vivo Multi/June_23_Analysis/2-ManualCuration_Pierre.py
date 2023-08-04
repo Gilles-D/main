@@ -70,7 +70,7 @@ def higher_channel_order_dict(recording_path,spikesorting_results_path, sorter_l
     for sorter in sorter_list:
         print(sorter)
         # Assign abbreviated names to sorters
-        if sorter == 'comp_mult_2_tridesclous_spykingcircus_mountainsort4':
+        if sorter == 'comp_mult_2_mountainsort4_tridesclous_spykingcircus':
             sorter_mini = 'comp'
         elif sorter == 'herdingspikes':
             sorter_mini = 'her'
@@ -344,13 +344,13 @@ def Check_Save_Dir(save_path):
         os.makedirs(save_path) #Create folder for the experience if it is not already done
     return
 
-
+#%%Script
 """
 Parameters
 """
 
-recording_name="0012_03_07_nooptotag_allchan"
-sorter_list = ['comp_mult_2_tridesclous_spykingcircus_mountainsort4', 'mountainsort4','spykingcircus', 'tridesclous']
+recording_name="0026_01_08_allchan_allfiles"
+sorter_list = ['mountainsort4','spykingcircus', 'tridesclous','comp_mult_2_mountainsort4_tridesclous_spykingcircus']
 
 
 
@@ -366,3 +366,4 @@ saving_summary_plot = rf'{spikesorting_results_path}/summary_plots'
 
 
 higher_channel_order_dict(recording_path,spikesorting_results_path,sorter_list,saving_spike_path,saving_waveform_path,saving_summary_plot)
+
