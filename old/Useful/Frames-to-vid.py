@@ -13,32 +13,71 @@ import re
  
 
 
-def make_video(files):
+def make_video(files,freq):
     img_array = []
-    for file in files:
+    for i,file in enumerate(files):
+        print(rf'{i+1} / {len(files)}')
         file_path = os.path.join(subdirs, file) 
-        print(file_path)
+        # print(file_path)
         img = cv2.imread(file_path)
         height, width, layers = img.shape
         size = (width,height)
         img_array.append(img)
-    a = re.sub(r'\\', '/', subdirs)
-    print(a)
-    a = re.split(r'/', a)
-    print(a)
-    a = "%s" % (a[-1])
-    a.replace(' ', '_')
+    name = re.sub(r'\\', '/', subdirs).split(r'/')
+    name = rf'{name[-2]}_{name[-1]}'
     print('Saving...')
-    out = cv2.VideoWriter('{}{}.avi'.format(rootdir, a),cv2.VideoWriter_fourcc(*'DIVX'), 70, size)
+    print('{}/{}.avi'.format(os.path.dirname(rootdir), name))
+    out = cv2.VideoWriter('{}/{}.avi'.format(os.path.dirname(rootdir), name),cv2.VideoWriter_fourcc(*'DIVX'), freq, size)
     for i in range(len(img_array)):
         out.write(img_array[i])
     return(out.release())
 
-rootdir = r'D:\SOD_2023\0014_24_05\1'
+def check_freq(files):
+    timestamps=[]
+    for file in files :
+        timestamps.append(float(file.split('_')[0].split('-')[-1])) 
+    time_delays = [j-i for i, j in zip(timestamps[:-1], timestamps[1:])]
+    freq = 1/np.array(time_delays)
+    
+    print(np.average(freq))
+    
+    return(np.average(freq))
+
+
+list_root_dir=[
+"D:/Videos/0012/0023_31_07/1",
+"D:/Videos/0012/0023_31_07/2",
+"D:/Videos/0012/0023_31_07/3",
+"D:/Videos/0012/0023_31_07/4",
+"D:/Videos/0012/XXXX_02_08/1",
+"D:/Videos/0012/XXXX_02_08/2",
+"D:/Videos/0012/XXXX_01_08/1",
+"D:/Videos/0012/XXXX_01_08/2",
+"D:/Videos/0012/XXXX_01_08/3",
+"D:/Videos/0012/XXXX_01_08/4",
+"D:/Videos/0012/XXXX_01_08/5",
+"D:/Videos/0012/0026_01_08/5",
+"D:/Videos/0012/0026_01_08/4",
+"D:/Videos/0012/0026_01_08/3",
+"D:/Videos/0012/0026_01_08/2",
+"D:/Videos/0012/0026_01_08/1",
+"D:/Videos/0012/0025_29_07/1",
+"D:/Videos/0012/0024_28_07/1",
+"D:/Videos/0012/0024_03_08/1",
+"D:/Videos/0012/0024_03_08/2",
+"D:/Videos/0012/0023_31_07/1",
+"D:/Videos/0012/0023_31_07/2",
+"D:/Videos/0012/0023_31_07/3",
+"D:/Videos/0012/0023_31_07/4"
+ ]
+# rootdir = r'D:/Videos/0012/0012_08_06/4'
 
 img_array = []
 
-for subdirs, dirs, files in os.walk(rootdir):
-    if re.search(r'\d+$', subdirs) is not None:
-        make_video(files)
- 
+
+for rootdir in list_root_dir:
+    for subdirs, dirs, files in os.walk(rootdir):
+        if re.search(r'\d+$', subdirs) is not None:
+            freq= check_freq(files)
+            make_video(files,freq)
+     
