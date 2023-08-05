@@ -1,8 +1,11 @@
-name: SI_master
+name: SI_env
 channels:
   - defaults
 dependencies:
   - alabaster=0.7.12=pyhd3eb1b0_0
+  - anyio=3.5.0=py311haa95532_0
+  - argon2-cffi=21.3.0=pyhd3eb1b0_0
+  - argon2-cffi-bindings=21.2.0=py311h2bbff1b_0
   - arrow=1.2.3=py311haa95532_1
   - astroid=2.14.2=py311haa95532_0
   - asttokens=2.0.5=pyhd3eb1b0_0
@@ -41,7 +44,6 @@ dependencies:
   - executing=0.8.3=pyhd3eb1b0_0
   - flake8=6.0.0=py311haa95532_0
   - giflib=5.2.1=h8cc25b3_3
-  - git=2.34.1=haa95532_0
   - glib=2.69.1=h5dc1a3c_2
   - gst-plugins-base=1.18.5=h9e645db_0
   - gstreamer=1.18.5=hd78058f_0
@@ -65,6 +67,7 @@ dependencies:
   - jsonschema=4.17.3=py311haa95532_0
   - jupyter_client=8.1.0=py311haa95532_0
   - jupyter_core=5.3.0=py311haa95532_0
+  - jupyter_server=1.23.4=py311haa95532_0
   - jupyterlab_pygments=0.1.2=py_0
   - keyring=23.13.1=py311haa95532_0
   - krb5=1.19.4=h5b6d351_0
@@ -93,10 +96,13 @@ dependencies:
   - mistune=0.8.4=py311h2bbff1b_1000
   - more-itertools=8.12.0=pyhd3eb1b0_0
   - mypy_extensions=0.4.3=py311haa95532_1
+  - nbclassic=0.5.5=py311haa95532_0
   - nbclient=0.5.13=py311haa95532_0
   - nbconvert=6.5.4=py311haa95532_0
   - nbformat=5.7.0=py311haa95532_0
   - nest-asyncio=1.5.6=py311haa95532_0
+  - notebook=6.5.4=py311haa95532_0
+  - notebook-shim=0.2.2=py311haa95532_0
   - numpydoc=1.5.0=py311haa95532_0
   - openssl=1.1.1t=h2bbff1b_0
   - pandocfilters=1.5.0=pyhd3eb1b0_0
@@ -111,6 +117,7 @@ dependencies:
   - pluggy=1.0.0=py311haa95532_1
   - ply=3.11=py311haa95532_0
   - poyo=0.5.0=pyhd3eb1b0_0
+  - prometheus_client=0.14.1=py311haa95532_0
   - prompt-toolkit=3.0.36=py311haa95532_0
   - psutil=5.9.0=py311h2bbff1b_0
   - ptyprocess=0.7.0=pyhd3eb1b0_2
@@ -140,6 +147,7 @@ dependencies:
   - pytoolconfig=1.2.5=py311haa95532_1
   - pywin32=305=py311h2bbff1b_0
   - pywin32-ctypes=0.2.0=py311haa95532_1000
+  - pywinpty=2.0.10=py311h5da7b33_0
   - pyyaml=6.0=py311h2bbff1b_1
   - pyzmq=25.0.2=py311hd77b12b_0
   - qdarkstyle=3.0.2=pyhd3eb1b0_0
@@ -153,9 +161,11 @@ dependencies:
   - requests=2.29.0=py311haa95532_0
   - rope=1.7.0=py311haa95532_0
   - rtree=1.0.1=py311h2eaa2aa_0
+  - send2trash=1.8.0=pyhd3eb1b0_1
   - setuptools=66.0.0=py311haa95532_0
   - sip=6.6.2=py311hd77b12b_0
   - six=1.16.0=pyhd3eb1b0_1
+  - sniffio=1.2.0=py311haa95532_1
   - snowballstemmer=2.2.0=pyhd3eb1b0_0
   - sortedcontainers=2.4.0=pyhd3eb1b0_0
   - soupsieve=2.4=py311haa95532_0
@@ -170,6 +180,7 @@ dependencies:
   - spyder-kernels=2.4.3=py311haa95532_0
   - sqlite=3.41.2=h2bbff1b_0
   - stack_data=0.2.0=pyhd3eb1b0_0
+  - terminado=0.17.1=py311haa95532_0
   - text-unidecode=1.3=pyhd3eb1b0_0
   - textdistance=4.2.1=pyhd3eb1b0_0
   - three-merge=0.1.1=pyhd3eb1b0_0
@@ -179,6 +190,8 @@ dependencies:
   - tomlkit=0.11.1=py311haa95532_0
   - tornado=6.2=py311h2bbff1b_0
   - traitlets=5.7.1=py311haa95532_0
+  - typing-extensions=4.5.0=py311haa95532_0
+  - typing_extensions=4.5.0=py311haa95532_0
   - ujson=5.4.0=py311hd77b12b_0
   - unidecode=1.2.0=pyhd3eb1b0_0
   - urllib3=1.26.15=py311haa95532_0
@@ -190,6 +203,7 @@ dependencies:
   - whatthepatch=1.0.2=py311haa95532_0
   - wheel=0.38.4=py311haa95532_0
   - win_inet_pton=1.1.0=py311haa95532_0
+  - winpty=0.4.3=4
   - wrapt=1.14.1=py311h2bbff1b_0
   - xz=5.4.2=h8cc25b3_0
   - yaml=0.2.5=he774522_0
@@ -206,35 +220,40 @@ dependencies:
       - cython==0.29.34
       - distinctipy==1.2.2
       - docker==6.1.2
-      - elephant==0.12.0
-      - et-xmlfile==1.1.0
+      - elephant==0.13.0
       - fasteners==0.18
       - fonttools==4.39.4
       - h5py==3.8.0
+      - hdmf==3.6.1
+      - ipywidgets==8.0.6
       - joblib==1.2.0
+      - jupyterlab-widgets==3.0.7
       - kiwisolver==1.4.4
       - matplotlib==3.7.1
       - neo==0.12.0
       - networkx==3.1
       - numcodecs==0.11.0
       - numpy==1.24.3
-      - opencv-python==4.8.0.74
-      - openpyxl==3.1.2
+      - opencv-python==4.7.0.72
       - packaging==23.1
       - pandas==2.0.1
       - pillow==9.5.0
       - probeinterface==0.2.16
+      - pynwb==2.3.2
       - pyparsing==3.0.9
       - pytz==2023.3
       - quantities==0.14.1
+      - ruamel-yaml==0.17.26
+      - ruamel-yaml-clib==0.2.7
       - scikit-learn==1.2.2
       - scipy==1.10.1
       - seaborn==0.12.2
-      - spikeinterface==0.98.0.dev0
+      - spikeinterface==0.97.1
       - threadpoolctl==3.1.0
       - tqdm==4.65.0
       - tzdata==2023.3
       - viziphant==0.3.0
       - websocket-client==1.5.1
+      - widgetsnbextension==4.0.7
       - xarray==2023.4.2
       - zarr==2.14.2

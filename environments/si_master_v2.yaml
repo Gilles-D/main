@@ -1,4 +1,4 @@
-name: SI_master
+name: si_master_v2
 channels:
   - defaults
 dependencies:
@@ -206,7 +206,7 @@ dependencies:
       - cython==0.29.34
       - distinctipy==1.2.2
       - docker==6.1.2
-      - elephant==0.12.0
+      - elephant==0.13.0
       - et-xmlfile==1.1.0
       - fasteners==0.18
       - fonttools==4.39.4
@@ -218,19 +218,18 @@ dependencies:
       - networkx==3.1
       - numcodecs==0.11.0
       - numpy==1.24.3
-      - opencv-python==4.8.0.74
       - openpyxl==3.1.2
       - packaging==23.1
       - pandas==2.0.1
       - pillow==9.5.0
-      - probeinterface==0.2.16
+      - probeinterface==0.2.17
       - pyparsing==3.0.9
       - pytz==2023.3
       - quantities==0.14.1
       - scikit-learn==1.2.2
       - scipy==1.10.1
       - seaborn==0.12.2
-      - spikeinterface==0.98.0.dev0
+      - spikeinterface==0.98.2
       - threadpoolctl==3.1.0
       - tqdm==4.65.0
       - tzdata==2023.3
