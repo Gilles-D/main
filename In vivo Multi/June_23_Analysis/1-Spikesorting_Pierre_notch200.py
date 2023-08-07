@@ -94,6 +94,7 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
         """------------------Pre Processing------------------"""
         #Bandpass filter
         recording_f = spre.bandpass_filter(multirecording, freq_min=freq_min, freq_max=freq_max)
+        recording_f = spre.notch_filter(recording_f,freq=200,q=10)
         if Plotting==True:
             w = sw.plot_timeseries(recording_f,time_range=[10,13], segment_index=0)
         
@@ -395,7 +396,7 @@ def list_recording_files(path):
 #####################################################################
 #Folder containing the folders of the session
 rhd_folder = r'D:\ePhy\Intan_Data\0026\0026_02_08'
-saving_name="0026_02_08_allchan_allfiles"
+saving_name="0026_02_08_allchan_allfiles_notch200"
 
 
 

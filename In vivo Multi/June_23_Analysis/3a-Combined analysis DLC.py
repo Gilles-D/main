@@ -268,7 +268,7 @@ def Check_Save_Dir(save_path):
     return
 
 
-def Get_spikes(session_name, spikesorting_results_path):
+def Get_spikes(session_name, spikesorting_results_path, time_axis, sampling_period=5):
     """
     Retrieves spike times from XLSX files in a given session directory.
 
@@ -292,7 +292,7 @@ def Get_spikes(session_name, spikesorting_results_path):
     file_paths = glob.glob(os.path.join(spike_times_path, '*.xlsx'))
 
     # Create lists to store the spike times arrays and spike trains
-    spike_times_array, elephant_spiketrains = [], []
+    spike_times_array, elephant_spiketrains, instantaneous_rates = [], [], []
 
     # Loop through the XLSX files
     for file_path in file_paths:
@@ -304,10 +304,16 @@ def Get_spikes(session_name, spikesorting_results_path):
         t_stop = max(spike_times) + 1
 
         # Create a spike train using the Elephant library
-        elephant_spiketrains.append(SpikeTrain(spike_times * s, t_stop=t_stop,sampling_rate=10*Hz))
-
+        spiketrain = SpikeTrain(spike_times * s, t_stop=t_stop,sampling_rate=10*Hz)
+        elephant_spiketrains.append(spiketrain)
+        
+        # Compute the instantaneous spiking rate
+        inst_rate = instantaneous_rate(spiketrain, t_start=0*s, t_stop=time_axis[-1]*s, sampling_period = sampling_period * ms)
+        instantaneous_rates.append(inst_rate)
+    
+    
     # Create a dictionary containing the unit names, spike times arrays, and spike trains
-    spike_times_dict = {'Units': unit_list, 'spike times': spike_times_array, 'spiketrains': elephant_spiketrains}
+    spike_times_dict = {'Units': unit_list, 'spike times': spike_times_array, 'spiketrains': elephant_spiketrains, 'instantaneous_rates':instantaneous_rates}
 
     print('Done')
 
@@ -620,75 +626,6 @@ def find_start_stop_obstacle(mocap_folder,session_name,mocap_frequency=200):
 
 
 
-
-
-#%% Loadings
-recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spikesorting_results_path)
-
-time_axis = np.array(range(sum(recordings_info['recordings_length'])))/recordings_info['sampling_rate']
-
-with open(fr'{concatenated_signals_path}/{session_name}/metadata.pickle', 'rb') as handle:
-    metadata = pickle.load(handle)
-
-spike_times_dict = Get_spikes(session_name,spikesorting_results_path)
-
-
-#%% Split by MOCAP TTL
-mocap_start_stop_dict=find_start_stop_obstacle(mocap_folder,session_name)
-
-if not os.path.exists(fr'{spikesorting_results_path}/{session_name}/spike_times_dict.pickle') or os.path.exists(fr'{spikesorting_results_path}/{session_name}/spike_times_by_mocap_session.pickle'):
-    # Detect Mocap start signals
-    mocap_starts_idx = (np.where(recordings_info['digital_mocap_signal_concatenated'] == True))[0]
-    mocap_starts_times = start_TTL_detection(mocap_starts_idx, sampling_rate)
-    mocap_session_periods = create_time_periods(mocap_starts_times)
-    
-    # Split spike times by mocap trial
-    spike_times_split_list = []
-    spike_times_by_mocap_session = {}
-    
-    for unit in spike_times_dict['Units']:
-        spike_times = spike_times_dict['spike times'][spike_times_dict['Units'].index(unit)]
-        spike_times_by_session = separate_events_by_period(spike_times, mocap_session_periods)
-        spike_times_split_list.append(spike_times_by_session)
-    
-    for i, dictionary in enumerate(spike_times_split_list):
-        unit = spike_times_dict['Units'][i]
-        spike_times_by_mocap_session[unit] = dictionary
-        
-    del spike_times_split_list, spike_times, spike_times_by_session, mocap_starts_idx, mocap_starts_times
-    
-    #Save the dictionnaries
-    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_dict.pickle', 'wb') as handle:
-        pickle.dump(spike_times_dict, handle)
-    
-    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_by_mocap_session.pickle', 'wb') as handle:
-        pickle.dump(spike_times_by_mocap_session, handle)
-
-else:
-    print('Split spiketimes pickle file already exists. Loading them...')
-    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_dict.pickle', 'rb') as handle:
-        spike_times_dict = pickle.load(handle)
-        
-    with open(fr'{spikesorting_results_path}/{session_name}/spike_times_by_mocap_session.pickle', 'rb') as handle:
-        spike_times_by_mocap_session = pickle.load(handle)
-
-
-#%% DLC movement bouts
-TTL_idx = (np.where(recordings_info['digital_mocap_signal_concatenated'] == True))[0]
-video_starts_times = start_TTL_detection(TTL_idx, sampling_rate)
-
-filepath="D:/Videos/0012/0026_29_07_01DLC_resnet50_OpenfieldJul31shuffle2_200000_filtered.csv"
-
-with open(fr'D:/Videos/0012/0026_29_07_01DLC_resnet50_OpenfieldJul31shuffle2_200000_meta.pickle', 'rb') as handle:
-    DLC_meta = pickle.load(handle)
-
-freq=DLC_meta['data']['fps']
-
-
-LED_delay = 40/freq
-
-
-
 def get_coord(filepath, bodypart):
     df = pd.read_csv(filepath)
     
@@ -711,137 +648,180 @@ def distance_entre_points(x1, y1, x2, y2):
     return np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
 
-x,y = get_coord(filepath, "Tail_base")
-
-time_axis_DLC =np.array(range(len(x)))/freq
 
 
-# Ajouter cette condition pour enlever les points entre 0 et 1
-indices_a_supprimer = np.where((x >= 0) & (x <= 5))[0]
-# x = np.delete(x, indices_a_supprimer)
-# y = np.delete(y, indices_a_supprimer)
+#%% Loadings
+recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spikesorting_results_path)
+
+time_axis = np.array(range(sum(recordings_info['recordings_length'])))/recordings_info['sampling_rate']
+
+with open(fr'{concatenated_signals_path}/{session_name}/metadata.pickle', 'rb') as handle:
+    metadata = pickle.load(handle)
+
+spike_times_dict = Get_spikes(session_name,spikesorting_results_path, time_axis)
 
 
-# Calculer la distance entre les points consécutifs
-distances = distance_entre_points(x[:-1], y[:-1], x[1:], y[1:])
 
-# Définir un seuil pour la distance au-delà duquel on considère qu'il y_smooth a un artefact
-seuil_distance = 80
-
-# Indiquer les indices des points où la distance dépasse le seuil (ce sont les artefacts)
-indices_artefacts_distance = np.where(distances > seuil_distance)[0] + 1
-
-# Indiquer les indices des points où la vitesse dépasse le seuil (ce sont les artefacts, comme précédemment)
-dx_smooth = np.diff(x)
-dy_smooth = np.diff(y)
-vitesse = np.sqrt(dx_smooth**2 + dy_smooth**2)
-seuil_vitesse = 80
-indices_artefacts_vitesse = np.where(vitesse > seuil_vitesse)[0]
-
-# Fusionner les indices d'artefacts basés sur la vitesse et la distance
-indices_artefacts_total = np.union1d(indices_artefacts_distance, indices_artefacts_vitesse)
-indices_artefacts_total = np.union1d(indices_artefacts_total, indices_a_supprimer)
-
-# Supprimer les points correspondants aux_smooth indices des artefacts de la trajectoire
-x_corrige = np.delete(x, indices_artefacts_total)
-y_corrige = np.delete(y, indices_artefacts_total)
-time_axis_corrige = np.delete(time_axis_DLC, indices_artefacts_total)
-
-# Plot de la trajectoire brute et de la trajectoire corrigée
-plt.figure()
-# plt.plot(x, y, 'o-', label='Trajectoire brute')
-plt.plot(x_corrige, y_corrige, 'r-', label='Trajectoire corrigée')
-plt.legend()
-plt.xlabel('Position x')
-plt.ylabel('Position y')
-plt.title('Correction des artefacts dans la trajectoire')
-plt.grid(True)
-plt.gca().invert_yaxis()
-plt.show()
-
-
-# Exemple de données de vitesse (simulées)
-time = time_axis_corrige[1:]  # Temps
-velocity = calculer_vitesse(x_corrige,y_corrige,dt=1/freq)  # Vitesse (simulée)
-
-# Définir le seuil de vitesse pour distinguer l'immobilité du mouvement
-seuil_vitesse = 20
-
-# Identifier les indices où la vitesse est supérieure au seuil (mouvement)
-indices_mouvement = np.where(velocity > seuil_vitesse)[0]
-
-# Identifier les indices où la vitesse est inférieure ou égale au seuil (immobilité)
-indices_immobilite = np.where(velocity <= seuil_vitesse)[0]
-
-# Créer un plot montrant la vitesse et les périodes d'immobilité et de mouvement
-plt.figure(figsize=(10, 6))
-plt.plot(time, velocity, label='Vitesse')
-plt.plot(time[indices_immobilite], velocity[indices_immobilite], 'ro', label='Immobilite')
-plt.plot(time[indices_mouvement], velocity[indices_mouvement], 'go', label='Mouvement')
-plt.axhline(y=seuil_vitesse, color='gray', linestyle='--', label='Seuil')
-plt.xlabel('Temps')
-plt.ylabel('Vitesse')
-plt.legend()
-plt.title('Décomposition des phases d\'immobilité et de mouvement')
-plt.show()
-
-# Définir la taille de la fenêtre glissante
-taille_fenetre = 10
-
-# Créer un masque avec True pour les points au-dessus du seuil et False pour les points en-dessous du seuil
-masque_mouvement = velocity > seuil_vitesse
-
-# Utiliser une fonction de convolution pour identifier les périodes de mouvement
-convolution = np.convolve(masque_mouvement, np.ones(taille_fenetre), mode='valid')
-
-# Identifier les indices où la convolution est égale à la taille de la fenêtre (c'est-à-dire où les 10 points consécutifs sont au-dessus du seuil)
-indices_mouvement = np.where(convolution == taille_fenetre)[0]
-
-# Identifier les indices où la convolution est égale à zéro (c'est-à-dire où les 10 points consécutifs sont en-dessous ou égaux au seuil)
-indices_immobilite = np.where(convolution == 0)[0]
-
-# Créer un plot montrant la vitesse et les périodes d'immobilité et de mouvement
-plt.figure(figsize=(10, 6))
-plt.plot(time, velocity, label='Vitesse')
-plt.plot(time[indices_immobilite], velocity[indices_immobilite], 'ro', label='Immobilite')
-plt.plot(time[indices_mouvement], velocity[indices_mouvement], 'go', label='Mouvement')
-plt.axhline(y=seuil_vitesse, color='gray', linestyle='--', label='Seuil')
-plt.xlabel('Temps')
-plt.ylabel('Vitesse')
-plt.legend()
-plt.title('Décomposition des phases d\'immobilité et de mouvement')
-plt.show()
-
-
-# Déterminer les phases d'immobilité sous forme d'un tableau de tuples (début, fin)
-phases_immobilite = []
-
-# Initialiser les indices de début et de fin de la phase d'immobilité
-debut_phase = indices_immobilite[0]/freq
-fin_phase = indices_immobilite[0]/freq
-
-# Parcourir les indices d'immobilité pour regrouper les périodes consécutives en une seule phase
-for i in range(1, len(indices_immobilite)):
-    if indices_immobilite[i] == indices_immobilite[i-1] + 1:
-        # Si l'indice est consécutif à l'indice précédent, il fait toujours partie de la même phase
-        fin_phase = indices_immobilite[i]
-    else:
-        # Sinon, nous avons trouvé la fin de la phase d'immobilité précédente et nous devons enregistrer cette phase
-        phases_immobilite.append((debut_phase/freq, fin_phase/freq))
-        # Déplacer les indices de début et de fin pour la prochaine phase
-        debut_phase = indices_immobilite[i]
-        fin_phase = indices_immobilite[i]
+#%% DLC movement bouts
+def get_DLC_mouvement_bouts(filepath,dlc_meta_filepath,LED_delay_frames, recordings_info,
+                            sampling_rate=20000, plot_trajectory=True,plot_speed=True,
+                            plot_speed_bouts=True,
+                            ):
+    
+    TTL_idx = (np.where(recordings_info['digital_mocap_signal_concatenated'] == True))[0]
+    video_starts_times = start_TTL_detection(TTL_idx, sampling_rate)
+    
+    with open(dlc_meta_filepath, 'rb') as handle:
+        DLC_meta = pickle.load(handle)
+    
+    freq=DLC_meta['data']['fps']
+    LED_delay_time = LED_delay_frames/freq
+    
+    
+    x,y = get_coord(filepath, "Tail_base")
+    time_axis_DLC =np.array(range(len(x)))/freq
+    
+    
+    # Ajouter cette condition pour enlever les points entre 0 et 5
+    # Souvent un bug de marqueur qui saute à l'origine
+    indices_a_supprimer = np.where((x >= 0) & (x <= 5))[0]   
+    
+    # Calculer la distance entre les points consécutifs
+    distances = distance_entre_points(x[:-1], y[:-1], x[1:], y[1:])
+    
+    # Définir un seuil pour la distance au-delà duquel on considère qu'il y_smooth a un artefact
+    seuil_distance = 80
+    
+    # Indiquer les indices des points où la distance dépasse le seuil (ce sont les artefacts)
+    indices_artefacts_distance = np.where(distances > seuil_distance)[0] + 1
+    
+    # Indiquer les indices des points où la vitesse dépasse le seuil (ce sont les artefacts, comme précédemment)
+    dx_smooth = np.diff(x)
+    dy_smooth = np.diff(y)
+    vitesse = np.sqrt(dx_smooth**2 + dy_smooth**2)
+    seuil_vitesse = 80
+    indices_artefacts_vitesse = np.where(vitesse > seuil_vitesse)[0]
+    
+    # Fusionner les indices d'artefacts basés sur la vitesse et la distance
+    indices_artefacts_total = np.union1d(indices_artefacts_distance, indices_artefacts_vitesse)
+    indices_artefacts_total = np.union1d(indices_artefacts_total, indices_a_supprimer)
+    
+    # Supprimer les points correspondants aux_smooth indices des artefacts de la trajectoire
+    x_corrige = np.delete(x, indices_artefacts_total)
+    y_corrige = np.delete(y, indices_artefacts_total)
+    time_axis_corrige = np.delete(time_axis_DLC, indices_artefacts_total)
+    
+    if plot_trajectory == True: 
+        # Plot de la trajectoire brute et de la trajectoire corrigée
+        plt.figure()
+        # plt.plot(x, y, 'o-', label='Trajectoire brute')
+        plt.plot(x_corrige, y_corrige, 'r-', label='Trajectoire corrigée')
+        plt.legend()
+        plt.xlabel('Position x')
+        plt.ylabel('Position y')
+        plt.title('Correction des artefacts dans la trajectoire')
+        plt.grid(True)
+        plt.gca().invert_yaxis()
+        plt.show()
+    
+    
+    # Exemple de données de vitesse (simulées)
+    time = time_axis_corrige[1:]  # Temps
+    velocity = calculer_vitesse(x_corrige,y_corrige,dt=1/freq)  # Vitesse (simulée)
+    
+    # Définir le seuil de vitesse pour distinguer l'immobilité du mouvement
+    seuil_vitesse = 20
+    
+    # Identifier les indices où la vitesse est supérieure au seuil (mouvement)
+    indices_mouvement = np.where(velocity > seuil_vitesse)[0]
+    
+    # Identifier les indices où la vitesse est inférieure ou égale au seuil (immobilité)
+    indices_immobilite = np.where(velocity <= seuil_vitesse)[0]
+    
+    if plot_speed == True:
         
-# Ajouter la dernière phase d'immobilité au tableau
-phases_immobilite.append((debut_phase/freq, fin_phase/freq))
+        # Créer un plot montrant la vitesse et les périodes d'immobilité et de mouvement
+        plt.figure(figsize=(10, 6))
+        plt.plot(time, velocity, label='Vitesse')
+        plt.plot(time[indices_immobilite], velocity[indices_immobilite], 'ro', label='Immobilite')
+        plt.plot(time[indices_mouvement], velocity[indices_mouvement], 'go', label='Mouvement')
+        plt.axhline(y=seuil_vitesse, color='gray', linestyle='--', label='Seuil')
+        plt.xlabel('Temps')
+        plt.ylabel('Vitesse')
+        plt.legend()
+        plt.title('Décomposition des phases d\'immobilité et de mouvement')
+        plt.show()
+    
+    # Définir la taille de la fenêtre glissante
+    taille_fenetre = 10
+    
+    # Créer un masque avec True pour les points au-dessus du seuil et False pour les points en-dessous du seuil
+    masque_mouvement = velocity > seuil_vitesse
+    
+    # Utiliser une fonction de convolution pour identifier les périodes de mouvement
+    convolution = np.convolve(masque_mouvement, np.ones(taille_fenetre), mode='valid')
+    
+    # Identifier les indices où la convolution est égale à la taille de la fenêtre (c'est-à-dire où les 10 points consécutifs sont au-dessus du seuil)
+    indices_mouvement = np.where(convolution == taille_fenetre)[0]
+    
+    # Identifier les indices où la convolution est égale à zéro (c'est-à-dire où les 10 points consécutifs sont en-dessous ou égaux au seuil)
+    indices_immobilite = np.where(convolution == 0)[0]
+    
+    if plot_speed_bouts == True:
+        # Créer un plot montrant la vitesse et les périodes d'immobilité et de mouvement
+        plt.figure(figsize=(10, 6))
+        plt.plot(time, velocity, label='Vitesse')
+        plt.plot(time[indices_immobilite], velocity[indices_immobilite], 'ro', label='Immobilite')
+        plt.plot(time[indices_mouvement], velocity[indices_mouvement], 'go', label='Mouvement')
+        plt.axhline(y=seuil_vitesse, color='gray', linestyle='--', label='Seuil')
+        plt.xlabel('Temps')
+        plt.ylabel('Vitesse')
+        plt.legend()
+        plt.title('Décomposition des phases d\'immobilité et de mouvement')
+        plt.show()
+    
+    
+    # Déterminer les phases d'immobilité sous forme d'un tableau de tuples (début, fin)
+    phases_immobilite = []
+    
+    # Initialiser les indices de début et de fin de la phase d'immobilité
+    debut_phase = indices_immobilite[0]/freq
+    fin_phase = indices_immobilite[0]/freq
+    
+    # Parcourir les indices d'immobilité pour regrouper les périodes consécutives en une seule phase
+    for i in range(1, len(indices_immobilite)):
+        if indices_immobilite[i] == indices_immobilite[i-1] + 1:
+            # Si l'indice est consécutif à l'indice précédent, il fait toujours partie de la même phase
+            fin_phase = indices_immobilite[i]
+        else:
+            # Sinon, nous avons trouvé la fin de la phase d'immobilité précédente et nous devons enregistrer cette phase
+            phases_immobilite.append((debut_phase/freq, fin_phase/freq))
+            # Déplacer les indices de début et de fin pour la prochaine phase
+            debut_phase = indices_immobilite[i]
+            fin_phase = indices_immobilite[i]
+            
+    # Ajouter la dernière phase d'immobilité au tableau
+    phases_immobilite.append((debut_phase/freq, fin_phase/freq))
+    
+    delta = video_starts_times[1]-LED_delay_time
+    phases_immobilite = [(x + delta, y + delta) for x, y in phases_immobilite]
+       
+    return phases_immobilite
 
-delta = video_starts_times[1]-LED_delay
-phases_immobilite = [(x + delta, y + delta) for x, y in phases_immobilite]
+
+def get_speed():
+    
+
+
+phases_immobilite = get_DLC_mouvement_bouts("D:/Videos/0012/shuffle 2/0026_29_07_01DLC_resnet50_OpenfieldJul31shuffle2_200000_filtered.csv",
+                               dlc_meta_filepath=fr'D:/Videos/0012/shuffle 2/0026_29_07_01DLC_resnet50_OpenfieldJul31shuffle2_200000_meta.pickle',
+                               LED_delay_frames=40,
+                               recordings_info=recordings_info)
 
 
 
 
-
+#%% Figure spike train analysis 
 #%% Figure 1 : Whole SpikeTrain Analysis
 print('Figure 1 - Elephant Spike Train Analysis')
 
@@ -863,7 +843,12 @@ for unit in spike_times_dict['Units']:
     histogram_rate = time_histogram([spiketrain], 0.1 * s, output='rate')
     
     # Compute the instantaneous rate
-    inst_rate = instantaneous_rate(spiketrain, sampling_period=5 * ms)
+    # inst_rate = instantaneous_rate(spiketrain,t_start=0*s,t_stop=time_axis[-1]*s, sampling_period=5 * ms)
+    inst_rate = spike_times_dict['instantaneous_rates'][spike_times_dict['Units'].index(unit)]
+    
+    
+    
+    
     
     recordings_cumsum = recordings_info['recordings_length_cumsum']
     for i in recordings_cumsum:

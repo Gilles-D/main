@@ -349,7 +349,7 @@ def Check_Save_Dir(save_path):
 Parameters
 """
 
-recording_name="0026_01_08_allchan_allfiles"
+recording_name="0026_02_08_allchan_allfiles"
 sorter_list = ['mountainsort4','spykingcircus', 'tridesclous','comp_mult_2_mountainsort4_tridesclous_spykingcircus']
 
 

@@ -91,8 +91,15 @@ for i,waveform in enumerate(waveforms):
         
         
         print("Aucun ou plusieurs pics négatifs détectés.")
-        properties=(waveform_name,'Fail')
+        properties=(waveform_name,'Fail','Fail')
         peak_properties.append(properties)
         
     
 
+peak_max = [t[1] for t in peak_properties]
+half_width = [t[2] for t in peak_properties]
+
+peak_max = [x for x in peak_max if not isinstance(x, str)]
+half_width = [x for x in half_width if not isinstance(x, str)]
+
+plt.scatter(peak_max,half_width)
