@@ -37,7 +37,7 @@ import MOCAP_analysis_class as MA
 
 
 #%% Parameters
-session_name = r'0026_29_07_allchan_allfiles'
+session_name = r'0026_05_08'
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
 concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
 
@@ -655,11 +655,24 @@ recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spi
 
 time_axis = np.array(range(sum(recordings_info['recordings_length'])))/recordings_info['sampling_rate']
 
-with open(fr'{concatenated_signals_path}/{session_name}/metadata.pickle', 'rb') as handle:
-    metadata = pickle.load(handle)
+# with open(fr'{concatenated_signals_path}/{session_name}/metadata.pickle', 'rb') as handle:
+#     metadata = pickle.load(handle)
 
 spike_times_dict = Get_spikes(session_name,spikesorting_results_path, time_axis)
 
+#%%Extract stim TTL idx
+TTL_stim_idx = (np.where(recordings_info['digital_stim_signal_concatenated'] == True))[0]
+stim_start_times = start_TTL_detection(TTL_stim_idx, sampling_rate)
+
+stim_start_idx = stim_start_times*sampling_rate
+
+#Save stim times
+with open(rf'{spikesorting_results_path}\{session_name}\stim_times_dict.pkl', 'wb') as f:
+    pickle.dump(stim_start_times, f)
+    
+#Save stim idx
+with open(rf'{spikesorting_results_path}\{session_name}\stim_idx_dict.pkl', 'wb') as f:
+    pickle.dump(stim_start_idx, f)
 
 
 #%% DLC movement bouts

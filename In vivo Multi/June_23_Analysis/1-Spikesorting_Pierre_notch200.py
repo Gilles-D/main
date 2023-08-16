@@ -76,6 +76,9 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
         probe = pi.io.read_probeinterface(probe_path)
         probe = probe.probes[0]
         multirecording = multirecording.set_probe(probe)
+        
+        # print(multirecording.get_channel_ids())
+        
         if Plotting==True:
             plot_probe(probe, with_channel_index=True, with_device_index=True)
         
@@ -83,26 +86,31 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
         
         """------------------Defective sites exclusion------------------"""
         if Plotting==True:
-            sw.plot_timeseries(multirecording, channel_ids=multirecording.get_channel_ids(),time_range=[10,13])
+            sw.plot_timeseries(multirecording, channel_ids=multirecording.get_channel_ids(),time_range=[16,18])
         
         multirecording.set_channel_groups(1, excluded_sites)
         multirecording = multirecording.split_by('group')[0]
         if Plotting==True:
-            sw.plot_timeseries(multirecording, channel_ids=multirecording.get_channel_ids(),time_range=[10,13])
+            sw.plot_timeseries(multirecording, channel_ids=multirecording.get_channel_ids(),time_range=[16,18])
         
         
         """------------------Pre Processing------------------"""
         #Bandpass filter
         recording_f = spre.bandpass_filter(multirecording, freq_min=freq_min, freq_max=freq_max)
-        recording_f = spre.notch_filter(recording_f,freq=200,q=10)
+        
         if Plotting==True:
-            w = sw.plot_timeseries(recording_f,time_range=[10,13], segment_index=0)
+            w = sw.plot_timeseries(recording_f,time_range=[16,18], segment_index=0)
         
         
         #Median common ref
         recording_cmr = spre.common_reference(recording_f, reference='global', operator='median')
+        # recording_cmr = spre.common_reference(recording_f, reference='global', operator='median',
+        #                                                     groups=[['0','4', '5','6', '7', '8', '9', '10', '11', '13', '14', '15'], ['1', '2', '3', '12']])
+
+        
+        
         if Plotting==True:
-            w = sw.plot_timeseries(recording_cmr,time_range=[10,13], segment_index=0)
+            w = sw.plot_timeseries(recording_cmr,time_range=[16,18], segment_index=0)
         
         rec_binary = recording_cmr.save(folder=rf'{saving_dir}/{saving_name}/', n_jobs=1, progress_bar=True, chunk_duration='1s')
      
@@ -396,7 +404,7 @@ def list_recording_files(path):
 #####################################################################
 #Folder containing the folders of the session
 rhd_folder = r'D:\ePhy\Intan_Data\0026\0026_02_08'
-saving_name="0026_02_08_allchan_allfiles_notch200"
+saving_name="0026_02_08_allchan_allfiles_cmrwholefinal"
 
 
 
@@ -419,7 +427,10 @@ excluded_sites = []
 #%%
 recordings = list_recording_files(rhd_folder)
 
+for i in range(len(recordings)-1):
+    recordings.pop(-1)
+
 recording = concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,excluded_sites,Plotting=True)
 save_metadata(recordings,saving_dir,saving_name,probe_path,excluded_sites)
 
-spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=False, plot_comp=True)
+# spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=False, plot_comp=True)
