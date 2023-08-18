@@ -302,92 +302,92 @@ def unit_high_channel_ploting(higher_chanel_order_dict, sorter_dict, saving_spik
     return unit_base_nb
 
 
-# def move_and_arrange_figures(nb_fig_layer=8):
-#     """
-#     Déplace et organise toutes les figures ouvertes à l'écran.
-#     """
-#     # Obtenir la taille de l'écran
-#     manager = plt.get_current_fig_manager()
-#     screen = manager.window.screen()
-#     screen_width = screen.size().width()
-#     screen_height = screen.size().height()
-    
-#     # Obtenir toutes les figures ouvertes
-#     figures = [plt.figure(num) for num in plt.get_fignums()]
-#     nb_fig_display = 0
-#     start_ind = 0
-#     end_ind = nb_fig_layer
-    
-#     while nb_fig_display < len(figures):
-#         current_figures = figures[start_ind: end_ind]
-#         nb_fig_display += len(current_figures)
-#         start_ind = end_ind
-#         end_ind = end_ind + nb_fig_layer
-        
-#         # Calcul de la taille de la grille
-#         ncols = math.ceil(nb_fig_layer / 2)
-#         nrows = math.ceil(nb_fig_layer / ncols)
-    
-#         # Calcul de la taille de la figure
-#         fig_width = screen_width // ncols
-#         fig_height = screen_height // nrows
-    
-#         for i, fig in enumerate(current_figures):
-#             # Calcul de la position (note : (0, 0) est le coin supérieur gauche)
-#             fig_x = (i % ncols) * fig_width
-#             fig_y = (i // ncols) * fig_height
-    
-#             # Définir la position de la figure
-#             fig.canvas.manager.window.move(fig_x, fig_y)
-    
-#             # Définir la taille de la figure
-#             fig.set_size_inches((fig_width / 100), (fig_height / 96) - 0.8)
-#             fig.tight_layout()
-
-
 def move_and_arrange_figures(nb_fig_layer=8):
     """
-    Déplace et organise toutes les figures ouvertes sur deux écrans.
+    Déplace et organise toutes les figures ouvertes à l'écran.
     """
-    # # Obtenir la taille de l'écran
-    # manager = plt.get_current_fig_manager()
-    # screen = manager.window.screen()
-    # screen_width = screen.size().width()
-    # screen_height = screen.size().height()
+    # Obtenir la taille de l'écran
+    manager = plt.get_current_fig_manager()
+    screen = manager.window.screen()
+    screen_width = screen.size().width()
+    screen_height = screen.size().height()
     
-    # # Obtenir toutes les figures ouvertes
-    # figures = [plt.figure(num) for num in plt.get_fignums()]
-    # nb_fig_display = 0
-    # start_ind = 0
-    # end_ind = nb_fig_layer
+    # Obtenir toutes les figures ouvertes
+    figures = [plt.figure(num) for num in plt.get_fignums()]
+    nb_fig_display = 0
+    start_ind = 0
+    end_ind = nb_fig_layer
     
-    # while nb_fig_display < len(figures):
-    #     current_figures = figures[start_ind: end_ind]
-    #     nb_fig_display += len(current_figures)
-    #     start_ind = end_ind
-    #     end_ind = end_ind + nb_fig_layer
+    while nb_fig_display < len(figures):
+        current_figures = figures[start_ind: end_ind]
+        nb_fig_display += len(current_figures)
+        start_ind = end_ind
+        end_ind = end_ind + nb_fig_layer
         
-    #     # Calcul de la taille de la grille
-    #     ncols = math.ceil(nb_fig_layer / 2)
-    #     nrows = math.ceil(nb_fig_layer / ncols)
+        # Calcul de la taille de la grille
+        ncols = math.ceil(nb_fig_layer / 2)
+        nrows = math.ceil(nb_fig_layer / ncols)
     
-    #     # Calcul de la taille de la figure
-    #     fig_width = screen_width // ncols
-    #     fig_height = screen_height // nrows
+        # Calcul de la taille de la figure
+        fig_width = screen_width // ncols
+        fig_height = screen_height // nrows
     
-    #     for i, fig in enumerate(current_figures):
-    #         # Calcul de la position (note : (0, 0) est le coin supérieur gauche)
-    #         fig_x = (i % ncols) * fig_width
-    #         fig_y = (i // ncols) * fig_height
+        for i, fig in enumerate(current_figures):
+            # Calcul de la position (note : (0, 0) est le coin supérieur gauche)
+            fig_x = (i % ncols) * fig_width
+            fig_y = (i // ncols) * fig_height
     
-    #         # Définir la position de la figure
-    #         fig.canvas.manager.window.setGeometry(fig_x, fig_y, fig_width, fig_height)
+            # Définir la position de la figure
+            fig.canvas.manager.window.move(fig_x, fig_y)
     
-    #         # Définir la taille de la figure
-    #         fig.set_size_inches(fig_width / 100, fig_height / 96 - 0.8)
-    #         fig.tight_layout()
-    # Appeler la fonction pour ouvrir les figures en plein écran
-    open_figures_fullscreen()    
+            # Définir la taille de la figure
+            fig.set_size_inches((fig_width / 100), (fig_height / 96) - 0.8)
+            fig.tight_layout()
+
+
+# def move_and_arrange_figures(nb_fig_layer=8):
+#     """
+#     Déplace et organise toutes les figures ouvertes sur deux écrans.
+#     """
+#     # # Obtenir la taille de l'écran
+#     # manager = plt.get_current_fig_manager()
+#     # screen = manager.window.screen()
+#     # screen_width = screen.size().width()
+#     # screen_height = screen.size().height()
+    
+#     # # Obtenir toutes les figures ouvertes
+#     # figures = [plt.figure(num) for num in plt.get_fignums()]
+#     # nb_fig_display = 0
+#     # start_ind = 0
+#     # end_ind = nb_fig_layer
+    
+#     # while nb_fig_display < len(figures):
+#     #     current_figures = figures[start_ind: end_ind]
+#     #     nb_fig_display += len(current_figures)
+#     #     start_ind = end_ind
+#     #     end_ind = end_ind + nb_fig_layer
+        
+#     #     # Calcul de la taille de la grille
+#     #     ncols = math.ceil(nb_fig_layer / 2)
+#     #     nrows = math.ceil(nb_fig_layer / ncols)
+    
+#     #     # Calcul de la taille de la figure
+#     #     fig_width = screen_width // ncols
+#     #     fig_height = screen_height // nrows
+    
+#     #     for i, fig in enumerate(current_figures):
+#     #         # Calcul de la position (note : (0, 0) est le coin supérieur gauche)
+#     #         fig_x = (i % ncols) * fig_width
+#     #         fig_y = (i // ncols) * fig_height
+    
+#     #         # Définir la position de la figure
+#     #         fig.canvas.manager.window.setGeometry(fig_x, fig_y, fig_width, fig_height)
+    
+#     #         # Définir la taille de la figure
+#     #         fig.set_size_inches(fig_width / 100, fig_height / 96 - 0.8)
+#     #         fig.tight_layout()
+#     # Appeler la fonction pour ouvrir les figures en plein écran
+#     open_figures_fullscreen()    
             
 def open_figures_fullscreen():
     """
@@ -434,7 +434,7 @@ def Check_Save_Dir(save_path):
 Parameters
 """
 
-recording_name="0026_05_08"
+recording_name="5755_08_08"
 sorter_list = ['kilosort3', 'mountainsort4', 'tridesclous','comp_mult_2_kilosort3_mountainsort4_tridesclous']
 
 

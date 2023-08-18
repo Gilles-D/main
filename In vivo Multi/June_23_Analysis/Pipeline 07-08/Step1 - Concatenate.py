@@ -683,7 +683,7 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #####################################################################
 #Folder containing the folders of the session
 rhd_folder = r'D:/ePhy/Intan_Data/0023/0023_31_07'
-saving_name="0023_31_07"
+saving_name="0026_02_08"
 
 
 

@@ -321,60 +321,68 @@ def Get_spikes(session_name, spikesorting_results_path, time_axis, sampling_peri
 
 
 def Get_recordings_info(session_name, concatenated_signals_path, spikesorting_results_path):
-    save_path = rf'{spikesorting_results_path}/{session_name}/recordings_info.pickle'
-    if os.path.exists(save_path):
-        print("Recordings info file exists")
-        print("Loading info file...")
-        recordings_info = pickle.load(open(save_path, "rb"))
-    else:
-        print("Recordings info file does not exist")
-        print("Getting info...")
+    try:
         # Read the metadata file created during concatenation
+        print("Reading the ttl_idx file in intan folder...")
         path = rf'{concatenated_signals_path}/{session_name}/'
-        metadata = pickle.load(open(rf"{path}/metadata.pickle", "rb"))
+        metadata = pickle.load(open(rf"{path}/ttl_idx.pickle", "rb"))
+    except:
+        print("No recording infos found in the intan folder. Please run Step 0")
+    
+    # save_path = rf'{spikesorting_results_path}/{session_name}/recordings_info.pickle'
+    # if os.path.exists(save_path):
+    #     print("Recordings info file exists")
+    #     print("Loading info file...")
+    #     recordings_info = pickle.load(open(save_path, "rb"))
+    # else:
+    #     print("Recordings info file does not exist")
+    #     print("Getting info...")
+    #     # Read the metadata file created during concatenation
+    #     path = rf'{concatenated_signals_path}/{session_name}/'
+    #     metadata = pickle.load(open(rf"{path}/ttl_idx.pickle", "rb"))
        
-        # Loop over intan files
-        recordings_list = metadata['recordings_files']
-        # RHD file reading
-        multi_recordings, recordings_lengths, multi_stim_idx, multi_frame_idx, frame_start_delay = [], [], [], [], []
+    #     # Loop over intan files
+    #     recordings_list = metadata['recordings_files']
+    #     # RHD file reading
+    #     multi_recordings, recordings_lengths, multi_stim_idx, multi_frame_idx, frame_start_delay = [], [], [], [], []
         
-        # Concatenate recordings
-        for record in recordings_list:
-            reader = read_data(record)
-            signal = reader['amplifier_data']
-            recordings_lengths.append(len(signal[0]))
-            multi_recordings.append(signal)
+    #     # Concatenate recordings
+    #     for record in recordings_list:
+    #         reader = read_data(record)
+    #         signal = reader['amplifier_data']
+    #         recordings_lengths.append(len(signal[0]))
+    #         multi_recordings.append(signal)
             
-            stim_idx = reader['board_dig_in_data'][0]  # Digital data for stim of the file
-            multi_stim_idx.append(stim_idx)  # Digital data for stim of all the files
+    #         stim_idx = reader['board_dig_in_data'][0]  # Digital data for stim of the file
+    #         multi_stim_idx.append(stim_idx)  # Digital data for stim of all the files
             
-            frame_idx = reader['board_dig_in_data'][1]  # Get digital data for mocap ttl
-            multi_frame_idx.append(frame_idx)  # Digital data for mocap ttl of all the files
+    #         frame_idx = reader['board_dig_in_data'][1]  # Get digital data for mocap ttl
+    #         multi_frame_idx.append(frame_idx)  # Digital data for mocap ttl of all the files
             
-        anaglog_signal_concatenated = np.hstack(multi_recordings)  # Signal concatenated from all the files
-        digital_stim_signal_concatenated = np.hstack(multi_stim_idx)  # Digital data for stim concatenated from all the files
-        digital_mocap_signal_concatenated = np.hstack(multi_frame_idx)
+    #     anaglog_signal_concatenated = np.hstack(multi_recordings)  # Signal concatenated from all the files
+    #     digital_stim_signal_concatenated = np.hstack(multi_stim_idx)  # Digital data for stim concatenated from all the files
+    #     digital_mocap_signal_concatenated = np.hstack(multi_frame_idx)
         
-        # Get sampling freq
-        sampling_rate = reader['frequency_parameters']['amplifier_sample_rate']
+    #     # Get sampling freq
+    #     sampling_rate = reader['frequency_parameters']['amplifier_sample_rate']
         
-        recordings_lengths_cumsum = np.cumsum(np.array(recordings_lengths) / sampling_rate)
+    #     recordings_lengths_cumsum = np.cumsum(np.array(recordings_lengths) / sampling_rate)
                                               
-        # Return: recording length, recording length cumsum, digital signals 1 and 2 (in full or logical?)
-        # Save them in a pickle
+    #     # Return: recording length, recording length cumsum, digital signals 1 and 2 (in full or logical?)
+    #     # Save them in a pickle
         
-        recordings_info = {
-            'recordings_length': recordings_lengths,
-            'recordings_length_cumsum': recordings_lengths_cumsum,
-            'sampling_rate': sampling_rate,
-            'digital_stim_signal_concatenated': digital_stim_signal_concatenated,
-            'digital_mocap_signal_concatenated': digital_mocap_signal_concatenated
-        }
+    #     recordings_info = {
+    #         'recordings_length': recordings_lengths,
+    #         'recordings_length_cumsum': recordings_lengths_cumsum,
+    #         'sampling_rate': sampling_rate,
+    #         'digital_stim_signal_concatenated': digital_stim_signal_concatenated,
+    #         'digital_mocap_signal_concatenated': digital_mocap_signal_concatenated
+    #     }
         
-        pickle.dump(recordings_info, open(save_path, "wb"))
+    #     pickle.dump(recordings_info, open(save_path, "wb"))
         
     print('Done')
-    return recordings_info
+    return metadata
 
 
 def plot_waveform_old(session_name, spikesorting_results_path, sites_location, unit,save=True):
@@ -655,9 +663,6 @@ recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spi
 
 time_axis = np.array(range(sum(recordings_info['recordings_length'])))/recordings_info['sampling_rate']
 
-# with open(fr'{concatenated_signals_path}/{session_name}/metadata.pickle', 'rb') as handle:
-#     metadata = pickle.load(handle)
-
 spike_times_dict = Get_spikes(session_name,spikesorting_results_path, time_axis)
 
 #%%Extract stim TTL idx
@@ -835,10 +840,11 @@ phases_immobilite = get_DLC_mouvement_bouts("D:/Videos/0012/shuffle 2/0026_29_07
 
 
 #%% Figure spike train analysis 
+
 #%% Figure 1 : Whole SpikeTrain Analysis
 print('Figure 1 - Elephant Spike Train Analysis')
 
-DLC_movement_bouts = True
+DLC_movement_bouts = False
 
 for unit in spike_times_dict['Units']:
     print(unit)
@@ -1095,6 +1101,92 @@ for unit in spike_times_dict['Units']:
     # plt.show()
     
             
+#%% Optotag
+#Select only optotag session with minimum idx
+
+idx_optotag_min = recordings_info['stim_ttl_on'][1325]
+
+#Select stim idx greater than this limit
+selected_stim_idx = recordings_info['stim_ttl_on'][recordings_info['stim_ttl_on'] > idx_optotag_min]
+selected_stim_times = selected_stim_idx/sampling_rate
+
+optotag_data = []
+
+for idx,unit in enumerate(spike_times_dict['Units']):
+    #Raster with the stim
+    spike_times = spike_times_dict['spike times'][idx]
+    first_event = []
     
+    # Définir la fenêtre temporelle
+    fenetre_avant = 0.05  # 100 ms avant
+    fenetre_apres = 0.05   # 100 ms après
+    
+    # Créer une figure
+    plt.figure(figsize=(10, 6))
+    
+    # Créer un tableau pour stocker les positions des événements
+    event_positions = []
+    
+    # Parcourir les temps de stimulation
+    for idx, stimulation in enumerate(selected_stim_times):
+        # Sélectionner les événements dans la fenêtre autour du temps de stimulation
+        evenements_autour = spike_times[(spike_times >= stimulation - fenetre_avant) & 
+                                        (spike_times <= stimulation + fenetre_apres)]
+        
+        # Calculer les positions relatives des événements par rapport à la stimulation
+        relative_positions = evenements_autour - stimulation
+        
+        # Ajouter les positions relatives au tableau
+        event_positions.extend(relative_positions)
+        
+        # Trouver le premier événement après la stimulation
+        if len(relative_positions[relative_positions > 0]) > 0:
+            
+            first_event.append(relative_positions[relative_positions > 0][0])
+        else:
+            first_event.append(None)  # Aucun événement après la stimulation
+    
+    # Créer un histogramme des réponses
+    bins = np.arange(-fenetre_avant, fenetre_apres + 0.001, 0.001)  # Pas de 1 ms
+    plt.hist(event_positions, bins=bins, color='b', alpha=0.7)
+    
+    # Marquer les temps de stimulation
+    plt.vlines(0, 0, plt.gca().get_ylim()[1], color='r', label='Stimulation')
+    
+    # Étiquettes et titre
+    plt.xlabel('Temps (s) par rapport à la stimulation')
+    plt.ylabel('Nombre d\'événements')
+    plt.title(rf'Optotag raster {unit}')
+    plt.legend()
+    
+    # Afficher la figure
+    plt.show()
+    event_positions_array = np.array(event_positions)
+   
+    reliability = first_event.count(None)/len(first_event)*100
+    delay = np.nanmean(np.array(first_event, dtype=float))
+    jitter = np.nanstd(np.array(first_event, dtype=float)) / np.sqrt(np.sum(~np.isnan(np.array(first_event, dtype=float))))*1000
+    
+    print(rf'{unit} Reliability = {reliability} % | Delay = {jitter} +/- {jitter} ms ')
 
 
+    optotag_data.append((unit, np.array([x for x in first_event if x is not None])))
+    
+data_dict = {unit: first_event for unit, first_event in optotag_data}
+
+# Créer un DataFrame à partir du dictionnaire
+data_frame = pd.DataFrame.from_dict(data_dict, orient='index').T
+
+# Utiliser Seaborn pour créer le box plot horizontal
+plt.figure(figsize=(10, 6))
+# sns.boxplot(data=data_frame, orient='h')
+# sns.stripplot(data=data_frame, orient='h',color='black')
+sns.violinplot(data=data_frame)
+
+# Ajouter des étiquettes aux axes
+plt.xlabel('Temps (ms)')
+plt.ylabel('Noms')
+plt.title('Box Plot Horizontal des Temps d\'Apparition d\'Événements')
+
+# Afficher le graphique
+plt.show()

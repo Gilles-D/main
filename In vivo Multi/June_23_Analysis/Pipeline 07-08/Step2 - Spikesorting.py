@@ -256,24 +256,11 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #Folder containing the folders of the session
 
 concatenated_signals = [
-"D:/ePhy/SI_Data/concatenated_signals/5756_08_08",
-"D:/ePhy/SI_Data/concatenated_signals/0023_31_07",
-"D:/ePhy/SI_Data/concatenated_signals/0023_28_07",
-"D:/ePhy/SI_Data/concatenated_signals/0023_10_08",
-"D:/ePhy/SI_Data/concatenated_signals/0023_09_08",
-"D:/ePhy/SI_Data/concatenated_signals/0023_07_08",
-"D:/ePhy/SI_Data/concatenated_signals/0023_01_08",
-"D:/ePhy/SI_Data/concatenated_signals/5755_15_08",
-"D:/ePhy/SI_Data/concatenated_signals/5755_10_08",
-"D:/ePhy/SI_Data/concatenated_signals/5755_08_08",
-"D:/ePhy/SI_Data/concatenated_signals/5756_15_08",
-"D:/ePhy/SI_Data/concatenated_signals/5756_10_08"
-
-
+"D:/ePhy/SI_Data/concatenated_signals/0026_02_08"
     ]
 
 
-saving_name="0026_whole"
+# saving_name="0026_02_08"
 spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
 concatenated_files_folder = 'D:/ePhy/SI_Data/concatenated_signals'
 
