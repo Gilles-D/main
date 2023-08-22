@@ -15,6 +15,7 @@ import spikeinterface.qualitymetrics as sqm
 import spikeinterface.comparison as sc
 import spikeinterface.exporters as sexp
 import spikeinterface.widgets as sw
+from spikeinterface.curation import MergeUnitsSorting, get_potential_auto_merge
 
 import os
 
@@ -52,11 +53,118 @@ def list_curated_units(directory):
             units.append((unit_id,unit_org_id,unit_sorter))
     return units
 
+def get_similarity_couples(similarity,similarity_threshold):
+    row_indices, col_indices = np.where(similarity > similarity_threshold)
+    # Utiliser un ensemble pour stocker les couples d'unités uniques
+    unique_couples = set()
+
+    # Parcourir les indices et ajouter les couples d'unités uniques à l'ensemble
+    for row_idx, col_idx in zip(row_indices, col_indices):
+        if row_idx != col_idx:
+            unique_couples.add((min(row_idx, col_idx), max(row_idx, col_idx)))
+
+    # Convertir l'ensemble en liste de couples d'unités
+    couples_unites = list(unique_couples)
+    
+    return couples_unites
+
 
 #%% Parameters
-spikesorting_results_folder = r'D:\ePhy\SI_Data\spikesorting_results'
-session_name = '0026_05_08'
+session_name = '0026_29_07'
+sorter_name='kilosort3'
 
+
+
+spikesorting_results_folder = r'D:\ePhy\SI_Data\spikesorting_results'
+sorter_folder = rf'{spikesorting_results_folder}/{session_name}/{sorter_name}'
+
+
+
+
+"""
+https://spikeinterface.readthedocs.io/en/latest/modules/qualitymetrics.html
+
+Criterium to exclude units :
+    
+    (- refractory period < 0.5% (1ms))
+    - minimum frequency < 0.1 Hz
+    - presence ratio > 90 (eliminate artefacts?)
+    - ISI violation ratio > 5
+    - L ratio > 10 ?
+    
+"""
+
+
+
+max_isi = 5
+min_frequency = 0.1
+min_presence = 0.9
+max_l_ratio = 10
+
+similarity_threshold = 0.85
+
+
+#%% One sorter auto-curation
+"""
+Loading
+"""
+sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
+we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we')
+similarity = np.load(rf"{sorter_folder}\we\similarity\similarity.npy")
+
+
+"""
+Computing metrics
+"""
+# qm_params = sqm.get_default_qm_params()
+# print(qm_params)
+quality_metrics = sqm.compute_quality_metrics(we, load_if_exists=True)
+spike_id_list = quality_metrics.index
+
+"""
+Filtering with criteria
+"""
+# Filter the units with good quality metrics, according to the selected parameters
+crit_ISI = quality_metrics['isi_violations_ratio'] < max_isi
+crit_frequency = quality_metrics['firing_rate'] > min_frequency
+crit_presence = quality_metrics['presence_ratio'] > min_presence
+crit_l_ratio = quality_metrics['l_ratio'] < max_l_ratio
+
+selected_quality_metrics = quality_metrics[crit_ISI & crit_frequency & crit_presence & crit_l_ratio]
+selected_spike_id_list = selected_quality_metrics.index
+
+#%% Similarity computing
+# Detect the units with high similarity and save them
+
+similarity_couples = get_similarity_couples(similarity,similarity_threshold)
+similarity_couples_indexed = []
+
+for indices_tuple in similarity_couples:
+    valeurs_tuple = [spike_id_list[idx] for idx in indices_tuple]
+    
+    if valeurs_tuple[0] in selected_spike_id_list and valeurs_tuple[1] in selected_spike_id_list :
+        similarity_couples_indexed.append(valeurs_tuple)
+
+print(rf"Similarity couples to check manually {similarity_couples_indexed}")
+
+
+#%% AFTER MANUAL CURATION
+
+# Next step = manually curate with phy
+# Select what units to merge and write them in a list of lists
+
+units_to_merge = [[36,37,38,39,55,50,27],
+[9,24],
+[8,19,20,22],
+[3, 14],
+[30, 43],
+[10, 26],
+]
+
+# definitive curated units list
+clean_sorting = MergeUnitsSorting(sorter_result,units_to_merge)
+
+# TODO : save the final curated spikesorting results
 
 
 #%% Script
@@ -130,3 +238,4 @@ for index,unit in enumerate(curated_units):
     
     # sw.plot_quality_metrics(we)
     # plt.plot(spost.compute_isi_histograms(we))
+
