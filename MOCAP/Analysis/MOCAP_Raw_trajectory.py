@@ -24,7 +24,7 @@ import MOCAP_analysis_class as MA
 
 
 #Directories location
-root_dir=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
+root_dir=r'D:\ePhy\SI_Data\mocap_files\Raw'
 flat_csv_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
 
 
@@ -34,12 +34,12 @@ flat_csv_path=r'//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_fille
 
 
 #Location of the figures to save
-savefig_path=r'\\equipe2-nas1\Gilles.DELBECQ\Data\MOCAP\Cohorte 2\Figs\Raw_traj'
+savefig_path=r'D:/ePhy/SI_Data/mocap_files/Raw/fig'
 
 Save = True
 Save_extension = "png" #svg or png
 
-Flat = True
+Flat = False
 
 
 

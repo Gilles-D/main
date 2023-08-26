@@ -31,10 +31,10 @@ sys.path.append(r'C:\Users\Gil\Documents\GitHub\main\MOCAP\Analysis')
 import MOCAP_analysis_class as MA
 
 #Directory location of raw csvs
-root_dir=r'D:\Seafile\Seafile\Data\ePhy\3_Mocap_data\0012'
+root_dir=r'D:\ePhy\SI_Data\mocap_files\Raw'
 
 #Directory location to save flattened csv
-save_dir=r'D:\Seafile\Seafile\Data\ePhy\3_Mocap_data\0012\flatte'
+save_dir=r'D:\ePhy\SI_Data\mocap_files\Flatten'
 
 
 # #Location of the data_info file

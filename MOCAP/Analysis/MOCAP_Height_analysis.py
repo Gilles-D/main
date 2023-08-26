@@ -37,7 +37,7 @@ import MOCAP_analysis_class as MA
 
 
 #Directories location
-root_dir='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled'
+root_dir='D:\ePhy\SI_Data\mocap_files\Raw'
 flat_csv_path='//equipe2-nas1/Gilles.DELBECQ/Data/MOCAP/Cohorte 2/CSV_gap_filled_flat'
 
 
