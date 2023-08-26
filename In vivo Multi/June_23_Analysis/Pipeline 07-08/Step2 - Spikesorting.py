@@ -42,7 +42,7 @@ import pandas as pd
 
 #%% Functions
 
-def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True,nb_of_agreement=2,plot_sorter=True,plot_comp=True,save=True):
+def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True,nb_of_agreement=2,plot_sorter=True,plot_comp=True,save=True,export_to_phy=True):
     """
     Perform spike sorting using multiple sorters and compare the results.
 
@@ -64,27 +64,27 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
         'kilosort3':{
             
             },   
-        'mountainsort4': {
-                                        'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
-                                        'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
-                                        'freq_min': 300,  # Use None for no bandpass filtering
-                                        'freq_max': 6000,
-                                        'filter': True,
-                                        'whiten': True,  # Whether to do channel whitening as part of preprocessing
-                                        'num_workers': 1,
-                                        'clip_size': 50,
-                                        'detect_threshold': 3,
-                                        'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel
-                                        'tempdir': None
-                                    },
-                    'tridesclous': {
-                                        'freq_min': 300.,   #'High-pass filter cutoff frequency'
-                                        'freq_max': 6000.,#'Low-pass filter cutoff frequency'
-                                        'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
-                                        'detect_threshold': 5, #'Threshold for spike detection',
-                                        'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
-                                        'common_ref_removal': True,     #'remove common reference with median',
-                                    },
+        # 'mountainsort4': {
+        #                                 'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
+        #                                 'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
+        #                                 'freq_min': 300,  # Use None for no bandpass filtering
+        #                                 'freq_max': 6000,
+        #                                 'filter': True,
+        #                                 'whiten': True,  # Whether to do channel whitening as part of preprocessing
+        #                                 'num_workers': 1,
+        #                                 'clip_size': 50,
+        #                                 'detect_threshold': 3,
+        #                                 'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel
+        #                                 'tempdir': None
+        #                             },
+        #             'tridesclous': {
+        #                                 'freq_min': 300.,   #'High-pass filter cutoff frequency'
+        #                                 'freq_max': 6000.,#'Low-pass filter cutoff frequency'
+        #                                 'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
+        #                                 'detect_threshold': 5, #'Threshold for spike detection',
+        #                                 'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
+        #                                 'common_ref_removal': True,     #'remove common reference with median',
+        #                             },
                     # 'spykingcircus': {
                     #                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
                     #                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
@@ -133,6 +133,17 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
             plot_maker(sorter_result, we, save, sorter_name, spikesorting_results_folder,saving_name)
             print('Plot sorting summary finished')
         print('================================')
+        
+        if export_to_phy == True:
+            
+            save_folder_phy = rf'{output_folder}\phy_export'
+            if os.path.exists(save_folder_phy) and os.path.isdir(save_folder_phy):
+                print("Phy export already exists")
+                
+            else:
+                print('Export to Phy...')
+                #Export to phy
+                sexp.export_to_phy(we, output_folder=save_folder_phy)
     
     print("Spike sorting done")
     
@@ -176,8 +187,10 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
             print('Plot multiple comparaison summary in progress')
             plot_maker(sorting_agreement, we, save, comp_multi_name, spikesorting_results_folder,saving_name)
             print('Plot multiple comparaison summary finished\n')
+            
+    
 
-    return
+    return sorter_result,we
 
 def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
     """
@@ -256,7 +269,7 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #Folder containing the folders of the session
 
 concatenated_signals = [
-"D:/ePhy/SI_Data/concatenated_signals/0026_02_08"
+"D:/ePhy/SI_Data/concatenated_signals/0026_29_07"
     ]
 
 
@@ -271,32 +284,4 @@ for session in concatenated_signals:
     session_name=os.path.basename(session)
     print(session_name)
     recording = si.load_extractor(session)
-    spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=True, plot_comp=True)
-
-
-
-# signal_list= []
-# recording_info_dict = {}
-
-# for i,session in enumerate(concatenated_signals):
-#     session_name = os.path.basename(session)
-#     rec_binary = si.load_extractor(session)
-#     signal_list.append(rec_binary)
-
-    
-#     recording_info = pickle.load(open(rf'{session}/ttl_idx.pickle', "rb"))
-
-    
-#     dictionnary = {
-#         'session_name':session_name,
-#         'recording_info':recording_info
-#         }
-    
-#     recording_info_dict[i]=dictionnary
-    
-# multirecording = si.concatenate_recordings(signal_list)
-# multirecording.save(folder=rf'{concatenated_files_folder}/{saving_name}/', n_jobs=1, progress_bar=True, chunk_duration='10s')
-
-# spike_sorting(multirecording,spikesorting_results_folder,saving_name,plot_sorter=True, plot_comp=True)
-
-# pickle.dump(recording_info_dict, open(rf"{spikesorting_results_folder}/{saving_name}/recording_info.pickle", "wb"))
+    sorting = spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=False, plot_comp=False, export_to_phy = True)
