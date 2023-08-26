@@ -325,6 +325,29 @@ class MOCAP_file:
         new_coords = np.array([x,y,new_z])
         
         return new_coords
+    
+    def distance_from(self,marker,marker_ref):
+        """
+        
+        
+        """
+        import numpy as np
+        
+        ref_position = self.coord(marker_ref)
+        ref_position_med = np.array((np.median(ref_position[0]),np.median(ref_position[1]),np.median(ref_position[2])))
+        
+        marker_position = np.vstack(self.coord(marker)).T
+
+        try:
+            # distance_from_ref = marker_position - np.tile(ref_position_med, (marker_position.shape[0], 1)) 
+            distances = np.linalg.norm(marker_position - ref_position_med, axis=1)
+            
+            
+            
+        except :
+            print('Error while computing position from reference. No reference positions ?')
+        
+        return distances
  
 
         
