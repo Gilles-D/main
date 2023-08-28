@@ -269,7 +269,7 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #Folder containing the folders of the session
 
 concatenated_signals = [
-"D:/ePhy/SI_Data/concatenated_signals/0026_29_07"
+"D:/ePhy/SI_Data/concatenated_signals/0026_10_08"
     ]
 
 
@@ -284,4 +284,4 @@ for session in concatenated_signals:
     session_name=os.path.basename(session)
     print(session_name)
     recording = si.load_extractor(session)
-    sorting = spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=False, plot_comp=False, export_to_phy = True)
+    sorting = spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=True, plot_comp=False, export_to_phy = True)

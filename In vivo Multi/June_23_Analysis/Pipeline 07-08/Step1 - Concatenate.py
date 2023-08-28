@@ -471,142 +471,6 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
 
     
     
-
-def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True,nb_of_agreement=2,plot_sorter=True,plot_comp=True,save=True):
-    """
-    Perform spike sorting using multiple sorters and compare the results.
-
-    Parameters:
-        record (spikeinterface.RecordingExtractor): The recording extractor to be sorted.
-        spikesorting_results_folder (str): Directory where the results of spike sorting will be saved.
-        saving_name (str): Name used for creating subdirectories for each sorter's results.
-        use_docker (bool, optional): Whether to use Docker to run the spike sorters. Defaults to True.
-        nb_of_agreement (int, optional): Minimum number of sorters that must agree to consider a unit as valid. Defaults to 2.
-        plot_sorter (bool, optional): Whether to enable plotting of individual sorter's results. Defaults to True.
-        plot_comp (bool, optional): Whether to enable plotting of comparison results. Defaults to True.
-        save (bool, optional): Whether to save the plot images. Defaults to True.
-
-    Returns:
-        None
-    """
-    
-    param_sorter = {
-        'kilosort3':{},   
-        'mountainsort4': {
-                                        'detect_sign': -1,  # Use -1, 0, or 1, depending on the sign of the spikes in the recording
-                                        'adjacency_radius': -1,  # Use -1 to include all channels in every neighborhood
-                                        'freq_min': 300,  # Use None for no bandpass filtering
-                                        'freq_max': 6000,
-                                        'filter': True,
-                                        'whiten': True,  # Whether to do channel whitening as part of preprocessing
-                                        'num_workers': 1,
-                                        'clip_size': 50,
-                                        'detect_threshold': 3,
-                                        'detect_interval': 10,  # Minimum number of timepoints between events detected on the same channel
-                                        'tempdir': None
-                                    },
-                    'tridesclous': {
-                                        'freq_min': 300.,   #'High-pass filter cutoff frequency'
-                                        'freq_max': 6000.,#'Low-pass filter cutoff frequency'
-                                        'detect_sign': -1,     #'Use -1 (negative) or 1 (positive) depending on the sign of the spikes in the recording',
-                                        'detect_threshold': 5, #'Threshold for spike detection',
-                                        'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
-                                        'common_ref_removal': True,     #'remove common reference with median',
-                                    },
-                    # 'spykingcircus': {
-                    #                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
-                    #                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
-                    #                     'detect_threshold': 6,  # Threshold for detection
-                    #                     'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
-                    #                     'filter': True, # Enable or disable filter
-                    #                     'merge_spikes': True, #Enable or disable automatic mergind
-                    #                     'auto_merge': 0.75, #Automatic merging threshold
-                    #                     'num_workers': None, #Number of workers (if None, half of the cpu number is used)
-                    #                     'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
-                    #                     'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
-                    #                 }
-                 }
-    
-    print("Spike sorting starting")
-
-    sorter_list = []
-    sorter_name_list = []
-    for sorter_name, sorter_param in param_sorter.items():
-        print(sorter_name)
-        
-        output_folder = rf'{spikesorting_results_folder}\{saving_name}\{sorter_name}'
-        
-        if os.path.isdir(output_folder):
-            print('Sorter folder found, load from folder')
-            sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{output_folder}/in_container_sorting')
-        else:
-            sorter_result = ss.run_sorter(sorter_name,recording=record,output_folder=output_folder,docker_image=True,verbose=False,**sorter_param)
-        
-              
-        sorter_list.append(sorter_result)
-        sorter_name_list.append(sorter_name)
-    
-
-        #save the sorter params
-        with open(f'{output_folder}\param_dict.pkl', 'wb') as f:
-            pickle.dump(sorter_param, f)
-        if os.path.isdir(f'{output_folder}\we'):
-            print('Waveform folder found, load from folder')
-            we = si.WaveformExtractor.load_from_folder(f'{output_folder}\we', sorting=sorter_result)
-        else:
-            we = si.extract_waveforms(record, sorter_result, folder=f'{output_folder}\we')
-    
-        if plot_sorter:
-            print('Plot sorting summary in progress')
-            plot_maker(sorter_result, we, save, sorter_name, spikesorting_results_folder,saving_name)
-            print('Plot sorting summary finished')
-        print('================================')
-    
-    print("Spike sorting done")
-    
-    
-    
-    if len(sorter_list) > 1 and nb_of_agreement != 0:
-        ############################
-        # Sorter outup comparaison #
-        base_comp_folder = rf'{spikesorting_results_folder}\{saving_name}'
-        comp_multi_name = f'comp_mult_{nb_of_agreement}'
-        
-        for sorter_name in sorter_name_list:
-            comp_multi_name += f'_{sorter_name}'
-        base_comp_folder = f'{base_comp_folder}\{comp_multi_name}'
-
-        if os.path.isdir(f'{base_comp_folder}\sorter'):
-            print('multiple comparaison sorter folder found, load from folder')
-            sorting_agreement = ss.NpzSortingExtractor.load_from_folder(f'{base_comp_folder}\sorter')
-        else:
-            print('multiple comparaison sorter folder not found, computing from sorter list')
-            comp_multi = sc.compare_multiple_sorters(sorting_list=sorter_list,
-                                                    name_list=sorter_name_list)
-            comp_multi.save_to_folder(base_comp_folder)
-            # del sorting_list, sorting_name_list
-            sorting_agreement = comp_multi.get_agreement_sorting(minimum_agreement_count=nb_of_agreement)
-            sorting_agreement._is_json_serializable = False
-
-            sorting_agreement.save_to_folder(f'{base_comp_folder}\sorter')
-        
-        
-        try:
-            we = si.extract_waveforms(record, sorting_agreement, folder=f'{base_comp_folder}\we')
-        
-        
-        except FileExistsError:
-            print('multiple comparaison waveform folder found, load from folder')
-            we = si.WaveformExtractor.load_from_folder(f'{base_comp_folder}\we', sorting=sorting_agreement)
-        
-        
-        if plot_comp:
-            print('Plot multiple comparaison summary in progress')
-            plot_maker(sorting_agreement, we, save, comp_multi_name, spikesorting_results_folder,saving_name)
-            print('Plot multiple comparaison summary finished\n')
-
-    return
-
 def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
     """
     Generate and save plots for an individual sorter's results.
@@ -682,8 +546,8 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 ###################### TO CHANGE ####################################
 #####################################################################
 #Folder containing the folders of the session
-rhd_folder = r'D:/ePhy/Intan_Data/0023/0023_31_07'
-saving_name="0026_02_08"
+rhd_folder = r'D:/ePhy/Intan_Data/0026/0026_10_08'
+saving_name="0026_10_08"
 
 
 

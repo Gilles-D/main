@@ -59,7 +59,7 @@ mocap_freq = 200
 mocap_delay = 45 #frames
 
 Save_plots = True
-plot_inst_speed = False
+plot_inst_speed = True
 plot_inst_feet = True
 plot_dist_from_obstacle = True
 
@@ -249,7 +249,7 @@ mocap_ttl_times = mocap_ttl/sampling_rate
 for i,ttl_time in enumerate(mocap_ttl_times):
     mocap_file = None
     trial = i+1
-
+    print(rf"############################## Trial {trial} ########################################")
     
     for file_path in mocap_files:
         trial_file = int(file_path.split("_")[-1].split('.')[0])
@@ -272,7 +272,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 selected_spike_times = spike_times[(spike_times >= ttl_time*Hz*s) & (spike_times <= ttl_time*Hz*s+time_length*s)]
                 
                 spiketrain = SpikeTrain(selected_spike_times,t_start = ttl_time*Hz*s, t_stop=ttl_time*Hz*s+time_length*s)     
-                inst_rate = instantaneous_rate(spiketrain, sampling_period=50*ms)
+                inst_rate = instantaneous_rate(spiketrain, sampling_period=10*ms)
                 
                 speed = mocap_data['speed_back1']
                 speed_right_foot =  mocap_data['speed_right_foot']
@@ -282,8 +282,8 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 
                 mocap_time_axis = (np.array(range(len(mocap_data)))/200+ttl_time*Hz)-mocap_delay/mocap_freq
                 
-                histogram_count = time_histogram([spiketrain], 0.1*s)
-                histogram_rate = time_histogram([spiketrain],  0.1*s, output='rate')
+                histogram_count = time_histogram([spiketrain], 0.05*s)
+                histogram_rate = time_histogram([spiketrain],  0.05*s, output='rate')
                 
                 
                 
@@ -341,7 +341,11 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     ax2.tick_params(axis='y', labelcolor='red')
                     ax2.legend(loc='upper right')
                     
-                    ax1.set_xlim(mocap_time_axis[np.argmax(~np.isnan(speed))], mocap_time_axis[-1])
+                    # ax1.set_xlim(mocap_time_axis[np.argmax(~np.isnan(speed))], mocap_time_axis[-1])
+                    
+                    index_first_non_nan = next((index for index, value in enumerate(speed) if not np.isnan(value)), None)
+                    index_last_non_nan = len(speed) - 1 - next((index for index, value in enumerate(speed[::-1]) if not np.isnan(value)), None)
+                    ax1.set_xlim(mocap_time_axis[index_first_non_nan], mocap_time_axis[index_last_non_nan])
                     
                     # Afficher le tracé
                     # plt.show()
@@ -349,7 +353,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     
                     if Save_plots == True:
                         
-                        savefig_path = rf'{plots_path}/{animal}/Inst_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
+                        savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Speed/Inst_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
                         Check_Save_Dir(os.path.dirname(savefig_path))
                         plt.savefig(savefig_path)
                     
@@ -371,14 +375,14 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     
                     
                     
-                    plt.figure()
-                    plt.title(rf'Correlation Trial # {trial} - Unit # {unit} ')
-                    plt.plot(correlation)
-                    if Save_plots == True:
-                        savefig_path = rf'{plots_path}/{animal}/Correlation_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
-                        Check_Save_Dir(os.path.dirname(savefig_path))
-                        plt.savefig(savefig_path)
-                    plt.close()
+                    # plt.figure()
+                    # plt.title(rf'Correlation Trial # {trial} - Unit # {unit} ')
+                    # plt.plot(correlation)
+                    # if Save_plots == True:
+                    #     savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Speed/Correlation_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
+                    #     Check_Save_Dir(os.path.dirname(savefig_path))
+                    #     plt.savefig(savefig_path)
+                    # plt.close()
                                     
                 if plot_inst_feet == True:                   
                     # Créer une figure et un axe principal
@@ -415,7 +419,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     
                     if Save_plots == True:
                         
-                        savefig_path = rf'{plots_path}/{animal}/Foot_Speed_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
+                        savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Foot_Speed/Foot_Speed_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
                         Check_Save_Dir(os.path.dirname(savefig_path))
                         plt.savefig(savefig_path)
                     
@@ -441,7 +445,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     # plt.title(rf'Correlation Trial # {trial} - Unit # {unit} ')
                     # plt.plot(correlation)
                     # if Save_plots == True:
-                    #     savefig_path = rf'{plots_path}/{animal}/Correlation_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
+                    #     savefig_path = rf'{plots_path}/{animal}/{mocap_session}/Correlation_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
                     #     Check_Save_Dir(os.path.dirname(savefig_path))
                     #     plt.savefig(savefig_path)
                     # plt.close()
@@ -481,7 +485,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     
                     if Save_plots == True:
                         
-                        savefig_path = rf'{plots_path}/{animal}/Dist_from_obst_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
+                        savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Distance_from_obstacle/Dist_from_obst_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
                         Check_Save_Dir(os.path.dirname(savefig_path))
                         plt.savefig(savefig_path)
                     

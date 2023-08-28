@@ -306,8 +306,11 @@ def Get_TTL_idx(file_list):
             'stim_ttl_on':stim_ttl_on_off,
             'mocap_ttl_on':mocap_ttl_on_off
         }
-        
-    pickle.dump(recordings_info, open(save_path, "wb"))
+    
+    try:
+        pickle.dump(recordings_info, open(save_path, "wb"))
+    except:
+        print("Can't save. ttl_idx.pickle already exists ?")
     
     print('Done')
     return 
