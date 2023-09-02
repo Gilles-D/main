@@ -317,11 +317,15 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 
                 """
                 spike_times = sorter_results.get_unit_spike_train(unit_id=unit)/sampling_rate*Hz*s
-                selected_spike_times = spike_times[(spike_times >= ttl_time*Hz*s) & (spike_times <= ttl_time*Hz*s+time_length*s)]
+                selected_spike_times = spike_times[(spike_times >= ttl_time*Hz*s-(mocap_delay/mocap_freq)*s) & (spike_times <= ttl_time*Hz*s+time_length*s-(mocap_delay/mocap_freq)*s)]
                 
-                spiketrain = SpikeTrain(selected_spike_times,t_start = ttl_time*Hz*s, t_stop=ttl_time*Hz*s+time_length*s)   
+                spiketrain = SpikeTrain(selected_spike_times,t_start = ttl_time*Hz*s-(mocap_delay/mocap_freq)*s, t_stop=ttl_time*Hz*s+time_length*s-(mocap_delay/mocap_freq)*s)   
                 
                 inst_rate = instantaneous_rate(spiketrain, sampling_period=5*ms)
+                
+                kernel = kernels.AlphaKernel(sigma=0.05*s, invert=True)
+                sampling_period = 5*ms
+                inst_rate2 = instantaneous_rate(spiketrain, sampling_period,kernel=kernel)
                 
                 speed = mocap_data['speed_back1']
                 acceleration =  np.abs(np.diff(speed) / 1*s)
@@ -349,8 +353,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     """
                     Compute correlation between inst_rate and speed
                     """
-                    #TODO : Mocap delay not compuited !
-                    
+                    #Mocap delay should be fixed
                     
                     index_first_non_nan = next((index for index, value in enumerate(speed) if not np.isnan(value)), None)
                     index_last_non_nan = len(speed) - 1 - next((index for index, value in enumerate(speed[::-1]) if not np.isnan(value)), None)
@@ -364,7 +367,8 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     array_with_interpolated_values[nan_indices] = interpolated_values
                     
                     
-                    selected_inst_rate = inst_rate.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
+                    # selected_inst_rate = inst_rate.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
+                    selected_inst_rate = inst_rate2.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
                     corr = np.correlate(array_with_interpolated_values,selected_inst_rate)
                     corr_coef = np.corrcoef(selected_inst_rate,array_with_interpolated_values)
                     
@@ -387,7 +391,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                         array_with_interpolated_values[nan_indices] = interpolated_values
                         
                         
-                        selected_inst_rate = inst_rate.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
+                        selected_inst_rate = inst_rate2.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
                         corr = np.correlate(array_with_interpolated_values,selected_inst_rate)
                         corr_coef = np.corrcoef(selected_inst_rate,array_with_interpolated_values)
                         
@@ -416,7 +420,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     array_with_interpolated_values[nan_indices] = interpolated_values
                     
                     
-                    selected_inst_rate = inst_rate.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
+                    selected_inst_rate = inst_rate2.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
                     corr = np.correlate(array_with_interpolated_values,selected_inst_rate)
                     corr_coef = np.corrcoef(selected_inst_rate,array_with_interpolated_values)
                     
@@ -642,7 +646,7 @@ if do_correlations == True:
         correlation_df_obst.to_excel(writer, sheet_name="Obstacle", index=False)
         correlation_df_z.to_excel(writer, sheet_name="Back_Z", index=False)
 
-#%% Correlation analysis
+#%% Correlation plots
 
 #TODO : add possibility to load correlation array if already exists without running previosu session
 
@@ -690,8 +694,6 @@ array_without_nan = np.nan_to_num(np.array(correlation_matrix), nan=0)
 distance_matrix = np.sqrt(2 * (1 - np.array(array_without_nan).T))
 # Effectuer le clustering hiérarchique avec des noms d'unités en abscisses
 
-
-
 dendrogram = sch.dendrogram(sch.linkage(distance_matrix, method='ward'),labels=unit_list)
 plt.xlabel("Units #")
 # Afficher le dendrogramme
@@ -713,7 +715,7 @@ plt.show()
 # # Créer un DataFrame pour stocker les résultats du clustering
 # clustering_results = pd.DataFrame({'Unit': unit_list, 'Cluster': cluster_labels})
 
-#%%
+#%% Concatenante all session by unit
 # Loop on units
 # Select spike train whole session
 
@@ -780,7 +782,7 @@ for unit in unit_list:
     # Configurer les étiquettes, les titres et les légendes pour l'axe principal
     ax1.set_xlabel('Temps [s]')
     ax1.set_ylabel('Taux de décharge [Hz]')
-    ax1.set_title(rf'Trial # {trial} - Unit # {unit} ')
+    ax1.set_title(rf'Unit # {unit} ')
     ax1.legend(loc='upper left')
     
     # Créer un axe Y secondaire pour la vitesse
@@ -799,4 +801,184 @@ for unit in unit_list:
         plt.axvline(time,color="black")
     
     
+    
     del whole_mocap_data
+
+#%% Raster plot by trial ?
+
+spike_times_all_units = []
+
+for unit in unit_list:
+    spike_times = sorter_results.get_unit_spike_train(unit_id=unit)/sampling_rate*Hz*s
+    spike_times_all_units.append(spike_times)
+
+
+"""
+Rasterplot whole session
+"""
+
+
+
+# # Créer la figure et l'axe
+# fig, ax = plt.subplots(figsize=(10, 6))
+
+# # Parcourir chaque unité et créer des marqueurs pour les temps d'événements
+# for i, unit_events in enumerate(spike_times_all_units):
+#     ax.eventplot(unit_events, lineoffsets=i + 1, colors=f'C{i+1}', linewidths=2)
+
+# # Ajuster les propriétés de l'axe
+# ax.set_xlabel('Temps')
+# ax.set_ylabel('Unités')
+# ax.set_title('Raster Plot des Événements')
+# ax.set_yticks(np.arange(1, len(spike_times_all_units) + 1))
+# ax.set_yticklabels([f'Unité {i+1}' for i in range(len(spike_times_all_units))])
+# ax.grid(True)
+
+# # Afficher le raster plot
+# plt.tight_layout()
+# plt.show()
+
+
+
+for i,ttl_time in enumerate(mocap_ttl_times):
+    mocap_file = None
+    trial = i+1
+    print(rf"############################## Trial {trial} ########################################")
+
+       
+    for file_path in mocap_files:
+        trial_file = int(file_path.split("_")[-1].split('.')[0])
+        if trial_file == trial:
+            mocap_file = file_path
+            
+    if mocap_file == None:
+        print(rf"No mocap file corresponding to the trial {trial}")
+        
+    else:
+        mocap_data = pd.read_excel(mocap_file)
+        time_length = len(mocap_data)/mocap_freq
+    
+        speed = mocap_data['speed_back1']
+        mocap_time_axis = (np.array(range(len(mocap_data)))/200+ttl_time*Hz)-mocap_delay/mocap_freq
+    
+    
+        """
+        Raster plot
+        """
+        # # Créer la figure et les axes pour les subplots
+        # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+        
+        # # Plot supérieur : plot de mocap_time_axis vs. speed
+        # ax1.plot(mocap_time_axis, speed)
+        # ax1.set_ylabel('Vitesse')
+        # ax1.set_title(rf'Trial {trial}')
+        
+        # # Plot inférieur : raster plot des événements
+        # for i, unit_events in enumerate(spike_times_all_units):
+        #     events_to_plot = unit_events[(unit_events >= mocap_time_axis[0] * s) & (unit_events <= mocap_time_axis[-1] * s)]
+        #     ax2.eventplot(events_to_plot, lineoffsets=i + 1, colors=f'C{i+1}', linewidths=2)
+        
+        # ax2.set_xlabel('Temps')
+        # ax2.set_ylabel('Unités')
+        # ax2.set_yticks(np.arange(1, len(spike_times_all_units) + 1))
+        # ax2.set_yticklabels([f'Unité {i+1}' for i in unit_list])
+        # ax2.grid(True)
+        
+        # # Ajuster les espacements et afficher le subplot
+        # plt.tight_layout()
+        # plt.show()
+        
+        
+        """
+        Heatmap
+        """
+
+        # # Convertir les temps d'événements entre les limites de temps en une matrice binaire
+        # num_units = len(spike_times_all_units)
+        
+        # time_bin = 500 #ms
+        # num_subdivisions = int((mocap_time_axis[-1] - mocap_time_axis[0])/(time_bin/1000))
+
+        # num_time_steps = int((mocap_time_axis[-1] - mocap_time_axis[0]) * s * num_subdivisions) + 1
+
+        # event_matrix = np.zeros((num_units, num_time_steps))
+        
+        # for i, unit_events in enumerate(spike_times_all_units):
+        #     valid_events = unit_events[(unit_events >= mocap_time_axis[0] * s) & (unit_events <= mocap_time_axis[-1] * s)]
+        #     time_indices = ((valid_events - mocap_time_axis[0]*s)* num_subdivisions).astype(int)
+        #     event_matrix[i, time_indices] = 1
+        
+        # # Créer la figure et les axes pour les subplots
+        # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+        
+        # # Plot supérieur : plot de mocap_time_axis vs. speed
+        # ax1.plot(mocap_time_axis, speed)
+        # ax1.set_ylabel('Vitesse')
+        # ax1.set_title('Plot de la Vitesse et Carte de Chaleur des Événements')
+        
+        # # Plot inférieur : carte de chaleur (heatmap) des événements entre les limites de temps
+        # heatmap = ax2.imshow(event_matrix, cmap='BuPu', aspect='auto', extent=[mocap_time_axis[0], mocap_time_axis[-1], 0, num_units])
+        
+        # ax2.set_xlabel('Temps')
+        # ax2.set_ylabel('Unités')
+        # ax2.set_yticks(np.arange(1, num_units + 1))
+        # ax2.set_yticklabels([f'Unité {i}' for i in unit_list])
+        # ax2.grid(True)
+        
+        # # Ajouter une barre de couleur pour interpréter les valeurs
+        # # cbar = plt.colorbar(heatmap, ax=ax2)
+        # # cbar.set_label('Nombre d\'événements')
+        
+        # # Ajuster les espacements et afficher le subplot
+        # plt.tight_layout()
+        # plt.show() 
+        
+        # Convertir les temps d'événements entre les limites de temps en une matrice binaire
+        num_units = len(spike_times_all_units)
+        
+        time_bin = 0.05  #s
+        # Calculer le nombre de subdivisions en ajustant le calcul
+        num_subdivisions = int((mocap_time_axis[-1] - mocap_time_axis[0]) / time_bin) + 1
+        
+        num_time_steps = int((mocap_time_axis[-1] - mocap_time_axis[0]) * num_subdivisions) + 1
+        
+        event_matrix = np.zeros((num_units, num_time_steps))
+        
+        for i, unit_events in enumerate(spike_times_all_units):
+            valid_events = unit_events[(unit_events >= mocap_time_axis[0]*s) & (unit_events <= mocap_time_axis[-1]*s)]
+            time_indices = ((valid_events - mocap_time_axis[0]*s) * num_subdivisions).astype(int)
+            event_matrix[i, time_indices] = 1
+        
+        # Créer la figure et les axes pour les subplots
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+        
+        # Plot supérieur : plot de mocap_time_axis vs. speed
+        ax1.plot(mocap_time_axis, speed)
+        ax1.set_ylabel('Vitesse')
+        ax1.set_title('Plot de la Vitesse et Carte de Chaleur des Événements')
+        
+        # Plot inférieur : carte de chaleur (heatmap) des événements entre les limites de temps
+        heatmap = ax2.imshow(event_matrix, cmap='BuPu', aspect='auto', extent=[mocap_time_axis[0], mocap_time_axis[-1], 0, num_units])
+        
+        ax2.set_xlabel('Temps')
+        ax2.set_ylabel('Unités')
+        ax2.set_yticks(np.arange(1, num_units + 1))
+        ax2.set_yticklabels([f'Unité {i}' for i in range(1, num_units + 1)])
+
+        
+        # Ajouter une barre de couleur pour interpréter les valeurs
+        # cbar = plt.colorbar(heatmap, ax=ax2)
+        # cbar.set_label("Nombre d'événements")
+        
+        # Ajuster les espacements et afficher le subplot
+        plt.tight_layout()
+        plt.show()
+        
+        
+
+        
+        
+        savefig_path = rf'{plots_path}/{animal}/Heatmap/Heatmap_{animal}_{mocap_session}_{trial}.png'
+        Check_Save_Dir(os.path.dirname(savefig_path))
+        plt.savefig(savefig_path)
+    
