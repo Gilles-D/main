@@ -6,35 +6,24 @@ Created on Sat Aug 26 14:23:06 2023
 """
 
 
-import glob
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
 import spikeinterface as si
-import spikeinterface.extractors as se 
-import spikeinterface.preprocessing as spre
 import spikeinterface.sorters as ss
 import spikeinterface.postprocessing as spost
-import spikeinterface.qualitymetrics as sqm
-import spikeinterface.comparison as sc
-import spikeinterface.exporters as sexp
-import spikeinterface.widgets as sw
-from spikeinterface.curation import MergeUnitsSorting, get_potential_auto_merge
 
 from neo.core import SpikeTrain
 from quantities import ms, s, Hz
 
-from elephant.spike_train_generation import homogeneous_poisson_process, homogeneous_gamma_process
-from elephant.statistics import mean_firing_rate
 from elephant.statistics import time_histogram, instantaneous_rate
-from elephant.kernels import GaussianKernel
+
 from elephant import kernels
 
 import pickle
 import time
-import sys
 
 import seaborn as sns
 import scipy.cluster.hierarchy as sch
@@ -59,6 +48,25 @@ mocap_data_folder = 'D:\ePhy\SI_Data\mocap_files\Auto-comp'
 sampling_rate = 20000*Hz
 mocap_freq = 200
 mocap_delay = 45 #frames
+
+sites_positions=[[0.0, 250.0],
+  [0.0, 300.0],
+  [0.0, 350.0],
+  [0.0, 200.0],
+  [0.0, 150.0],
+  [0.0, 100.0],
+  [0.0, 50.0],
+  [0.0, 0.0],
+  [43.3, 25.0],
+  [43.3, 75.0],
+  [43.3, 125.0],
+  [43.3, 175.0],
+  [43.3, 225.0],
+  [43.3, 275.0],
+  [43.3, 325.0],
+  [43.3, 375.0]]
+
+
 
 Save_plots = False
 plot_inst_speed = False
@@ -88,84 +96,39 @@ def Check_Save_Dir(save_path):
     return
 
 def Get_recordings_info(session_name, concatenated_signals_path, spikesorting_results_path):
+    """
+    Cette fonction récupère les informations d'enregistrement à partir d'un fichier de métadonnées
+    dans le dossier de signaux concaténés.
+
+    Args:
+        session_name (str): Le nom de la session d'enregistrement.
+        concatenated_signals_path (str): Le chemin vers le dossier contenant les signaux concaténés.
+        spikesorting_results_path (str): Le chemin vers le dossier des résultats du tri des spikes.
+
+    Returns:
+        dict or None: Un dictionnaire contenant les métadonnées si la lecture est réussie,
+        ou None si la lecture échoue.
+
+    Raises:
+        Exception: Si une erreur se produit pendant la lecture du fichier.
+
+    """
     try:
-        # Read the metadata file created during concatenation
-        print("Reading the ttl_idx file in intan folder...")
+        # Construire le chemin complet vers le fichier de métadonnées
         path = rf'{concatenated_signals_path}/{session_name}/'
+        
+        # Lire le fichier de métadonnées à l'aide de la bibliothèque pickle
+        print("Lecture du fichier ttl_idx dans le dossier Intan...")
         metadata = pickle.load(open(rf"{path}/ttl_idx.pickle", "rb"))
-    except:
-        print("No recording infos found in the intan folder. Please run Step 0")
+        
+    except Exception as e:
+        # Gérer toute exception qui pourrait se produire pendant la lecture du fichier
+        print("Aucune information d'enregistrement trouvée dans le dossier Intan. Veuillez exécuter l'étape 0.")
+        metadata = None  # Aucune métadonnée disponible en cas d'erreur
     
-    # save_path = rf'{spikesorting_results_path}/{session_name}/recordings_info.pickle'
-    # if os.path.exists(save_path):
-    #     print("Recordings info file exists")
-    #     print("Loading info file...")
-    #     recordings_info = pickle.load(open(save_path, "rb"))
-    # else:
-    #     print("Recordings info file does not exist")
-    #     print("Getting info...")
-    #     # Read the metadata file created during concatenation
-    #     path = rf'{concatenated_signals_path}/{session_name}/'
-    #     metadata = pickle.load(open(rf"{path}/ttl_idx.pickle", "rb"))
-       
-    #     # Loop over intan files
-    #     recordings_list = metadata['recordings_files']
-    #     # RHD file reading
-    #     multi_recordings, recordings_lengths, multi_stim_idx, multi_frame_idx, frame_start_delay = [], [], [], [], []
-        
-    #     # Concatenate recordings
-    #     for record in recordings_list:
-    #         reader = read_data(record)
-    #         signal = reader['amplifier_data']
-    #         recordings_lengths.append(len(signal[0]))
-    #         multi_recordings.append(signal)
-            
-    #         stim_idx = reader['board_dig_in_data'][0]  # Digital data for stim of the file
-    #         multi_stim_idx.append(stim_idx)  # Digital data for stim of all the files
-            
-    #         frame_idx = reader['board_dig_in_data'][1]  # Get digital data for mocap ttl
-    #         multi_frame_idx.append(frame_idx)  # Digital data for mocap ttl of all the files
-            
-    #     anaglog_signal_concatenated = np.hstack(multi_recordings)  # Signal concatenated from all the files
-    #     digital_stim_signal_concatenated = np.hstack(multi_stim_idx)  # Digital data for stim concatenated from all the files
-    #     digital_mocap_signal_concatenated = np.hstack(multi_frame_idx)
-        
-    #     # Get sampling freq
-    #     sampling_rate = reader['frequency_parameters']['amplifier_sample_rate']
-        
-    #     recordings_lengths_cumsum = np.cumsum(np.array(recordings_lengths) / sampling_rate)
-                                              
-    #     # Return: recording length, recording length cumsum, digital signals 1 and 2 (in full or logical?)
-    #     # Save them in a pickle
-        
-    #     recordings_info = {
-    #         'recordings_length': recordings_lengths,
-    #         'recordings_length_cumsum': recordings_lengths_cumsum,
-    #         'sampling_rate': sampling_rate,
-    #         'digital_stim_signal_concatenated': digital_stim_signal_concatenated,
-    #         'digital_mocap_signal_concatenated': digital_mocap_signal_concatenated
-    #     }
-        
-    #     pickle.dump(recordings_info, open(save_path, "wb"))
-        
-    print('Done')
+    print('Terminé')
     return metadata
 
-# def list_recording_files(path):
-#     """
-#     List all recording files (.rhd) in the specified directory and its subdirectories.
-    
-#     Parameters:
-#         path (str): The directory path to search for recording files.
-        
-#     Returns:
-#         list: A list of paths to all recording files found.
-#     """
-#     import os
-#     import glob
-#     subfolders = [ f.path for f in os.scandir(path) if f.is_file() ]
-    
-#     return subfolders
 
 def list_recording_files(path, session):
     """
@@ -210,10 +173,21 @@ def find_file_with_string(file_paths, target_string):
     return None
 
 def moving_average(data, window_size):
-    # Créer une fenêtre de moyenne mobile
+    """
+    Calcule la moyenne mobile d'un ensemble de données en utilisant une fenêtre donnée.
+
+    Args:
+        data (numpy.ndarray): Les données d'entrée sur lesquelles la moyenne mobile sera calculée.
+        window_size (int): La taille de la fenêtre utilisée pour la moyenne mobile.
+
+    Returns:
+        numpy.ndarray: Les données lissées après l'application de la moyenne mobile.
+
+    """
+    # Créer une fenêtre de moyenne mobile avec des coefficients égaux
     window = np.ones(window_size) / window_size
 
-    # Appliquer la moyenne mobile en utilisant la convolution
+    # Appliquer la moyenne mobile en utilisant la convolution avec le mode 'same'
     smoothed_data = np.convolve(data, window, mode='same')
 
     return smoothed_data
@@ -243,6 +217,47 @@ def calculate_instantaneous_frequencies(event_times, total_time, window_size, st
     
     return instantaneous_frequencies
 
+
+def plot_waveform(session_name, sorter_folder, sites_location, unit, save=True):
+    import glob
+    file_pattern = rf"Unit_{unit} *"
+    matching_files = glob.glob(rf"{sorter_folder}/we/curated/waveforms/{file_pattern}")
+    
+    print(rf"{sorter_folder}/curated/waveforms/{file_pattern}")
+    
+    if len(matching_files) > 0:
+        print("Matching file(s) found:")
+        for file_path in matching_files:
+            print(file_path)
+            
+            df = pd.read_excel(file_path)
+            max_wave = df.abs().max().max()  # Calculate the maximum value in all channels
+            
+            fig1 = plt.figure(figsize=(10, 12))
+            ax1 = fig1.add_subplot(111)
+            
+            fig1.suptitle(rf'Average Waveform Unit # {unit}')
+            ax1.set_xlabel('Probe location (micrometers)')
+            ax1.set_ylabel('Probe location (micrometers)')
+            
+            for loc, prob_loc in enumerate(sites_location):
+                x_offset, y_offset = prob_loc[0], prob_loc[1]
+                base_x = np.linspace(-15, 15, num=len(df.iloc[:, loc]))  # Basic x-array for plot, centered
+                # clust_color = 'C{}'.format(cluster)
+                
+                wave = df.iloc[:, loc] * 100 + max_wave * y_offset  # Adjust y_offset with the max_wave value
+                ax1.plot(base_x + 2 * x_offset, wave)
+                # ax1.fill_between(base_x + 2 * x_offset, wave - wf_rms[cluster + delta], wave + wf_rms[cluster + delta], alpha=wf_alpha)
+                
+            plt.show()
+            if save == True:
+                save_path = rf"{spikesorting_results_path}/{session_name}/plots/waveforms/"
+                Check_Save_Dir(save_path)
+                plt.savefig(rf"{save_path}/Units {unit}.png")
+    else:
+        print("No matching file found")
+        
+    return
 
 
 #%% Loadings
@@ -276,6 +291,200 @@ elif len(mocap_ttl) < len(mocap_files):
     
 mocap_ttl_times = mocap_ttl/sampling_rate
     
+#%%Export spike_times as an excel file
+
+spike_times = []
+
+for unit in unit_list:
+    spike_times.append(sorter_results.get_unit_spike_train(unit_id=unit)/sampling_rate*Hz*s)
+
+spike_times_df = pd.DataFrame(spike_times).T
+spike_times_df.rename(columns=dict(zip(spike_times_df.columns, unit_list)), inplace=True)
+
+spike_times_df.to_excel(rf"{sorter_folder}/curated/spike_trimes.xlsx")
+
+del spike_times,spike_times_df
+
+#%%TESTS Units postions
+# units_location = spost.compute_unit_locations(we)
+
+# spike_location = spost.compute_spike_locations(we)
+
+
+# corr = spost.compute_correlograms(sorter_results)
+
+# waveform_extractor, kwargs)
+
+# spost.compute_isi_histograms()
+
+#%% Marche pas Plots waveforms position électrode
+
+# for unit in unit_list:
+#     waveform = we.get_waveforms(unit)
+#     plot_waveform(session_name, sorter_folder, sites_positions, unit)
+
+
+
+#%% WIP : Produce whole session data matrix for each unit, with mocap data
+
+
+
+# Loop on units
+# Select spike train whole session
+
+# Get mocap infos from all trials of session
+# Get time axis of whole session
+# Append all mocap trials, with nan? bewteen trials
+
+"""
+Parameters
+"""
+sampling_period = 0.05*ms #Sampling period used for instataneous rate
+
+
+whole_session_time_axis = pd.DataFrame(range(int(signal.get_total_duration()*200)),columns=['time_axis'])/200 #Time axis to align mocap data (200Hz)
+
+
+for i,ttl_time in enumerate(mocap_ttl_times):   #Loop on all MOCAP trials, based on the TTL
+    mocap_file = None
+    trial = i+1
+       
+    print(rf"Trial {trial}")
+        
+    for file_path in mocap_files:               #Check if there is a MOCAP file for this trial
+        trial_file = int(file_path.split("_")[-1].split('.')[0])
+        if trial_file == trial:
+            mocap_file = file_path              #Read the mocap file
+         
+    
+    if mocap_file is not None:
+        mocap_data = np.array(pd.read_excel(mocap_file))
+        target_index = (whole_session_time_axis['time_axis'] - ttl_time).abs().idxmin()
+        
+        
+        """
+        Coller tous les dataframes de Mocap avec leur time axis en colonne 1
+        Puis calculer le rate de chaque unit, avec son time axis. Slicer le time axis pour qu'il colle au mocap
+        
+        
+        """
+        
+        
+        
+        
+        
+        
+        
+        
+
+        speed = pd.read_excel(mocap_file)['speed_back1']
+        
+        
+        trial_time_axis = (np.array(range(len(speed)))/mocap_freq*s)+ttl_time-mocap_delay/mocap_freq*s
+        
+        selected_spike_times = spike_times[(spike_times >= ttl_time*Hz*s) & (spike_times <= ttl_time*Hz*s+time_length*s)]
+        
+        
+        
+        data_matrix = np.column_stack((trial_time_axis,speed))
+        try:
+            whole_mocap_data = np.vstack((whole_mocap_data,data_matrix))
+        except NameError:
+            whole_mocap_data = data_matrix
+        del data_matrix
+    
+    else:
+        print(rf"Pas de fichier pour l'essai {trial}")
+
+
+
+for unit in unit_list:
+    print(rf"Unit {unit}")
+    spike_times = sorter_results.get_unit_spike_train(unit_id=unit)/sampling_rate*Hz*s
+    
+    total_duration = signal.get_total_duration()
+    time_axis = np.array(range(0,int(total_duration*20000)))/20000
+    
+    spiketrain = SpikeTrain(spike_times, t_stop=total_duration)
+       
+    kernel = kernels.AlphaKernel(sigma=1*s, invert=True) #TODO : check sigma value
+    inst_rate = instantaneous_rate(spiketrain, sampling_period,kernel=kernel)  
+    
+    instantenous_rate_array = np.vstack((time_axis,np.array(inst_rate.flatten()))).T
+     
+    
+    
+    
+    for i,ttl_time in enumerate(mocap_ttl_times):
+        mocap_file = None
+        trial = i+1
+        
+        
+        
+        print(rf"Trial {trial}")
+            
+        for file_path in mocap_files:
+            trial_file = int(file_path.split("_")[-1].split('.')[0])
+            if trial_file == trial:
+                mocap_file = file_path
+             
+        
+        if mocap_file is not None:
+            mocap_data = pd.read_excel(mocap_file)
+            mocap_trial_time_length = len(mocap_data)/mocap_freq
+            mocap_trial_time_axis = (np.array(range(len(mocap_data)))/mocap_freq*s)+ttl_time-mocap_delay/mocap_freq*s
+
+            speed = pd.read_excel(mocap_file)['speed_back1']
+            
+            
+            trial_time_axis = (np.array(range(len(speed)))/mocap_freq*s)+ttl_time-mocap_delay/mocap_freq*s
+            
+            selected_spike_times = spike_times[(spike_times >= ttl_time*Hz*s) & (spike_times <= ttl_time*Hz*s+time_length*s)]
+            
+            
+            
+            data_matrix = np.column_stack((trial_time_axis,speed))
+            try:
+                whole_mocap_data = np.vstack((whole_mocap_data,data_matrix))
+            except NameError:
+                whole_mocap_data = data_matrix
+            del data_matrix
+        
+        else:
+            print(rf"Pas de fichier pour l'essai {trial}")
+            
+    
+
+   
+    # Créer une figure et un axe principal
+    fig, ax1 = plt.subplots()
+    
+    # Tracé de l'histogramme de taux sur l'axe principal
+    ax1.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+    
+    # Configurer les étiquettes, les titres et les légendes pour l'axe principal
+    ax1.set_xlabel('Temps [s]')
+    ax1.set_ylabel('Taux de décharge [Hz]')
+    ax1.set_title(rf'Unit # {unit} ')
+    ax1.legend(loc='upper left')
+    
+    # Créer un axe Y secondaire pour la vitesse
+    ax2 = ax1.twinx()
+    
+    # Tracé de la vitesse sur l'axe Y secondaire
+    ax2.plot(whole_mocap_data[:,0], moving_average(whole_mocap_data[:,1],10),alpha=0.5, color='red', label='Vitesse')
+    # ax2.plot(mocap_time_axis[1:], moving_average(np.array(acceleration),10),alpha=0.5, color='green', label='Vitesse')
+    
+    # Configurer les étiquettes et la légende pour l'axe Y secondaire
+    ax2.set_ylabel('Vitesse [m/s]', color='red')
+    ax2.tick_params(axis='y', labelcolor='red')
+    ax2.legend(loc='upper right')
+
+    for time in mocap_ttl_times:
+        plt.axvline(time,color="black")
+        
+    del whole_mocap_data
+
 
 
 
@@ -702,18 +911,6 @@ plt.savefig(rf'{sorter_folder}/curated/dendrogram.png')
 plt.show()
 
 
-# from sklearn.cluster import KMeans
-
-# # Transposer la matrice de corrélation
-# correlation_matrix_transposed = correlation_array.T
-
-# # Effectuer le regroupement K-means
-# k = 3  # Nombre de classes souhaitées
-# kmeans = KMeans(n_clusters=k)
-# cluster_labels = kmeans.fit_predict(correlation_matrix_transposed)
-
-# # Créer un DataFrame pour stocker les résultats du clustering
-# clustering_results = pd.DataFrame({'Unit': unit_list, 'Cluster': cluster_labels})
 
 #%% Concatenante all session by unit
 # Loop on units
@@ -721,7 +918,7 @@ plt.show()
 
 # Get mocap infos from all trials of session
 # Get time axis of whole session
-# Append all mocap trials, with nan? bewteen trials
+# Append all mocap trials, with nan bewteen trials
 
 for unit in unit_list:
     print(rf"Unit {unit}")
