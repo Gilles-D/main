@@ -53,7 +53,9 @@ def file_info(file):
 #Directory location of raw csvs
 mocap_data_folder=r'D:\ePhy\SI_Data\mocap_files\Auto-comp'
 
-Stance = True
+force_rewrite = True
+
+Stance = False
 control_plot = False
 
 #%% Parameters computation
@@ -80,10 +82,10 @@ for i,file in enumerate(Files):
     save_folder = rf"{os.path.dirname(file)}/Analysis/"
     save_path = rf"{save_folder}/Analysis_{idx[0]}_{idx[1]}_{idx[2]}.xlsx"
     
-    if os.path.isfile(save_path):
+    if os.path.isfile(save_path) and force_rewrite == False:
         print(rf"{save_path} already exists")
         
-    else:
+    else :
         #Get coords for each foot
         left_foot=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Foot")
         left_ankle = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Ankle")
@@ -104,7 +106,15 @@ for i,file in enumerate(Files):
         right_ankle_angle = data_MOCAP.calculate_angle(f"{data_MOCAP.subject()}:Right_Foot", f"{data_MOCAP.subject()}:Right_Ankle", f"{data_MOCAP.subject()}:Right_Knee")
         right_knee_angle = data_MOCAP.calculate_angle(f"{data_MOCAP.subject()}:Right_Ankle", f"{data_MOCAP.subject()}:Right_Knee", f"{data_MOCAP.subject()}:Right_Hip")
         right_hip_angle = data_MOCAP.calculate_angle(f"{data_MOCAP.subject()}:Right_Knee", f"{data_MOCAP.subject()}:Right_Hip", f"{data_MOCAP.subject()}:Back1")
-    
+        
+        back1 = data_MOCAP.coord(f"{data_MOCAP.subject()}:Back1")
+        back2 = data_MOCAP.coord(f"{data_MOCAP.subject()}:Back2")
+        back_orientation = np.degrees(np.arctan((back2[2] - back1[2]) / np.sqrt((back2[1] - back1[1])**2 + (back2[0] - back1[0])**2)))
+        back_inclination = back2[2] - back1[2]
+        
+        back_1_Z = back1[2]
+        back_2_Z = back2[2]
+        
         
         # Compute Speed
         
@@ -164,6 +174,11 @@ for i,file in enumerate(Files):
             'right_ankle_angle' : right_ankle_angle,
             'right_knee_angle' : right_knee_angle,
             'right_hip_angle' : right_hip_angle,
+            
+            'back_orientation' : back_orientation,
+            'back_inclination' : back_inclination,
+            'back_1_Z' : back_1_Z,
+            'back_2_Z' : back_2_Z,
             
             'speed_back1' : speed_back1,
             'speed_left_foot' : speed_left_foot,
