@@ -284,6 +284,10 @@ curation_infos = {
 
 pickle.dump(curation_infos, open(rf"{sorter_folder}\curated\curated_infos.pickle", "wb"))
 
+#%%
+#TODO : export to phy
+
+
 #%% Script
 
 
