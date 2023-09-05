@@ -68,10 +68,10 @@ sites_positions=[[0.0, 250.0],
 
 
 
-Save_plots = False
-plot_inst_speed = False
+Save_plots = True
+plot_inst_speed = True
 plot_inst_feet = False
-plot_dist_from_obstacle = False
+plot_dist_from_obstacle = True
 plot_back_inclination = False
 
 do_correlations = True
@@ -267,7 +267,7 @@ recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spi
 print(rf"Loading spikesorting results for session {session_name}")
 sorter_results = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/curated').remove_empty_units()
 signal = si.load_extractor(signal_folder)
-we = si.WaveformExtractor(signal,sorter_results)
+we = si.load_waveforms(rf'{sorter_folder}/curated/waveforms')
 
 time_axis = signal.get_times()
 unit_list = sorter_results.get_unit_ids()
@@ -306,24 +306,25 @@ spike_times_df.to_excel(rf"{sorter_folder}/curated/spike_trimes.xlsx")
 del spike_times,spike_times_df
 
 #%%TESTS Units postions
-# units_location = spost.compute_unit_locations(we)
+units_location = spost.compute_unit_locations(we)
+plt.scatter(units_location[:,0], units_location[:,1])
+
+
+"""
+we.get_waveforms(unit_list[0])
 
 # spike_location = spost.compute_spike_locations(we)
 
+template_metrics = spost.compute_template_metrics(we)
+plt.figure()
+sns.scatterplot(template_metrics, x='peak_to_valley',y='half_width')
 
-# corr = spost.compute_correlograms(sorter_results)
+corr = spost.compute_correlograms(sorter_results)
 
 # waveform_extractor, kwargs)
 
-# spost.compute_isi_histograms()
-
-#%% Marche pas Plots waveforms position électrode
-
-# for unit in unit_list:
-#     waveform = we.get_waveforms(unit)
-#     plot_waveform(session_name, sorter_folder, sites_positions, unit)
-
-
+spost.compute_isi_histograms()
+"""
 
 #%% WIP : Produce whole session data matrix for each unit, with mocap data
 
@@ -490,6 +491,16 @@ for unit in unit_list:
 
 #%% Splitting
 #Split spiketrains by Mocap TTL
+"""
+Slice every spiketrains by mocap session
+
+
+Correlation can be computed over each slice
+
+"""
+
+
+
 trial_list = []
 correlation_matrix_speed, correlation_matrix_obst, correlation_matrix_z = [],[],[]
 
@@ -530,11 +541,15 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 
                 spiketrain = SpikeTrain(selected_spike_times,t_start = ttl_time*Hz*s-(mocap_delay/mocap_freq)*s, t_stop=ttl_time*Hz*s+time_length*s-(mocap_delay/mocap_freq)*s)   
                 
+                
+                
+                #TODO : determine better instantaneous rate
                 inst_rate = instantaneous_rate(spiketrain, sampling_period=5*ms)
                 
-                kernel = kernels.AlphaKernel(sigma=0.05*s, invert=True)
+                kernel = kernels.AlphaKernel(sigma=1*s, invert=True)
                 sampling_period = 5*ms
-                inst_rate2 = instantaneous_rate(spiketrain, sampling_period,kernel=kernel)
+                inst_rate2 = instantaneous_rate(spiketrain, sampling_period,kernel='auto')
+
                 
                 speed = mocap_data['speed_back1']
                 acceleration =  np.abs(np.diff(speed) / 1*s)
@@ -551,23 +566,26 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 histogram_count = time_histogram([spiketrain], 0.05*s)
                 histogram_rate = time_histogram([spiketrain],  0.05*s, output='rate')
                 
-                    
+                #TODO : split between catwalk and obstacle
                 
                 
                 """
-                Correlations computation
+                Correlations computation with speed
                 """
                 
                 if do_correlations == True:
                     """
                     Compute correlation between inst_rate and speed
                     """
-                    #Mocap delay should be fixed
+                    #Mocap delay is fixed
                     
+                    #select when mocap detects animal (to remove pre-start)
                     index_first_non_nan = next((index for index, value in enumerate(speed) if not np.isnan(value)), None)
                     index_last_non_nan = len(speed) - 1 - next((index for index, value in enumerate(speed[::-1]) if not np.isnan(value)), None)
                     selected_speed = np.array(speed[index_first_non_nan:index_last_non_nan])
                     
+                    #Do interpolation of speed when there are missing frames
+                    #TODO : find better solution to interpolation?
                     non_nan_indices = np.where(~np.isnan(selected_speed))[0]
                     nan_indices = np.where(np.isnan(selected_speed))[0]
                     
@@ -575,6 +593,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     array_with_interpolated_values = selected_speed.copy()
                     array_with_interpolated_values[nan_indices] = interpolated_values
                     
+                    #Calculate the correaltion on the selected slice of the trial
                     
                     # selected_inst_rate = inst_rate.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
                     selected_inst_rate = inst_rate2.magnitude.flatten()[index_first_non_nan:index_last_non_nan]
@@ -646,9 +665,9 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     fig, ax1 = plt.subplots()
                     
                     # Tracé de l'histogramme de taux sur l'axe principal
-                    ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
-                            align='edge', alpha=0.3, label='time histogram (rate)',color='black')
-                    ax1.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+                    # ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
+                    #         align='edge', alpha=0.3, label='time histogram (rate)',color='black')
+                    ax1.plot(inst_rate2.times.rescale(s), inst_rate2.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
                     
                     # Configurer les étiquettes, les titres et les légendes pour l'axe principal
                     ax1.set_xlabel('Temps [s]')
@@ -660,7 +679,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     ax2 = ax1.twinx()
                     
                     # Tracé de la vitesse sur l'axe Y secondaire
-                    ax2.plot(mocap_time_axis, moving_average(np.array(speed),10),alpha=0.5, color='red', label='Vitesse')
+                    ax2.plot(mocap_time_axis, moving_average(np.array(speed),10),alpha=1, color='red', label='Vitesse')
                     # ax2.plot(mocap_time_axis[1:], moving_average(np.array(acceleration),10),alpha=0.5, color='green', label='Vitesse')
                     
                     # Configurer les étiquettes et la légende pour l'axe Y secondaire
@@ -698,7 +717,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     # Tracé de l'histogramme de taux sur l'axe principal
                     ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
                             align='edge', alpha=0.3, label='time histogram (rate)',color='black')
-                    ax1.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+                    ax1.plot(inst_rate2.times.rescale(s), inst_rate2.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
                     
                     # Configurer les étiquettes, les titres et les légendes pour l'axe principal
                     ax1.set_xlabel('Temps [s]')
@@ -737,45 +756,48 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 Plot distance from obstacle
                 """
                 
-                if plot_dist_from_obstacle == True:                   
-                    # Créer une figure et un axe principal
-                    fig, ax1 = plt.subplots()
+                if plot_dist_from_obstacle == True:       
                     
-                    # Tracé de l'histogramme de taux sur l'axe principal
-                    ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
-                            align='edge', alpha=0.3, label='time histogram (rate)',color='black')
-                    ax1.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
-                    
-                    # Configurer les étiquettes, les titres et les légendes pour l'axe principal
-                    ax1.set_xlabel('Temps [s]')
-                    ax1.set_ylabel('Taux de décharge [Hz]')
-                    ax1.set_title(rf'Trial # {trial} - Unit # {unit} ')
-                    ax1.legend(loc='upper left')
-                    
-                    # Créer un axe Y secondaire pour la vitesse
-                    ax2 = ax1.twinx()
-                    
-                    # Tracé de la vitesse sur l'axe Y secondaire
-                    ax2.plot(mocap_time_axis, distance_from_obstacle, alpha=0.5, color='blue', label='Vitesse')
-                    
-                    # Configurer les étiquettes et la légende pour l'axe Y secondaire
-                    ax2.set_ylabel('Vitesse [m/s]', color='red')
-                    ax2.tick_params(axis='y', labelcolor='red')
-                    ax2.legend(loc='upper right')
-                    
-                    ax1.set_xlim(mocap_time_axis[np.argmax(~np.isnan(speed_right_foot))], mocap_time_axis[-1])
-                    
-                    # Afficher le tracé
-                    plt.show()
-                    
-                    
-                    if Save_plots == True:
+                    #TODO : Detect if there is an obstacle in the trial...
+                    if np.isnan(distance_from_obstacle).all() == False:
+                        # Créer une figure et un axe principal
+                        fig, ax1 = plt.subplots()
                         
-                        savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Distance_from_obstacle/Dist_from_obst_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
-                        Check_Save_Dir(os.path.dirname(savefig_path))
-                        plt.savefig(savefig_path)
-                    
-                    plt.close()
+                        # Tracé de l'histogramme de taux sur l'axe principal
+                        ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
+                                align='edge', alpha=0.3, label='time histogram (rate)',color='black')
+                        ax1.plot(inst_rate2.times.rescale(s), inst_rate2.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+                        
+                        # Configurer les étiquettes, les titres et les légendes pour l'axe principal
+                        ax1.set_xlabel('Temps [s]')
+                        ax1.set_ylabel('Taux de décharge [Hz]')
+                        ax1.set_title(rf'Trial # {trial} - Unit # {unit} ')
+                        ax1.legend(loc='upper left')
+                        
+                        # Créer un axe Y secondaire pour la vitesse
+                        ax2 = ax1.twinx()
+                        
+                        # Tracé de la vitesse sur l'axe Y secondaire
+                        ax2.plot(mocap_time_axis, distance_from_obstacle, alpha=0.5, color='blue', label='Vitesse')
+                        
+                        # Configurer les étiquettes et la légende pour l'axe Y secondaire
+                        ax2.set_ylabel('Vitesse [m/s]', color='red')
+                        ax2.tick_params(axis='y', labelcolor='red')
+                        ax2.legend(loc='upper right')
+                        
+                        ax1.set_xlim(mocap_time_axis[np.argmax(~np.isnan(speed_right_foot))], mocap_time_axis[-1])
+                        
+                        # Afficher le tracé
+                        plt.show()
+                        
+                        
+                        if Save_plots == True:
+                            
+                            savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Distance_from_obstacle/Dist_from_obst_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
+                            Check_Save_Dir(os.path.dirname(savefig_path))
+                            plt.savefig(savefig_path)
+                        
+                        plt.close()
                 
                 """
                 Plot Back inclination
@@ -788,7 +810,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     # Tracé de l'histogramme de taux sur l'axe principal
                     ax1.bar(histogram_rate.times, histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period,
                             align='edge', alpha=0.3, label='time histogram (rate)',color='black')
-                    ax1.plot(inst_rate.times.rescale(s), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+                    ax1.plot(inst_rate2.times.rescale(s), inst_rate2.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
                     
                     # Configurer les étiquettes, les titres et les légendes pour l'axe principal
                     ax1.set_xlabel('Temps [s]')
@@ -824,7 +846,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                         Check_Save_Dir(os.path.dirname(savefig_path))
                         plt.savefig(savefig_path)
                     
-                    plt.close()
+                    # plt.close()
                     
             except:
                 print(rf"Error with unit # {unit}")
@@ -858,8 +880,6 @@ if do_correlations == True:
 #%% Correlation plots
 
 #TODO : add possibility to load correlation array if already exists without running previosu session
-
-
 correlation_df = correlation_df_speed
 correlation_matrix = correlation_matrix_speed
 
@@ -887,8 +907,11 @@ plt.title("Correlation between inst_rate and speed (median)")
 plt.xlabel("Units #")
 plt.ylabel("Corr coeff")
 
-sns.boxplot(data = correlation_df[column_med.sort_values().index])  
+sns.boxplot(data = correlation_df[column_med.sort_values().index],showfliers=False)  
 plt.savefig(rf'{sorter_folder}/curated/correlation_med.png')
+
+
+
 
 """
 Plot dendrogramm by hierarchichal clustering
@@ -1062,28 +1085,33 @@ for i,ttl_time in enumerate(mocap_ttl_times):
         """
         Raster plot
         """
-        # # Créer la figure et les axes pour les subplots
-        # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+        # Créer la figure et les axes pour les subplots
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
         
-        # # Plot supérieur : plot de mocap_time_axis vs. speed
-        # ax1.plot(mocap_time_axis, speed)
-        # ax1.set_ylabel('Vitesse')
-        # ax1.set_title(rf'Trial {trial}')
+        # Plot supérieur : plot de mocap_time_axis vs. speed
+        ax1.plot(mocap_time_axis, speed)
+        ax1.set_ylabel('Vitesse')
+        ax1.set_title(rf'Trial {trial}')
         
-        # # Plot inférieur : raster plot des événements
-        # for i, unit_events in enumerate(spike_times_all_units):
-        #     events_to_plot = unit_events[(unit_events >= mocap_time_axis[0] * s) & (unit_events <= mocap_time_axis[-1] * s)]
-        #     ax2.eventplot(events_to_plot, lineoffsets=i + 1, colors=f'C{i+1}', linewidths=2)
+        # Plot inférieur : raster plot des événements
+        for i, unit_events in enumerate(spike_times_all_units):
+            events_to_plot = unit_events[(unit_events >= mocap_time_axis[0] * s) & (unit_events <= mocap_time_axis[-1] * s)]
+            ax2.eventplot(events_to_plot, lineoffsets=i + 1, colors=f'C{i+1}', linewidths=2)
         
-        # ax2.set_xlabel('Temps')
-        # ax2.set_ylabel('Unités')
-        # ax2.set_yticks(np.arange(1, len(spike_times_all_units) + 1))
-        # ax2.set_yticklabels([f'Unité {i+1}' for i in unit_list])
-        # ax2.grid(True)
+        ax2.set_xlabel('Temps')
+        ax2.set_ylabel('Unités')
+        ax2.set_yticks(np.arange(1, len(spike_times_all_units) + 1))
+        ax2.set_yticklabels([f'Unité {i}' for i in unit_list])
+        ax2.grid(True)
         
-        # # Ajuster les espacements et afficher le subplot
-        # plt.tight_layout()
-        # plt.show()
+        # Ajuster les espacements et afficher le subplot
+        plt.tight_layout()
+        plt.show()
+        
+        savefig_path = rf'{plots_path}/{animal}/Rasterplot/Rasterplot{animal}_{mocap_session}_{trial}.png'
+        Check_Save_Dir(os.path.dirname(savefig_path))
+        plt.savefig(savefig_path)
+        
         
         
         """
@@ -1130,52 +1158,58 @@ for i,ttl_time in enumerate(mocap_ttl_times):
         # plt.tight_layout()
         # plt.show() 
         
+        
+        
+        
+        
+        
+        
         # Convertir les temps d'événements entre les limites de temps en une matrice binaire
-        num_units = len(spike_times_all_units)
+        # num_units = len(spike_times_all_units)
         
-        time_bin = 0.05  #s
-        # Calculer le nombre de subdivisions en ajustant le calcul
-        num_subdivisions = int((mocap_time_axis[-1] - mocap_time_axis[0]) / time_bin) + 1
+        # time_bin = 0.05  #s
+        # # Calculer le nombre de subdivisions en ajustant le calcul
+        # num_subdivisions = int((mocap_time_axis[-1] - mocap_time_axis[0]) / time_bin) + 1
         
-        num_time_steps = int((mocap_time_axis[-1] - mocap_time_axis[0]) * num_subdivisions) + 1
+        # num_time_steps = int((mocap_time_axis[-1] - mocap_time_axis[0]) * num_subdivisions) + 1
         
-        event_matrix = np.zeros((num_units, num_time_steps))
+        # event_matrix = np.zeros((num_units, num_time_steps))
         
-        for i, unit_events in enumerate(spike_times_all_units):
-            valid_events = unit_events[(unit_events >= mocap_time_axis[0]*s) & (unit_events <= mocap_time_axis[-1]*s)]
-            time_indices = ((valid_events - mocap_time_axis[0]*s) * num_subdivisions).astype(int)
-            event_matrix[i, time_indices] = 1
+        # for i, unit_events in enumerate(spike_times_all_units):
+        #     valid_events = unit_events[(unit_events >= mocap_time_axis[0]*s) & (unit_events <= mocap_time_axis[-1]*s)]
+        #     time_indices = ((valid_events - mocap_time_axis[0]*s) * num_subdivisions).astype(int)
+        #     event_matrix[i, time_indices] = 1
         
-        # Créer la figure et les axes pour les subplots
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+        # # Créer la figure et les axes pour les subplots
+        # fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
         
-        # Plot supérieur : plot de mocap_time_axis vs. speed
-        ax1.plot(mocap_time_axis, speed)
-        ax1.set_ylabel('Vitesse')
-        ax1.set_title('Plot de la Vitesse et Carte de Chaleur des Événements')
+        # # Plot supérieur : plot de mocap_time_axis vs. speed
+        # ax1.plot(mocap_time_axis, speed)
+        # ax1.set_ylabel('Vitesse')
+        # ax1.set_title('Plot de la Vitesse et Carte de Chaleur des Événements')
         
-        # Plot inférieur : carte de chaleur (heatmap) des événements entre les limites de temps
-        heatmap = ax2.imshow(event_matrix, cmap='BuPu', aspect='auto', extent=[mocap_time_axis[0], mocap_time_axis[-1], 0, num_units])
+        # # Plot inférieur : carte de chaleur (heatmap) des événements entre les limites de temps
+        # heatmap = ax2.imshow(event_matrix, cmap='BuPu', aspect='auto', extent=[mocap_time_axis[0], mocap_time_axis[-1], 0, num_units])
         
-        ax2.set_xlabel('Temps')
-        ax2.set_ylabel('Unités')
-        ax2.set_yticks(np.arange(1, num_units + 1))
-        ax2.set_yticklabels([f'Unité {i}' for i in range(1, num_units + 1)])
+        # ax2.set_xlabel('Temps')
+        # ax2.set_ylabel('Unités')
+        # ax2.set_yticks(np.arange(1, num_units + 1))
+        # ax2.set_yticklabels([f'Unité {i}' for i in range(1, num_units + 1)])
 
         
-        # Ajouter une barre de couleur pour interpréter les valeurs
-        # cbar = plt.colorbar(heatmap, ax=ax2)
-        # cbar.set_label("Nombre d'événements")
+        # # Ajouter une barre de couleur pour interpréter les valeurs
+        # # cbar = plt.colorbar(heatmap, ax=ax2)
+        # # cbar.set_label("Nombre d'événements")
         
-        # Ajuster les espacements et afficher le subplot
-        plt.tight_layout()
-        plt.show()
+        # # Ajuster les espacements et afficher le subplot
+        # plt.tight_layout()
+        # plt.show()
         
         
 
         
         
-        savefig_path = rf'{plots_path}/{animal}/Heatmap/Heatmap_{animal}_{mocap_session}_{trial}.png'
-        Check_Save_Dir(os.path.dirname(savefig_path))
-        plt.savefig(savefig_path)
+        # savefig_path = rf'{plots_path}/{animal}/Heatmap/Heatmap_{animal}_{mocap_session}_{trial}.png'
+        # Check_Save_Dir(os.path.dirname(savefig_path))
+        # plt.savefig(savefig_path)
     

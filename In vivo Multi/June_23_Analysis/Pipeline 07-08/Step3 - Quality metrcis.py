@@ -41,6 +41,10 @@ from quantities import s, ms
 import pandas as pd
 import math
 
+import seaborn as sns
+
+
+#%% Functions
 
 def list_curated_units(directory):
     units = []
@@ -133,17 +137,23 @@ def plot_maker(sorter, we,unit_list):
         plt.tight_layout()
         rasterplot_rates(current_spike_train_list, ax=ax6, histscale=0.1)
 
-
+def fractionner_liste(liste, taille_sous_liste):
+    sous_listes = []
+    for i in range(0, len(liste), taille_sous_liste):
+        sous_liste = liste[i:i + taille_sous_liste]
+        sous_listes.append(sous_liste)
+    return sous_listes
 
 
 #%% Parameters
-session_name = '0026_10_08'
+session_name = '0026_02_08'
 sorter_name='kilosort3'
 
 
-
+concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
 spikesorting_results_folder = r'D:\ePhy\SI_Data\spikesorting_results'
 sorter_folder = rf'{spikesorting_results_folder}/{session_name}/{sorter_name}'
+signal_folder = rf'{concatenated_signals_path}/{session_name}'
 
 
 
@@ -178,6 +188,10 @@ Loading
 sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
 we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we')
 similarity = np.load(rf"{sorter_folder}\we\similarity\similarity.npy")
+
+#read signal (concatenated)
+signal = si.load_extractor(signal_folder)
+
 
 units_location = spost.compute_unit_locations(we)
 
@@ -259,19 +273,30 @@ print("Matrice des distances entre les points :\n", distances)
     
     
 
-units_to_merge = [[47, 55], [57, 58,59, 69], [18, 43], [26, 46]
+units_to_merge = [[8,21],
+                  [24, 33],
+                  [26, 35],
+                  [36,42],
                   
-                            
+                                               
 ]
 
-units_to_remove = [62, 63];
+units_to_remove = [43]
 
 # definitive curated units list
 clean_sorting = MergeUnitsSorting(sorter_result,units_to_merge).remove_units(spikes_not_passing_quality_metrics).remove_units(units_to_remove)
 
 # save the final curated spikesorting results
 save_path = rf"{sorter_folder}\curated"
-clean_sorting.save_to_folder(save_path)
+clean_sorting_saved = clean_sorting.save_to_folder(save_path)
+
+#TODO : get waveform from signal
+clean_we = si.extract_waveforms(signal, clean_sorting,folder=rf"{sorter_folder}\curated\waveforms",load_if_exists=True)
+
+
+
+
+
 
 #save units_to_merge and units_toremove (and units pre-fitlered by metrics)
 curation_infos = {
@@ -284,79 +309,85 @@ curation_infos = {
 
 pickle.dump(curation_infos, open(rf"{sorter_folder}\curated\curated_infos.pickle", "wb"))
 
-#%%
-#TODO : export to phy
+#%% export to phy
+#export to phy
+save_folder_phy = rf"{sorter_folder}\curated\phy"
+sexp.export_to_phy(clean_we, output_folder=save_folder_phy)
 
 
-#%% Script
+#TODO : export waveforms xls
+
+#%% waveform plots
+unit_list = clean_sorting.get_unit_ids()
+
+count=0
+for i in fractionner_liste(unit_list,5):
+    count = count +1
+    sw.plot_unit_templates(clean_we, unit_ids=i)
+    plt.savefig(rf"{sorter_folder}\curated\waveforms\multiple_unit_{count}.png")
+
+"""
+Individual templates
+"""
+for i in unit_list:
+    sw.plot_unit_templates(clean_we, unit_ids=np.array([i]))
+    plt.savefig(rf"{sorter_folder}\curated\waveforms\unit_{i}.png")
 
 
-# #List all curated units
+"""
+Units location
 
-# curated_units = list_curated_units(rf'{spikesorting_results_folder}/{session_name}/spikes')
+0,0 = site 7 (SI)
+tip = -75µm
 
-# post_curated_units = []
+So depth 0 = stereotaxy_depth - 75
+0 = 825 µm
 
-# for index,unit in enumerate(curated_units):
-#     sorter_name = unit[-1]
-#     if sorter_name == 'comp':
-#         sorter_folder = rf'{spikesorting_results_folder}/{session_name}/comp_mult_2_kilosort3_mountainsort4_tridesclous'
-#         sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/sorter')
-#         # we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=sorter_result)
-#         select_unit = sorter_result.select_units(np.array([int(unit[1])]))
-#         we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=select_unit)
-        
-#     elif sorter_name == 'tdc':
-#         sorter_folder = rf'{spikesorting_results_folder}/{session_name}/tridesclous'
-#         sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
-#         # we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=sorter_result)
-#         select_unit = sorter_result.select_units(np.array([int(unit[1])]))
-#         we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=select_unit)
-#     elif sorter_name == 'moun':
-#         sorter_folder = rf'{spikesorting_results_folder}/{session_name}/mountainsort4'
-#         sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
-#         # we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=sorter_result)
-#         select_unit = sorter_result.select_units(np.array([int(unit[1])]))
-#         we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=select_unit)
-#     else:
-#         sorter_folder = rf'{spikesorting_results_folder}/{session_name}/{sorter_name}'
-#         sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
-#         # we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=sorter_result)
-#         select_unit = sorter_result.select_units(np.array([int(unit[1])]))
-#         we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we', sorting=select_unit)
+"""
+units_location = spost.compute_unit_locations(clean_we)
+plt.figure()
+plt.scatter(units_location[:,0], 825-units_location[:,1])
 
-#     ISI_violation_ratio,ISI_violation_count = sqm.compute_isi_violations(we, isi_threshold_ms=1.0)
-    
+for i, name in enumerate(unit_list):
+    plt.text(units_location[i,0], 825-units_location[i,1], name, fontsize=15, ha='center', va='bottom')
 
-    
-    
-#     quality_metrics = sqm.compute_quality_metrics(we)
-#     num_spikes = int(quality_metrics['num_spikes'])
-    
-#     refrac_period_violation = sqm.compute_refrac_period_violations(we)
-#     refrac_period_violation = list(refrac_period_violation[1].values())[0]/num_spikes*100
-    
-#     print(rf' Unit {unit[0]} ISI violation rate = {ISI_violation_ratio[int(unit[1])]}')
-#     print(rf' Refractory period violation = {refrac_period_violation} %')
-    
-#     post_curated_units.append(select_unit)
-    
-#     # output_file = rf'{spikesorting_results_folder}/{session_name}/post_curated_spikes.h5'
-#     # post_curated_units
-#     # se.MultiSortingExtractor()
-    
-#%%
-    # pc = spost.compute_principal_components(we, load_if_exists=True, n_components=3, mode='by_channel_local')
-    # sw.plot_principal_component(we)
-    
-    # keep_mask = (metrics['snr'] > 7.5) & (metrics['isi_violations_ratio'] < 0.2) & (metrics['nn_hit_rate'] > 0.90)
-    # print(keep_mask)
-    
-    # keep_unit_ids = keep_mask[keep_mask].index.values
-    # print(keep_unit_ids)
-    
-    # sw.plot_autocorrelograms(sorter_result, unit_ids=[np.array([int(unit[1])])], bin_ms=1, window_ms=100)
-    
-    # sw.plot_quality_metrics(we)
-    # plt.plot(spost.compute_isi_histograms(we))
+plt.gca().invert_yaxis()
+plt.title("Unit position")
+plt.savefig(rf"{sorter_folder}\curated\waveforms\Unit_locations.png")
 
+
+# spike_location = spost.compute_spike_locations(we)
+
+"""
+waveform parameters plot
+"""
+
+template_metrics = spost.compute_template_metrics(clean_we)
+plt.figure()
+sns.scatterplot(template_metrics, x='peak_to_valley',y='half_width')
+
+for unit in unit_list:
+    plt.annotate(unit, (template_metrics['peak_to_valley'][unit], template_metrics['half_width'][unit]))
+
+plt.savefig(rf"{sorter_folder}\curated\waveforms\waveforms_parameters.png")
+
+
+"""
+Correlograms
+"""
+
+corr = spost.compute_correlograms(clean_sorting)
+
+correlogram = corr[0][unit_list[4], unit_list[1], :]
+
+# Accédez aux bords des bins
+bin_edges = corr[1]
+
+# Tracez l'histogramme
+plt.figure(figsize=(8, 4))
+plt.bar(bin_edges[:-1], correlogram, width=bin_edges[1] - bin_edges[0], align='center')
+plt.xlabel('Temps (ms)')
+plt.ylabel('Fréquence')
+plt.title(f'Correlogramme entre l\'unité  et l\'unité ')
+plt.grid(True)
+plt.show()
