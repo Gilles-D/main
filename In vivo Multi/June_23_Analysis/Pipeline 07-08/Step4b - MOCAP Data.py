@@ -2,7 +2,13 @@
 """
 Created on Sat Aug 26 08:48:20 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+Extracts data from MOCAP output xslx files
+Uses MOCAP class
+
+Output : excel files for analysis (positions of bodyparts, angles, distances, stances)
+
 """
 
 
@@ -17,6 +23,7 @@ from matplotlib import pyplot as plt
 sys.path.append(r'C:\Users\MOCAP\Documents\GitHub\main\MOCAP\Analysis')
 import MOCAP_analysis_class as MA
 
+#%%Functions
 
 def list_all_files(root):
     #First Loop : loop on all csv files to list them in the list "Files"
@@ -55,8 +62,8 @@ mocap_data_folder=r'D:\ePhy\SI_Data\mocap_files\Auto-comp'
 
 force_rewrite = True
 
-Stance = False
-control_plot = False
+Stance = True
+control_plot = True
 
 #%% Parameters computation
 
