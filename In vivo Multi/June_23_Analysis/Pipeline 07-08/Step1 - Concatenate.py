@@ -2,9 +2,13 @@
 """
 Created on Thu Jul 13 14:59:35 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+Concatenate signal from intan files for a given session
+Saves concatenated signal for spikeinterface analysis (spikesorting)
+
 """
-#%% modules
+#%% Imports
 import spikeinterface as si
 import spikeinterface.extractors as se 
 import spikeinterface.preprocessing as spre
@@ -567,7 +571,7 @@ spikesorting_results_folder='D:\ePhy\SI_Data\spikesorting_results'
 excluded_sites = []
 
 
-#%%
+#%%Main script
 recordings = list_recording_files(rhd_folder)
 
     

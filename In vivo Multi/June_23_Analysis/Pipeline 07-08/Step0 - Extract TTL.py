@@ -2,9 +2,16 @@
 """
 Created on Tue Aug  8 22:20:13 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+
+Extract TTL indexes from intan files for a given animal
+Saves it as a pickle file (recording_info) in the signal folder
+
 """
 import os
+
+#%%Functions
 
 def Get_TTL_idx(file_list):
     import sys
@@ -349,7 +356,7 @@ def list_recording_files(path):
     
     return fichiers
 
-#%%
+#%% Main script
 session_folder_path = r'D:/ePhy/Intan_Data/0026'
 
 recording_folders = list_recording_folders(session_folder_path)

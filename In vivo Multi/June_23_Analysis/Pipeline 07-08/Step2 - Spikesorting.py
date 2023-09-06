@@ -2,7 +2,16 @@
 """
 Created on Wed Aug  9 11:35:43 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+Perform spikinterface spikesorting
+Sorters (and parameters) can be set in the function spike_sorting()
+
+
+Inputs = concatenated signals (one or multiple sessions)
+Outputs = sorting results (spikeinterface)
+
+
 """
 
 #%% modules
