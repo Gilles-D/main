@@ -2,7 +2,16 @@
 """
 Created on Tue Sep  5 11:32:27 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+Performs optotag analysis : 
+    - compute delay and jitter for each unit
+    - compute reliability of the photostimulation for each unit
+
+Inputs : spikesorting results (spikeinterface)
+
+Outputs : Excel files with parameters for each units
+
 """
 
 
@@ -52,7 +61,7 @@ stim_duration = 100 #ms
 #Reliability windows
 window_reliability=40#ms
 
-check_waveform = True
+check_waveform = False
 
 
 
@@ -209,9 +218,6 @@ for unit in unit_list:
             plt.axvspan(stim_time, stim_time+0.1, alpha=0.3)
             
 
-#TODO : save these parameters
-
-
 # Créer un histogramme
 plt.figure()
 plt.hist(reliability_scores, bins=10, edgecolor='black')  # Vous pouvez ajuster le nombre de bacs (bins) selon vos besoins
@@ -244,6 +250,19 @@ plt.xlabel('Delay (ms)')
 plt.ylabel('Reliability (%)')
 plt.legend(['Jitter (ms)'])
 
-savefig_path = rf'{sorter_folder}/curated/plots/optotag/reliability_scatter.png'
+savefig_path = rf'{sorter_folder}/curated/optotag/reliability_scatter.png'
 Check_Save_Dir(os.path.dirname(savefig_path))
 plt.savefig(savefig_path)
+
+
+"""
+Saving in dataframes
+"""
+df_optotag = pd.DataFrame({
+    'units' : unit_list,
+    'reliability_scores' : reliability_scores,
+    'delays' : delays,
+    'jitters' : jitters   
+    })
+
+df_optotag.to_excel(rf'{sorter_folder}/curated/optotag/optotag_infos.xlsx')
