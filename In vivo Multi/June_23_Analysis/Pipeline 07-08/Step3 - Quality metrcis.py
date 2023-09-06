@@ -2,25 +2,31 @@
 """
 Created on Wed Aug 16 10:07:55 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+Perform automatic and manual curation over a sorter result (spikeinterface sorter result - for one sorter here)
+
+Inputs : Spike sorting results (for instance from a session)
+
+- performs automatic curation (with quality metrics parameters)
+- performs manual curation (with manual selection/split/merge of units)
+- compute metrics for units (waveform, location)
+
+Returns: a curated sorter result (spikeinterface) and computed metrics, and waveforms
+
 """
 
 #%% Imports and functions
 import spikeinterface as si
-import spikeinterface.extractors as se 
-import spikeinterface.preprocessing as spre
 import spikeinterface.sorters as ss
 import spikeinterface.postprocessing as spost
 import spikeinterface.qualitymetrics as sqm
-import spikeinterface.comparison as sc
 import spikeinterface.exporters as sexp
 import spikeinterface.widgets as sw
-from spikeinterface.curation import MergeUnitsSorting, get_potential_auto_merge
+from spikeinterface.curation import MergeUnitsSorting
 
 import os
 
-import probeinterface as pi
-from probeinterface.plotting import plot_probe
 
 import warnings
 warnings.simplefilter("ignore")
@@ -30,7 +36,6 @@ import pickle
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import numpy as np
-from matplotlib.widgets import Button
 
 from viziphant.statistics import plot_time_histogram
 from viziphant.rasterplot import rasterplot_rates
@@ -39,12 +44,26 @@ from neo.core import SpikeTrain
 from quantities import s, ms
 
 import pandas as pd
-import math
+
 
 import seaborn as sns
 
 
 #%% Functions
+def Check_Save_Dir(save_path):
+    """
+    Check if the save folder exists. If not, create it.
+
+    Args:
+        save_path (str): Path to the save folder.
+
+    """
+    import os
+    isExist = os.path.exists(save_path)
+    if not isExist:
+        os.makedirs(save_path)  # Create folder for the experiment if it does not already exist
+
+    return
 
 def list_curated_units(directory):
     units = []
@@ -193,14 +212,12 @@ similarity = np.load(rf"{sorter_folder}\we\similarity\similarity.npy")
 signal = si.load_extractor(signal_folder)
 
 
-units_location = spost.compute_unit_locations(we)
-
-
 """
 Computing metrics
 """
 # qm_params = sqm.get_default_qm_params()
 # print(qm_params)
+
 try:
     quality_metrics = sqm.compute_quality_metrics(we, load_if_exists=True)
 except:
@@ -244,25 +261,18 @@ for couple in similarity_couples_indexed:
     plot_maker(sorter_result,we,couple)
 
 #%% AFTER MANUAL CURATION
-
-# Next step = manually curate with phy
-# Select what units to merge and write them in a list of lists
-
 """
-# Calcul des distances entre chaque paire de points
-num_points = units_location.shape[0]
-distances = np.zeros((num_points, num_points))  # Matrice pour stocker les distances
-
-for i in range(num_points):
-    for j in range(num_points):
-        distances[i, j] = np.sqrt((units_location[i, 0] - units_location[j, 0])**2 + (units_location[i, 1] - units_location[j, 1])**2)
-
-print("Matrice des distances entre les points :\n", distances)
+- Next step = manually curate with phy 
+- Select what units to merge and write them in a list of lists
 """
 
+
+# If you want to plot units locations
 
 # for units in similarity_couples_indexed:
 #     sw.plot_unit_locations(we,unit_ids=[units[0], units[1]])
+
+#If you want to plot waveforms template
 
 # for unit in selected_spike_id_list:
 #     template = we.get_template(unit_id=unit, mode='median')
@@ -277,8 +287,6 @@ units_to_merge = [[8,21],
                   [24, 33],
                   [26, 35],
                   [36,42],
-                  
-                                               
 ]
 
 units_to_remove = [43]
@@ -290,7 +298,7 @@ clean_sorting = MergeUnitsSorting(sorter_result,units_to_merge).remove_units(spi
 save_path = rf"{sorter_folder}\curated"
 clean_sorting_saved = clean_sorting.save_to_folder(save_path)
 
-#TODO : get waveform from signal
+#Get waveform from signal
 clean_we = si.extract_waveforms(signal, clean_sorting,folder=rf"{sorter_folder}\curated\waveforms",load_if_exists=True)
 
 
@@ -311,11 +319,10 @@ pickle.dump(curation_infos, open(rf"{sorter_folder}\curated\curated_infos.pickle
 
 #%% export to phy
 #export to phy
+
 save_folder_phy = rf"{sorter_folder}\curated\phy"
-sexp.export_to_phy(clean_we, output_folder=save_folder_phy)
+sexp.export_to_phy(clean_we, output_folder=save_folder_phy, remove_if_exists=True)
 
-
-#TODO : export waveforms xls
 
 #%% waveform plots
 unit_list = clean_sorting.get_unit_ids()
@@ -324,14 +331,21 @@ count=0
 for i in fractionner_liste(unit_list,5):
     count = count +1
     sw.plot_unit_templates(clean_we, unit_ids=i)
-    plt.savefig(rf"{sorter_folder}\curated\waveforms\multiple_unit_{count}.png")
+    
+    savepath = rf"{sorter_folder}\curated\processing_data\waveforms\plots\multiple_unit_{count}.svg"
+    Check_Save_Dir(os.path.dirname((savepath)))
+    plt.savefig(savepath)
 
 """
 Individual templates
 """
 for i in unit_list:
     sw.plot_unit_templates(clean_we, unit_ids=np.array([i]))
-    plt.savefig(rf"{sorter_folder}\curated\waveforms\unit_{i}.png")
+    
+    savepath = rf"{sorter_folder}\curated\processing_data\waveforms\plots\unit_{i}.svg"
+    Check_Save_Dir(os.path.dirname((savepath)))
+    plt.savefig(savepath)
+
 
 
 """
@@ -353,8 +367,11 @@ for i, name in enumerate(unit_list):
 
 plt.gca().invert_yaxis()
 plt.title("Unit position")
-plt.savefig(rf"{sorter_folder}\curated\waveforms\Unit_locations.png")
 
+
+savepath = rf"{sorter_folder}\curated\processing_data\waveforms\plots\Unit_locations.svg"
+Check_Save_Dir(os.path.dirname((savepath)))
+plt.savefig(savepath)
 
 # spike_location = spost.compute_spike_locations(we)
 
@@ -369,13 +386,17 @@ sns.scatterplot(template_metrics, x='peak_to_valley',y='half_width')
 for unit in unit_list:
     plt.annotate(unit, (template_metrics['peak_to_valley'][unit], template_metrics['half_width'][unit]))
 
-plt.savefig(rf"{sorter_folder}\curated\waveforms\waveforms_parameters.png")
 
+savepath = rf"{sorter_folder}\curated\processing_data\waveforms\plots\waveforms_parameters.svg"
+Check_Save_Dir(os.path.dirname((savepath)))
+plt.savefig(savepath)
 
 """
 Correlograms
 """
 
+#TODO : correlogramms
+"""
 corr = spost.compute_correlograms(clean_sorting)
 
 correlogram = corr[0][unit_list[4], unit_list[1], :]
@@ -388,6 +409,49 @@ plt.figure(figsize=(8, 4))
 plt.bar(bin_edges[:-1], correlogram, width=bin_edges[1] - bin_edges[0], align='center')
 plt.xlabel('Temps (ms)')
 plt.ylabel('Fréquence')
-plt.title(f'Correlogramme entre l\'unité  et l\'unité ')
+plt.title('Correlogramme entre l\'unité  et l\'unité ')
 plt.grid(True)
 plt.show()
+"""
+
+#%% Export datas in dataframes
+"""
+units location
+template metrics
+pca?
+
+other df
+export waveforms template
+"""
+units_location = spost.compute_unit_locations(clean_we)
+template_metrics = spost.compute_template_metrics(clean_we)
+unit_list = clean_sorting.get_unit_ids()
+
+# pca_components = spost.compute_principal_components(we)
+
+df = pd.DataFrame({
+    "Unit" : unit_list,
+    "Unit position x" : units_location[:,0],
+    "Unit depth" : units_location[:,1],
+    "peak_to_valley" : template_metrics['peak_to_valley'],
+    "peak_trough_ratio" : template_metrics['peak_trough_ratio'],
+    "half_width" : template_metrics['half_width'],
+    "repolarization_slope" : template_metrics['repolarization_slope'],
+    'recovery_slope' : template_metrics['recovery_slope'],
+    
+    }
+    
+    )
+
+savepath = rf"{sorter_folder}\curated\processing_data\units_metrics.xlsx"
+Check_Save_Dir(os.path.dirname((savepath)))
+df.to_excel(savepath)
+
+for unit in unit_list:
+    templates = clean_we.get_all_templates(unit_ids=[unit])[0]
+    df_templates = pd.DataFrame(templates)
+    
+    savepath = rf"{sorter_folder}\curated\processing_data\waveforms\Unit_{unit}_wf.xlsx"
+    Check_Save_Dir(os.path.dirname((savepath)))
+    
+    df_templates.to_excel(savepath)
