@@ -2,7 +2,10 @@
 """
 Created on Sat Aug 26 14:23:06 2023
 
-@author: MOCAP
+@author: Gilles Delbecq
+
+Perform analysis over MOCAP data and spike sorting results (spikeinterface)
+
 """
 
 
@@ -68,8 +71,8 @@ sites_positions=[[0.0, 250.0],
 
 
 
-Save_plots = True
-plot_inst_speed = True
+Save_plots = False
+plot_inst_speed = False
 plot_inst_feet = False
 plot_dist_from_obstacle = True
 plot_back_inclination = False
@@ -305,30 +308,7 @@ spike_times_df.to_excel(rf"{sorter_folder}/curated/spike_trimes.xlsx")
 
 del spike_times,spike_times_df
 
-#%%TESTS Units postions
-units_location = spost.compute_unit_locations(we)
-plt.scatter(units_location[:,0], units_location[:,1])
-
-
-"""
-we.get_waveforms(unit_list[0])
-
-# spike_location = spost.compute_spike_locations(we)
-
-template_metrics = spost.compute_template_metrics(we)
-plt.figure()
-sns.scatterplot(template_metrics, x='peak_to_valley',y='half_width')
-
-corr = spost.compute_correlograms(sorter_results)
-
-# waveform_extractor, kwargs)
-
-spost.compute_isi_histograms()
-"""
-
 #%% WIP : Produce whole session data matrix for each unit, with mocap data
-
-
 
 # Loop on units
 # Select spike train whole session
@@ -489,8 +469,7 @@ for unit in unit_list:
 
 
 
-#%% Splitting
-#Split spiketrains by Mocap TTL
+#%% Split spiketrains by Mocap TTL
 """
 Slice every spiketrains by mocap session
 
@@ -758,7 +737,7 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                 
                 if plot_dist_from_obstacle == True:       
                     
-                    #TODO : Detect if there is an obstacle in the trial...
+                    #Detect if there is an obstacle in the trial...
                     if np.isnan(distance_from_obstacle).all() == False:
                         # Créer une figure et un axe principal
                         fig, ax1 = plt.subplots()
@@ -843,7 +822,6 @@ for i,ttl_time in enumerate(mocap_ttl_times):
                     if Save_plots == True:
                         
                         savefig_path = rf'{plots_path}/{animal}/Session_{mocap_session}/Back_inclination/Back_inclination_rate_mocap_{animal}_{mocap_session}_{trial}_Unit_{unit}.png'
-                        Check_Save_Dir(os.path.dirname(savefig_path))
                         plt.savefig(savefig_path)
                     
                     # plt.close()
@@ -876,6 +854,8 @@ if do_correlations == True:
         correlation_df_speed.to_excel(writer, sheet_name="Speed", index=False)
         correlation_df_obst.to_excel(writer, sheet_name="Obstacle", index=False)
         correlation_df_z.to_excel(writer, sheet_name="Back_Z", index=False)
+        
+   
 
 #%% Correlation plots
 
@@ -1024,7 +1004,7 @@ for unit in unit_list:
     
     del whole_mocap_data
 
-#%% Raster plot by trial ?
+#%% Raster plot by trial
 
 spike_times_all_units = []
 
