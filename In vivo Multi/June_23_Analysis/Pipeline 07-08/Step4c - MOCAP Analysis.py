@@ -264,7 +264,9 @@ def plot_waveform(session_name, sorter_folder, sites_location, unit, save=True):
 
 
 #%% Loadings
-#Load units
+"""
+Load units
+"""
 recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spikesorting_results_path)
 
 print(rf"Loading spikesorting results for session {session_name}")
@@ -278,7 +280,12 @@ unit_list = sorter_results.get_unit_ids()
 print(rf"{len(sorter_results.get_unit_ids())} units loaded")
 
 
-#Load Mocap data
+
+
+
+"""
+Load Mocap data
+"""
 animal = session_name.split('_')[0]
 print(rf"Loading MOCAP data for Mocap session {animal}_{mocap_session}")
 mocap_files = list_recording_files(rf"{mocap_data_folder}/{animal}/Analysis",mocap_session)
@@ -304,7 +311,7 @@ for unit in unit_list:
 spike_times_df = pd.DataFrame(spike_times).T
 spike_times_df.rename(columns=dict(zip(spike_times_df.columns, unit_list)), inplace=True)
 
-spike_times_df.to_excel(rf"{sorter_folder}/curated/spike_trimes.xlsx")
+spike_times_df.to_excel(rf"{sorter_folder}/curated/processing_data/spike_times.xlsx")
 
 del spike_times,spike_times_df
 
@@ -324,6 +331,12 @@ sampling_period = 0.05*ms #Sampling period used for instataneous rate
 
 
 whole_session_time_axis = pd.DataFrame(range(int(signal.get_total_duration()*200)),columns=['time_axis'])/200 #Time axis to align mocap data (200Hz)
+
+
+
+
+
+
 
 
 for i,ttl_time in enumerate(mocap_ttl_times):   #Loop on all MOCAP trials, based on the TTL
@@ -473,11 +486,9 @@ for unit in unit_list:
 """
 Slice every spiketrains by mocap session
 
-
 Correlation can be computed over each slice
 
 """
-
 
 
 trial_list = []
@@ -915,7 +926,8 @@ plt.show()
 
 
 
-#%% Concatenante all session by unit
+#%% Concatenate all session by unit
+
 # Loop on units
 # Select spike train whole session
 
