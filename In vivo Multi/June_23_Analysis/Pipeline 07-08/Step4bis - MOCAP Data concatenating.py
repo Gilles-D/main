@@ -91,20 +91,17 @@ def list_recording_files(path, session):
 
 
 #%%Parameters
-session_name = '0022_07_08'
-mocap_session = "02"
+session_name = '0022_01_08'
+mocap_session = "01"
 
-spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
-concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
-plots_path = r'D:\ePhy\SI_Data\plots'
+spikesorting_results_path = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results"
+concatenated_signals_path = r'\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\concatenated_signals'
 
 sorter_name = "kilosort3"
 
 sorter_folder = rf'{spikesorting_results_path}/{session_name}/{sorter_name}'
-signal_folder = rf'{concatenated_signals_path}/{session_name}'
 
-
-mocap_data_folder = 'D:\ePhy\SI_Data\mocap_files\Auto-comp'
+mocap_data_folder = '//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/mocap_files/Auto-comp'
 
 sampling_rate = 20000
 mocap_freq = 200
@@ -154,6 +151,8 @@ for i,ttl_time in enumerate(mocap_ttl_times):
         
         mocap_data.insert(0,'time_axis',trial_time_axis)
         whole_data_mocap.append(mocap_data)
+             
+
         
 df_mocap_data_all = pd.concat(whole_data_mocap, axis=0)
         
@@ -161,5 +160,52 @@ savepath = rf"{sorter_folder}\curated\processing_data\Mocap_data.xlsx"
 Check_Save_Dir(os.path.dirname((savepath)))
 
 df_mocap_data_all.to_excel(savepath)
+
+
+#%%Split by obstacle / catwalk
+trial_info_path="{spikesorting_results_path}/{session_name}/sessions_infos.xlsx"
+
+trials_info = pd.read_excel(trial_info_path)
+
+catwalk_trials = trials_info['trials'][trials_info['type'] == 'catwalk']
+obstacle_trials = trials_info['trials'][trials_info['type'] == 'obstacle']
+
+catwalk_data_mocap,obstacle_data_mocap = [],[]
+for i,ttl_time in enumerate(mocap_ttl_times):
+    mocap_file = None
+    trial = i+1
+    
+    print(rf"Trial {trial}")
         
+    for file_path in mocap_files:
+        trial_file = int(file_path.split("_")[-1].split('.')[0])
+        if trial_file == trial:
+            mocap_file = file_path         
+    
+    if mocap_file is not None and trial in catwalk_trials:
+        mocap_data = pd.read_excel(mocap_file).iloc[:, 1:]
+                
+        trial_time_axis = (np.array(range(len(mocap_data)))/mocap_freq)+ttl_time-mocap_delay/mocap_freq
+        
+        mocap_data.insert(0,'time_axis',trial_time_axis)
+        catwalk_data_mocap.append(mocap_data)
+        
+    elif mocap_file is not None and trial in obstacle_trials:
+        mocap_data = pd.read_excel(mocap_file).iloc[:, 1:]
+                
+        trial_time_axis = (np.array(range(len(mocap_data)))/mocap_freq)+ttl_time-mocap_delay/mocap_freq
+        
+        mocap_data.insert(0,'time_axis',trial_time_axis)
+        obstacle_data_mocap.append(mocap_data)
+
+df_mocap_catwalk = pd.concat(catwalk_data_mocap, axis=0)
+df_mocap_obstacle = pd.concat(obstacle_data_mocap, axis=0)
+
+savepath_obstacle = rf"{sorter_folder}\curated\processing_data\Mocap_data_obstacle.xlsx"
+savepath_catwalk = rf"{sorter_folder}\curated\processing_data\Mocap_data_catwalk.xlsx"
+
+Check_Save_Dir(os.path.dirname((savepath_obstacle)))
+
+df_mocap_catwalk.to_excel(savepath_catwalk)    
+df_mocap_obstacle.to_excel(savepath_obstacle)    
 
