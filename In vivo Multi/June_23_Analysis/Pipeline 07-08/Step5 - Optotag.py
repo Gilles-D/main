@@ -39,7 +39,7 @@ import seaborn as sns
 import scipy.cluster.hierarchy as sch
 
 #%%Parameters
-session_name = '0026_02_08'
+session_name = '0022_07_08'
 mocap_session = "01"
 
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
@@ -124,7 +124,23 @@ recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spi
 
 #Load Stim ttl times
 stim_idx = recordings_info['stim_ttl_on'][0::2]
-stim_times = stim_idx/sampling_rate#secondes
+
+
+
+#Select values of stim idx spaced of 2000 pts (100ms) = optotag stim
+#Do that to get rid of other stim (for perturbation for instance)
+
+diffs = np.diff(stim_idx)
+
+mask = np.logical_and(diffs >= 19984 - 200, diffs <= 19984 + 200)
+
+
+selected_optotag_stim_idx = stim_idx[1:][mask]
+
+selected_optotag_stim_times = selected_optotag_stim_idx/sampling_rate#secondes
+
+
+
 
 print(rf"Loading spikesorting results for session {session_name}")
 sorter_results = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/curated').remove_empty_units()
@@ -148,7 +164,7 @@ for unit in unit_list:
     Slicing
     """
     
-    for stimulation in stim_idx:
+    for stimulation in selected_optotag_stim_idx:
         start_idx = int(stimulation - ((window_before/1000)*sampling_rate))
         end_idx  = int(stimulation + ((window_after/1000)*sampling_rate))
         
@@ -169,7 +185,7 @@ for unit in unit_list:
     plt.xlim(-50, 200)
     
 
-    savefig_path = rf'{sorter_folder}/curated/plots/optotag/rasterplot/unit_{unit}.png'
+    savefig_path = rf'{sorter_folder}/curated/processing_data/plots/rasterplot/unit_{unit}.png'
     Check_Save_Dir(os.path.dirname(savefig_path))
     plt.savefig(savefig_path)
     
@@ -211,7 +227,7 @@ for unit in unit_list:
     print(rf'Unit # {unit} delay = {round(mean_first_spike,2)} ms +/- {round(jitter,2)} ms and reliability of {round(reliability_ratio,2)}%')
 
     if check_waveform == True:
-        for i in stim_idx[0:10]:
+        for i in selected_optotag_stim_times[0:10]:
             stim_time = i/sampling_rate
             sw.plot_spikes_on_traces(we,time_range=[stim_time-1,stim_time+1])
             # plt.axvline(1.8)
@@ -231,7 +247,7 @@ plt.title(rf'Reliability session {session_name}')
 # Afficher l'histogramme
 plt.show()
 
-savefig_path = rf'{sorter_folder}/curated/plots/optotag/reliability_histo.png'
+savefig_path = rf'{sorter_folder}/curated/processing_data/plots/reliability_histo.png'
 Check_Save_Dir(os.path.dirname(savefig_path))
 plt.savefig(savefig_path)
 
@@ -250,7 +266,7 @@ plt.xlabel('Delay (ms)')
 plt.ylabel('Reliability (%)')
 plt.legend(['Jitter (ms)'])
 
-savefig_path = rf'{sorter_folder}/curated/optotag/reliability_scatter.png'
+savefig_path = rf'{sorter_folder}/curated/processing_data/plots/reliability_scatter.png'
 Check_Save_Dir(os.path.dirname(savefig_path))
 plt.savefig(savefig_path)
 
@@ -265,4 +281,4 @@ df_optotag = pd.DataFrame({
     'jitters' : jitters   
     })
 
-df_optotag.to_excel(rf'{sorter_folder}/curated/optotag/optotag_infos.xlsx')
+df_optotag.to_excel(rf'{sorter_folder}/curated/processing_data/optotag_infos.xlsx')
