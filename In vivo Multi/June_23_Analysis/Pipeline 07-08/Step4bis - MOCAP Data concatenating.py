@@ -97,6 +97,8 @@ mocap_session = "01"
 spikesorting_results_path = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results"
 concatenated_signals_path = r'\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\concatenated_signals'
 
+processing_data_path = rf"G:\Data\ePhy\{session_name}\processing_data"
+
 sorter_name = "kilosort3"
 
 sorter_folder = rf'{spikesorting_results_path}/{session_name}/{sorter_name}'
@@ -107,6 +109,9 @@ sampling_rate = 20000
 mocap_freq = 200
 mocap_delay = 45 #frames
 
+
+instantaneous_rate_bin_size = 1 #s
+trageted_instantaneous_rate_bin_size = 0.005 #s
 
 
 #%%
