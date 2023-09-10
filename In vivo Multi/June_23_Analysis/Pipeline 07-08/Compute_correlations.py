@@ -7,7 +7,7 @@ Created on Fri Sep  8 14:20:52 2023
 
 #%% Parameters
 session = "0022_01_08"
-processing_data_path = rf"//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/{session}/kilosort3/curated/processing_data"
+processing_data_path = rf"G:\Data\ePhy\{session}\processing_data"
 
 plots_extension = "png"
 
@@ -102,6 +102,14 @@ if plot_chek == True:
     plt.tight_layout()
     plt.show()
 
+
+#%%Rounding time axis to 3 decimals
+interpolated_rates['time_axis'] = interpolated_rates['time_axis'].round(3)
+mocap_data['time_axis'] = mocap_data['time_axis'].round(3)
+
+common_axis = np.intersect1d(interpolated_rates['time_axis'], mocap_data['time_axis'])
+
+print(rf"common axis reach {round(len(common_axis)/len(mocap_data['time_axis'])*100,2)}% of mocap axis")
 
 
 #%%Perform correlation
