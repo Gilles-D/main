@@ -95,7 +95,7 @@ spike_count_sample = generate_spike_count(spike_times_df[sample_unit].dropna().v
 glm_results_spike_counts = {}
 
 # Loop through each random unit and perform GLM using spike counts
-for unit in random_units:
+for unit in selected_units:
     # Generate spike counts for the unit
     spike_counts = generate_spike_count(spike_times_df[unit].dropna().values, time_bins, bin_size)
     
