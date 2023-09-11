@@ -20,6 +20,8 @@ filtered_mocap_df = mocap_df[mocap_df['back_1_Z'].first_valid_index(): mocap_df[
 # Interpolate missing values
 interpolated_df = filtered_mocap_df.interpolate(method='linear', limit_direction='both')
 
+selected_units = ['Unit_7', 'Unit_74', 'Unit_20', 'Unit_42', 'Unit_62']
+
 
 # List of columns to focus on
 focus_columns = [
