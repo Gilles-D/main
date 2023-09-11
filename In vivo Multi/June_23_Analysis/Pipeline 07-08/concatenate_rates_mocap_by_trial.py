@@ -7,11 +7,10 @@ Created on Sat Sep  9 14:31:57 2023
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-import statsmodels.api as sm
 import os
 
 
-
+#%% Functions
 def list_recording_files(path,type_file):
     """
     List all CSV files containing the specified session in the name
@@ -34,10 +33,16 @@ def list_recording_files(path,type_file):
 
     return csv_files
 
-# list_of_trials = ["3","4","5","6","7","8","9","10","11","12","13"]
-list_of_trials = ["3","4"]
+#%% Parameters
 
-selected_units = ['Unit_7', 'Unit_74', 'Unit_20', 'Unit_42', 'Unit_62']
+session = "0023_01_08"
+
+sync_data_path = rf"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\{session}\kilosort3\curated\processing_data\sync_data"
+mocap_session_name = "0023_01"
+
+
+list_of_trials = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+
 # List of columns to focus on
 focus_columns = [
     "left_foot_x", "left_foot_y", "left_foot_z",
@@ -51,18 +56,21 @@ focus_columns = [
     "left_ankle_angle", "left_knee_angle", "left_hip_angle",
     "right_ankle_angle", "right_knee_angle", "right_hip_angle",
     "back_orientation", "back_inclination", "back_1_Z", "back_2_Z",
-    "speed_back1", "speed_left_foot", "speed_right_foot"
+    "speed_back1", "speed_left_foot", "speed_right_foot",
+    # "distance_from_obstacle"
 ]
 
 
 
 
+#%% Script
+
 concatenated_df=None
 
 for trial in list_of_trials:
     print(rf'Trial {trial}')
-    rates_df = pd.read_excel(rf"G:/Data/ePhy/0022_01_08/processing_data/sync_data/0022_01_{trial}_rates.xlsx")
-    mocap_df = pd.read_excel(rf"G:/Data/ePhy/0022_01_08/processing_data/sync_data/0022_01_{trial}_mocap.xlsx")
+    rates_df = pd.read_excel(rf"{sync_data_path}/{mocap_session_name}_{trial}_rates.xlsx")
+    mocap_df = pd.read_excel(rf"{sync_data_path}/{mocap_session_name}_{trial}_mocap.xlsx")
     
     mocap_df = mocap_df[["time_axis"] + focus_columns]
     
@@ -84,5 +92,24 @@ for trial in list_of_trials:
         concatenated_df = pd.concat([concatenated_df,cleaned_focus_df])
     else:
         concatenated_df = cleaned_focus_df
-        
 
+
+
+import tkinter as tk
+from tkinter import filedialog
+
+# Créez une fenêtre principale Tkinter (facultatif)
+root = tk.Tk()
+root.withdraw()  # Masquer la fenêtre principale
+
+# Utilisez le dialogue de sauvegarde de fichier
+file_path = filedialog.asksaveasfilename(
+    defaultextension=".xlsx",
+    filetypes=[("Fichiers Excel", "*.xlsx"), ("Tous les fichiers", "*.*")]
+)
+
+      
+concatenated_df.to_excel(file_path)
+
+# N'oubliez pas de détruire la fenêtre principale (si vous l'avez créée) à la fin
+root.destroy()
