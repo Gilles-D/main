@@ -93,16 +93,20 @@ for i,file in enumerate(Files):
         print(rf"{save_path} already exists")
         
     else :
-        #Get coords for each foot
-        left_foot=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Foot")
-        left_ankle = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Ankle")
-        left_knee = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Knee")
-        left_hip = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Hip")
+        #Get normalized coords for side
+        left_foot_norm=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Foot")
+        left_ankle_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Ankle")
+        left_knee_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Knee")
+        left_hip_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Left_Hip")
         
-        right_foot=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Foot")
-        right_ankle = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Ankle")
-        right_knee = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Knee")
-        right_hip = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Hip")
+        right_foot_norm=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Foot")
+        right_ankle_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Ankle")
+        right_knee_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Knee")
+        right_hip_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Hip")
+        
+        
+        #Get coord for obstacle
+        obstacle = data_MOCAP.coord(f"{data_MOCAP.subject()}:Obstacle1")
         
         #Compute the angles
         
@@ -142,37 +146,40 @@ for i,file in enumerate(Files):
         #Setup a array with all parameters
         
         data = {
-            'left_foot_x' : left_foot[1],
-            'left_foot_y' : left_foot[0],
-            'left_foot_z' : left_foot[2],
             
-            'left_ankle_x' : left_ankle[1],
-            'left_ankle_y' : left_ankle[0],
-            'left_ankle_z' : left_ankle[2],
             
-            'left_knee_x' : left_knee[1],
-            'left_knee_y' : left_knee[0],
-            'left_knee_z' : left_knee[2],
             
-            'left_hip_x' : left_hip[1],
-            'left_hip_y' : left_hip[0],
-            'left_hip_z' : left_hip[2],
+            'left_foot_x_norm' : left_foot_norm[1],
+            'left_foot_y_norm' : left_foot_norm[0],
+            'left_foot_z_norm' : left_foot_norm[2],
             
-            'right_foot_x' : right_foot[1],
-            'right_foot_y' : right_foot[0],
-            'right_foot_z' : right_foot[2],
+            'left_ankle_x_norm' : left_ankle_norm[1],
+            'left_ankle_y_norm' : left_ankle_norm[0],
+            'left_ankle_z_norm' : left_ankle_norm[2],
             
-            'right_ankle_x' : right_ankle[1],
-            'right_ankle_y' : right_ankle[0],
-            'right_ankle_z' : right_ankle[2],
+            'left_knee_x_norm' : left_knee_norm[1],
+            'left_knee_y_norm' : left_knee_norm[0],
+            'left_knee_z_norm' : left_knee_norm[2],
             
-            'right_knee_x' : right_knee[1],
-            'right_knee_y' : right_knee[0],
-            'right_knee_z' : right_knee[2],
+            'left_hip_x_norm' : left_hip_norm[1],
+            'left_hip_y_norm' : left_hip_norm[0],
+            'left_hip_z_norm' : left_hip_norm[2],
             
-            'right_hip_x' : right_hip[1],
-            'right_hip_y' : right_hip[0],
-            'right_hip_z' : right_hip[2],
+            'right_foot_x_norm' : right_foot_norm[1],
+            'right_foot_y_norm' : right_foot_norm[0],
+            'right_foot_z_norm' : right_foot_norm[2],
+            
+            'right_ankle_x_norm' : right_ankle_norm[1],
+            'right_ankle_y_norm' : right_ankle_norm[0],
+            'right_ankle_z_norm' : right_ankle_norm[2],
+            
+            'right_knee_x_norm' : right_knee_norm[1],
+            'right_knee_y_norm' : right_knee_norm[0],
+            'right_knee_z_norm' : right_knee_norm[2],
+            
+            'right_hip_x_norm' : right_hip_norm[1],
+            'right_hip_y_norm' : right_hip_norm[0],
+            'right_hip_z_norm' : right_hip_norm[2],
             
             'left_ankle_angle' : left_ankle_angle,
             'left_knee_angle' : left_knee_angle,
@@ -182,6 +189,14 @@ for i,file in enumerate(Files):
             'right_knee_angle' : right_knee_angle,
             'right_hip_angle' : right_hip_angle,
             
+            'back1_x' : back1[1],
+            'back1_y' : back1[0],
+            'back1_z' : back1[2],
+            
+            'back2_x' : back2[1],
+            'back2_y' : back2[0],
+            'back2_z' : back2[2],
+            
             'back_orientation' : back_orientation,
             'back_inclination' : back_inclination,
             'back_1_Z' : back_1_Z,
@@ -190,6 +205,10 @@ for i,file in enumerate(Files):
             'speed_back1' : speed_back1,
             'speed_left_foot' : speed_left_foot,
             'speed_right_foot' : speed_right_foot,
+            
+            'obstacle_x' : obstacle[1],
+            'obstacle_y' : obstacle[0],
+            'obstacle_z' : obstacle[2],
             
             'distance_from_obstacle' : distance_from_obstacle,
             'distance_from_start' : distance_from_start,
@@ -211,8 +230,8 @@ for i,file in enumerate(Files):
             #Plot trajectory of each foot
             figure1 = plt.figure()
             plt.title(f'Normalized Feet trajectory {data_MOCAP.subject()}_{data_MOCAP.session_idx()}_{data_MOCAP.trial_idx()}')
-            plt.plot(-left_foot[1],left_foot[2],color='red',label='Left')
-            plt.plot(-right_foot[1],right_foot[2],color='blue',label='Right')
+            plt.plot(-left_foot_norm[1],left_foot_norm[2],color='red',label='Left')
+            plt.plot(-right_foot_norm[1],right_foot_norm[2],color='blue',label='Right')
         
     
         
