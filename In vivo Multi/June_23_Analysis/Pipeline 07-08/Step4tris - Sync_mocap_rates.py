@@ -12,6 +12,7 @@ import os
 from neo.core import SpikeTrain
 from quantities import ms, s, Hz
 from elephant.statistics import time_histogram, instantaneous_rate
+
 from elephant import kernels
 import matplotlib.pyplot as plt
 
@@ -97,7 +98,7 @@ def list_recording_files(path, session):
 
 
 #%%Parameters
-session_name = '0026_02_08'
+session_name = '0022_01_08'
 mocap_session = "01"
 
 spikesorting_results_path = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results"
@@ -117,9 +118,17 @@ sampling_rate = 20000
 mocap_freq = 200
 mocap_delay = 45 #frames
 
+# PArameters instantaneous rate
+sampling_period = 50*ms
+sampling_period_ir = 5*ms
+sigma_ir =20*ms
+kernel = kernels.GaussianKernel(sigma=sigma_ir, invert=True)
+
 
 instantaneous_rate_bin_size = 1 #s
 trageted_instantaneous_rate_bin_size = 0.005 #s
+
+plot_check = False
 
 
 #%%
@@ -134,6 +143,9 @@ Load spike times
 # Load the spike times data
 spike_times = pd.read_excel(rf"{processing_data_path}/spike_times.xlsx")
 
+# instantaneous_rates_df = pd.read_excel(rf"{processing_data_path}/instantaneous_rates_20ms.xlsx")
+# unit_list = instantaneous_rates_df.columns.tolist()[1:]
+# instantaneous_rates_time_taxis = np.array(instantaneous_rates_df[instantaneous_rates_df.columns[0]])
 
 """
 Load Mocap data
@@ -166,88 +178,76 @@ for i,ttl_time in enumerate(mocap_ttl_times):
         if trial_file == trial:
             mocap_file = file_path
          
-    instantaneous_rates = []
+    
     if mocap_file is not None:
         mocap_data = pd.read_excel(mocap_file).iloc[:, 1:]
-                
-        trial_time_axis = np.round((np.array(range(len(mocap_data)))/mocap_freq)+ttl_time-mocap_delay/mocap_freq,3)
+        
+        trial_start = round(ttl_time-mocap_delay/mocap_freq,3)
+        trial_stop = round(trial_start + len(mocap_data) / mocap_freq,3)
+        
+        trial_time_axis = np.linspace(trial_start, trial_stop, len(mocap_data), endpoint=False)
+
+        
+        # trial_time_axis = np.arange(trial_start, trial_stop, 1/mocap_freq)
         
         mocap_data.insert(0,'time_axis',trial_time_axis)
         
-        trial_start = trial_time_axis[0]
-        trial_stop =  trial_time_axis[-1]
-        
-        selected_spikes = spike_times.apply(lambda col: col[(col >= trial_start) & (col <= trial_stop)], axis=0)
-        selected_spikes = np.array(selected_spikes.drop(columns=["Unnamed: 0"])).T
         
         
-        
-        
-        
-        
-        for i in range(selected_spikes.shape[0]):
-            spiketrain = SpikeTrain(selected_spikes[i]*s, t_start = trial_start*s, t_stop=trial_stop*s)
-            
-            sampling_period = 5*ms
-            kernel = kernels.GaussianKernel(sigma=80*ms)
-            
-            inst_rate = instantaneous_rate(spiketrain, sampling_period,kernel=kernel)
-            instantaneous_rates.append(inst_rate.magnitude.flatten())
-        
-        instantaneous_rates_array = np.array(instantaneous_rates).T
-        
+        instantaneous_rates = []
         unit_list = spike_times.columns.tolist()[1:]
         
-        instantaneous_rates_df = pd.DataFrame(instantaneous_rates_array,columns=unit_list)
-        rate_time_axis = trial_time_axis[0:-(len(trial_time_axis)-len(instantaneous_rates_df))]
+        selected_spikes = spike_times.apply(lambda col: col[(col >= trial_start) & (col <= trial_stop)], axis=0)
+        selected_spikes = selected_spikes.drop(columns=["Unnamed: 0"])
         
         
-        instantaneous_rates_df['time_axis'] = rate_time_axis
-        
-        
-        common_axis = np.intersect1d(instantaneous_rates_df['time_axis'], mocap_data['time_axis'])
-        print(rf"common axis reach {round(len(common_axis)/len(mocap_data['time_axis'])*100,2)}% of mocap axis")
-        
-        
-        # #Compute instaneous rate (on 1s window)
-        # # Creating 1-second time bins
-        # bin_edges = np.arange(mocap_data["time_axis"].min(), mocap_data["time_axis"].max() + 1, instantaneous_rate_bin_size)
-        # # Compute the smoothed firing rate for each unit using 1-second bins
-        # firing_rates = pd.DataFrame()
-        # firing_rates["time_axis"] = (bin_edges[:-1] + bin_edges[1:]) / 2  # Bin centers
+        for unit in selected_spikes.columns:
+            # print(unit)
+            selected_unit_spikes = selected_spikes[unit]
+            spiketrain = SpikeTrain(np.array(selected_unit_spikes)*s,t_start = trial_start*s, t_stop=trial_stop*s)
 
-        # for column in selected_spikes.columns[1:]:
-        #     # Count the number of spikes in each 1-second bin for the given unit
-        #     spike_counts, _ = np.histogram(selected_spikes[column].dropna(), bins=bin_edges)
+            inst_rate = instantaneous_rate(spiketrain, sampling_period_ir,kernel=kernel)
             
-        #     # Compute firing rate (spikes/second)
-        #     firing_rate = spike_counts  # Since bin width is 1 second, rate = count
-        #     firing_rates[column] = firing_rate
-        
-        
-        
-        
-        
-        # #Interpolate to get 5ms sampling period
-        # # Creating a new time axis with 5ms interval
-        # new_time_axis = np.round(np.arange(firing_rates["time_axis"].min(), firing_rates["time_axis"].max(), trageted_instantaneous_rate_bin_size),3)
-
-        # # Interpolating the firing rates onto the new time axis
-        # interpolated_rates = pd.DataFrame()
-        # interpolated_rates["time_axis"] = new_time_axis
-
-        # for column in firing_rates.columns[1:]:
-        #     interpolated_values = np.interp(new_time_axis, firing_rates["time_axis"], firing_rates[column])
-        #     interpolated_rates[column] = interpolated_values
+            
+            if plot_check == True:
+                histogram_count = time_histogram([spiketrain], sampling_period)
+                histogram_rate = time_histogram([spiketrain], sampling_period, output='rate')
+                
+                plt.figure(dpi=150)
+    
+                # time histogram
+                plt.bar(histogram_rate.times.rescale(ms), histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period, align='edge', alpha=0.3, label='time histogram (rate)')
+                
+                # instantaneous rate
+                plt.plot(inst_rate.times.rescale(ms), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+                
+                plt.title(rf"{unit}")
+                
+            instantaneous_rates.append(inst_rate.magnitude.flatten())
             
         
+            
         
-        # common_axis = np.intersect1d(interpolated_rates['time_axis'], mocap_data['time_axis'])
-        # print(rf"common axis reach {round(len(common_axis)/len(mocap_data['time_axis'])*100,2)}% of mocap axis")
+        instantaneous_rates_array = np.array(instantaneous_rates).T
+        instantaneous_rates_df = pd.DataFrame(instantaneous_rates_array,columns=unit_list)       
         
+        if len(mocap_data) == len(inst_rate):
+            instantaneous_rates_df['time_axis'] =  mocap_data['time_axis']
+            
         
+        elif len(mocap_data) != len(inst_rate):
+            print("Different time axis size")
+            print(rf"mocap length = {len(mocap_data)} rate length = {len(inst_rate)}")
+            
+            instantaneous_rates_df['time_axis'] = trial_time_axis[0:-1]
+            mocap_data = mocap_data[:-1]
+            
+                       
+            
+        instantaneous_rates_df = instantaneous_rates_df.set_index('time_axis')
+        mocap_data = mocap_data.set_index('time_axis')     
         
-        savepath = rf"{processing_data_path}\sync_data_rate_sigma_80ms"
+        savepath = rf"{processing_data_path}\sync_data_rate_sigma_{sigma_ir}ms_Gaussian"
         Check_Save_Dir((savepath))
         
         mocap_data.to_excel(rf"{savepath}/{animal}_{mocap_session}_{trial}_mocap.xlsx")
