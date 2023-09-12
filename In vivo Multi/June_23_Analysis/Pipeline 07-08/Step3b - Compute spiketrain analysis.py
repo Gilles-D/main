@@ -16,7 +16,7 @@ import spikeinterface.postprocessing as spost
 from neo.core import SpikeTrain
 from quantities import ms, s, Hz
 
-from elephant.statistics import time_histogram, instantaneous_rate
+from elephant.statistics import time_histogram, instantaneous_rate,mean_firing_rate
 
 from elephant import kernels
 
@@ -28,7 +28,7 @@ import scipy.cluster.hierarchy as sch
 
 
 #%%Parameters
-session_name = '0022_01_08'
+session_name = '0026_02_08'
 mocap_session = "01"
 
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
@@ -246,10 +246,8 @@ print(rf"{len(sorter_results.get_unit_ids())} units loaded")
 
 inst_rates = []
 
-sampling_period = 5*ms
-kernel = kernels.AlphaKernel(sigma=1*s, invert=True)
 
-whole_spike_times = np.array()
+whole_spike_times = []
 for unit in unit_list:
     spike_times = (sorter_results.get_unit_spike_train(unit_id=unit)/sampling_rate)*s
     whole_spike_times.append(spike_times)
@@ -268,11 +266,46 @@ for unit in unit_list:
     time_axis = np.array(range(0,int(total_duration*20000)))/20000
     
     spiketrain = SpikeTrain(spike_times, t_stop=total_duration)
+    
+    
+    
+    
+    start_time=30*s
+    end_time = 40*s
+    
+    spiketrain_slice = spiketrain.time_slice(start_time, end_time)
+    
+    sampling_period = 50*ms
+    
+    from elephant.statistics import time_histogram, instantaneous_rate
+    histogram_count = time_histogram([spiketrain_slice], sampling_period)
+    histogram_rate = time_histogram([spiketrain_slice], sampling_period, output='rate')
+    
+    mean_fr = mean_firing_rate(spiketrain)
+    
+    print(mean_fr)
 
-    inst_rate = instantaneous_rate(spiketrain, sampling_period,kernel=kernel)
+    
+    sampling_period_ir = 5*ms
+    sigma_ir =20*ms
+    
+    
+    kernel = kernels.GaussianKernel(sigma=sigma_ir, invert=True)
+    inst_rate = instantaneous_rate(spiketrain, sampling_period_ir,kernel=kernel)
     inst_rates.append(inst_rate)
     
+    # plt.figure(dpi=150)
+
+    # # time histogram
+    # plt.bar(histogram_rate.times.rescale(ms), histogram_rate.magnitude.flatten(), width=histogram_rate.sampling_period, align='edge', alpha=0.3, label='time histogram (rate)')
     
+    # # instantaneous rate
+    # plt.plot(inst_rate.times.rescale(ms), inst_rate.rescale(histogram_rate.dimensionality).magnitude.flatten(), label='instantaneous rate')
+
+    # plt.plot(spiketrain_slice.rescale(ms), [0]*len(spiketrain_slice), 'r', marker=2, ms=25, markeredgewidth=2, lw=0, label='poisson spike times')
+
+    # plt.xlim(31000,33000)
+    # plt.title(rf'Unit {unit} sigma = {sigma_ir}')
     
     # plt.plot(time_axis_instantaneous_rate,inst_rate)
     
@@ -280,12 +313,13 @@ for unit in unit_list:
 time_axis_instantaneous_rate = range(len(inst_rates[0]))/(1/sampling_period)/1000
 inst_rates_array = np.hstack(inst_rates)
 
+
 df_inst_rates = pd.DataFrame(inst_rates_array)
 df_inst_rates.index = time_axis_instantaneous_rate
-df_inst_rates.columns = unit_list
+df_inst_rates.columns = ["Unit_" + str(x) for x in unit_list]
 
 
-savepath = rf"{sorter_folder}\curated\processing_data\instantaneous_rates.xlsx"
+savepath = rf"{sorter_folder}\curated\processing_data\instantaneous_rates_20ms.xlsx"
 Check_Save_Dir(os.path.dirname((savepath)))
 
 df_inst_rates.to_excel(savepath)
