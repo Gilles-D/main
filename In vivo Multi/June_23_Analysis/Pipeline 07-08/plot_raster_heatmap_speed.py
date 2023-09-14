@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
+#%% functions
+
 def list_recording_files(path):
     """
     List all CSV files containing the specified session in the name
@@ -50,13 +52,13 @@ def Check_Save_Dir(save_path):
 
     return
 
-# 2. Load the datasets
-spike_times = pd.read_excel("G:/Data/ePhy/0022_01_08/processing_data/spike_times.xlsx")
+#%% 2. Load the datasets
+spike_times = pd.read_excel(r"//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/0022_01_08_spike_times.xlsx")
 
-mocap_files = list_recording_files('G:/Data/ePhy/0022_01_08/processing_data/sync_data')
+mocap_files = list_recording_files(r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/sync_data_rate_sigma_20.0 msms_Gaussian')
 
 
-save_folder = "G:/Data/ePhy/0022_01_08/processing_data/plots/Speed_Rasterplots" 
+save_folder = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\0022_01_08\kilosort3\curated\processing_data\plots/Speed_Rasterplots" 
 
 
 for file in mocap_files:

@@ -7,7 +7,7 @@ Created on Fri Sep  8 14:20:52 2023
 
 #%% Parameters
 session = "0022_01_08"
-processing_data_path = rf"G:\Data\ePhy\{session}\processing_data"
+processing_data_path = rf"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\{session}\kilosort3\curated\processing_data"
 
 plots_extension = "png"
 
