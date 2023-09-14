@@ -328,7 +328,7 @@ class MOCAP_file:
     
     def distance_from(self,marker,marker_ref):
         """
-        
+        Get the distance between marker and reference
         
         """
         import numpy as np
@@ -337,7 +337,7 @@ class MOCAP_file:
         ref_position_med = np.array((np.median(ref_position[0]),np.median(ref_position[1]),np.median(ref_position[2])))
         
         marker_position = np.vstack(self.coord(marker)).T
-
+        
         try:
             # distance_from_ref = marker_position - np.tile(ref_position_med, (marker_position.shape[0], 1)) 
             distances = np.linalg.norm(marker_position - ref_position_med, axis=1)
@@ -349,7 +349,26 @@ class MOCAP_file:
         
         return distances
  
+    def distance_x_from(self,marker,marker_ref):
+        """
+        Get the distance between marker and reference, only on x axis
+        
+        """
+        import numpy as np
+        
+        ref_position = self.coord(marker_ref)
+        ref_position_med = np.array((np.median(ref_position[0]),np.median(ref_position[1]),np.median(ref_position[2])))
+        
+        marker_position = self.coord(marker)
+        
 
+        try:
+            distances = np.array(marker_position[1]) - ref_position_med[1]
+            
+        except :
+            print('Error while computing position from reference. No reference positions ?')
+        
+        return distances
         
         
 
