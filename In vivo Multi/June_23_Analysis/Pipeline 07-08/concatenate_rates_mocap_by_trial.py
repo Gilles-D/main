@@ -35,29 +35,36 @@ def list_recording_files(path,type_file):
 
 #%% Parameters
 
-session = "0023_01_08"
+session = "0022_01_08"
 
-sync_data_path = rf"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\{session}\kilosort3\curated\processing_data\sync_data"
-mocap_session_name = "0023_01"
+sync_data_path = rf"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\{session}\kilosort3\curated\processing_data\sync_data_rate_sigma_20.0 msms_Gaussian"
+mocap_session_name = "0022_01"
 
 
-list_of_trials = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+list_of_trials = [3,4,5,6,7,8,9,10,11,12,13]
 
 # List of columns to focus on
 focus_columns = [
-    "left_foot_x", "left_foot_y", "left_foot_z",
-    "left_ankle_x", "left_ankle_y", "left_ankle_z",
-    "left_knee_x", "left_knee_y", "left_knee_z",
-    "left_hip_x", "left_hip_y", "left_hip_z",
-    "right_foot_x", "right_foot_y", "right_foot_z",
-    "right_ankle_x", "right_ankle_y", "right_ankle_z",
-    "right_knee_x", "right_knee_y", "right_knee_z",
-    "right_hip_x", "right_hip_y", "right_hip_z",
-    "left_ankle_angle", "left_knee_angle", "left_hip_angle",
-    "right_ankle_angle", "right_knee_angle", "right_hip_angle",
+    "left_foot_x_norm", "left_foot_y_norm", "left_foot_z_norm",
+    "left_ankle_x_norm", "left_ankle_y_norm", "left_ankle_z_norm",
+    "left_knee_x_norm", "left_knee_y_norm", "left_knee_z_norm",
+    "left_hip_x_norm", "left_hip_y_norm", "left_hip_z_norm",
+    "right_foot_x_norm", "right_foot_y_norm", "right_foot_z_norm",
+    "right_ankle_x_norm", "right_ankle_y_norm", "right_ankle_z_norm",
+    "right_knee_x_norm", "right_knee_y_norm", "right_knee_z_norm",
+    "right_hip_x_norm", "right_hip_y_norm", "right_hip_z_norm",
+    "left_ankle_angle", 
+    "left_knee_angle",
+    "left_hip_angle",
+    "right_ankle_angle", 
+    "right_knee_angle", 
+    "right_hip_angle",
+    "back1_x", "back1_y", "back1_z",
+    "back2_x", "back2_y", "back2_z",
     "back_orientation", "back_inclination", "back_1_Z", "back_2_Z",
     "speed_back1", "speed_left_foot", "speed_right_foot",
-    # "distance_from_obstacle"
+    # "obstacle_x", "obstacle_y", "obstacle_z","distance_from_obstacle",
+    # "distance_from_start", "distance_from_end"
 ]
 
 
@@ -79,14 +86,18 @@ for trial in list_of_trials:
     
     # Filter mocap_df to only include rows from the first non-missing "back_1_Z" value to the last non-missing "back_1_Z" value
     filtered_mocap_df = merged_df[merged_df['back_1_Z'].first_valid_index(): merged_df['back_1_Z'].last_valid_index() + 1]
-    """
-    # Interpolate missing values
-    interpolated_df = filtered_mocap_df.interpolate(method='linear', limit_direction='both')
-
-    # Drop rows with missing values in the subset dataframe
-    cleaned_focus_df = interpolated_df.dropna()
-    """
+    
+    nan_counts = filtered_mocap_df.isna().sum()
+    top_5_columns_with_nan = nan_counts.nlargest(30).index.tolist()
+    top_5_nan_counts = nan_counts.nlargest(30).values
+    
+    for i,col in enumerate(top_5_columns_with_nan):
+        print(rf"{col} : {top_5_nan_counts[i]/len(filtered_mocap_df)*100} % nans")
+    
     cleaned_focus_df = filtered_mocap_df.dropna()
+    
+    print(rf"{round(100 - (len(merged_df) - len(cleaned_focus_df) )/len(merged_df)*100,2)} % of rows left")
+    
     
     if concatenated_df is not None:
         concatenated_df = pd.concat([concatenated_df,cleaned_focus_df])
