@@ -5,6 +5,14 @@ Created on Thu Sep 14 11:11:43 2023
 @author: Gilles.DELBECQ
 """
 
+"""
+Two diffrent plotting : one with Analysis excel file and the other with the mocap data time axised
+
+"""
+
+
+
+
 import pandas as pd
 
 # Load the data from the provided Excel files
@@ -14,6 +22,8 @@ stances_df = pd.read_excel('//equipe2-nas1/Public/DATA/Gilles/Spikesorting_Augus
 analysis_df.head(), stances_df.head()
 
 import matplotlib.pyplot as plt
+
+#%% Z en fonction de X
 
 # Extract relevant data for the left foot
 left_foot_x = analysis_df['left_foot_x']
@@ -57,3 +67,28 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.show()
+
+#%% X en fonction du temps
+
+# Load the stances file
+stances_data = pd.read_excel("//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/mocap_stances/0022_01_9_stances.xlsx")
+
+# Load the mocap file
+mocap_data = pd.read_excel("//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/sync_data_rate_sigma_20.0 msms_Gaussian/0022_01_9_mocap.xlsx")
+
+# Plot right_foot_x_norm in function of time
+plt.figure(figsize=(15, 6))
+plt.plot(mocap_data['time_axis'], mocap_data['right_foot_z_norm'], label='Right Foot X Coordinate', color='blue')
+
+# Add vertical lines for right_foot_stance times
+for stance_time in stances_data['stance_right_times']:
+    plt.axvline(x=stance_time, color='red', linestyle='--')
+
+plt.title('Right Foot X Coordinate over Time with Stance Times')
+plt.xlabel('Time')
+plt.ylabel('Right Foot X Coordinate')
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
