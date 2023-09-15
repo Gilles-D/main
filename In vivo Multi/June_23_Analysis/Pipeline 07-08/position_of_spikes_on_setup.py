@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # 1. Charger les données
-spike_times_data = pd.read_excel(r"C:/Users/Gil/Desktop/spike_times.xlsx")
+spike_times_data = pd.read_excel(r"//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/spike_times.xlsx")
 session_files = [
     # "0022_01_3_mocap.xlsx", "0022_01_4_mocap.xlsx", "0022_01_5_mocap.xlsx",
     #              "0022_01_6_mocap.xlsx", "0022_01_7_mocap.xlsx", "0022_01_8_mocap.xlsx",
@@ -14,10 +14,13 @@ session_files = [
                    "0022_01_21_mocap.xlsx", "0022_01_22_mocap.xlsx"
                  ]
 mocap_sessions = {}
+
+plot_path = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\0022_01_08\kilosort3\curated\processing_data\plots\spikes_location_on_setup"
+
 for file in session_files:
     print(file)
     session_name = "_".join(file.split('_')[1:3])
-    mocap_sessions[session_name] = pd.read_excel(rf"C:\Users\Gil\Desktop\sync_data_rate_sigma_20.0 msms_Gaussian/{file}")
+    mocap_sessions[session_name] = pd.read_excel(rf"//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/sync_data_rate_sigma_20.0 msms_Gaussian/{file}")
 
 # 2. Fonctions utiles
 def find_closest_times(spike, time_axis):
@@ -27,7 +30,7 @@ def find_closest_times(spike, time_axis):
     after_time = time_axis.iloc[index]
     return before_time, after_time
 
-def plot_interpolated_positions_with_equal_axes(unit_name, positions_by_session):
+def plot_interpolated_positions_with_equal_axes(unit_name, positions_by_session,plot_path):
     plt.figure(figsize=(10, 6))
     
     # Tracer le rectangle
@@ -36,7 +39,6 @@ def plot_interpolated_positions_with_equal_axes(unit_name, positions_by_session)
     
     for session, (x_positions, y_positions) in positions_by_session.items():
         plt.scatter(x_positions, y_positions, label=session, alpha=0.6)
-    
     plt.title(f"Positions interpolées (x,y) de back1 pour {unit_name}")
     plt.xlabel("Position X")
     plt.ylabel("Position Y")
@@ -44,6 +46,8 @@ def plot_interpolated_positions_with_equal_axes(unit_name, positions_by_session)
     plt.grid(True)
     plt.axis('equal')  # Mettre la même échelle pour les deux axes
     plt.show()
+    plt.savefig(rf'{plot_path}/obstacle_unit_{unit_name}.png')
+    print(rf'{plot_path}/obstacle_unit_{unit_name}.png')
 
 # 3. Traitement des données
 positions_by_session_dict = {unit: {} for unit in spike_times_data.columns[1:]}
@@ -79,5 +83,5 @@ for session, data in mocap_sessions.items():
 
 # 4. Visualisation
 for unit in spike_times_data.columns[1:]:
-    plot_interpolated_positions_with_equal_axes(unit, positions_by_session_dict[unit])
-    plt.savefig(rf'C:/Users/Gil/Desktop/plots/obstacle_unit_{unit}.png')
+    plot_interpolated_positions_with_equal_axes(unit, positions_by_session_dict[unit],plot_path)
+
