@@ -39,7 +39,7 @@ import seaborn as sns
 import scipy.cluster.hierarchy as sch
 
 #%%Parameters
-session_name = '0022_07_08'
+session_name = '0022_01_08'
 mocap_session = "01"
 
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
@@ -185,7 +185,7 @@ for unit in unit_list:
     plt.xlim(-50, 200)
     
 
-    savefig_path = rf'{sorter_folder}/curated/processing_data/plots/rasterplot/unit_{unit}.png'
+    savefig_path = rf'{sorter_folder}/curated/processing_data/plots/rasterplot_opto/unit_{unit}.png'
     Check_Save_Dir(os.path.dirname(savefig_path))
     plt.savefig(savefig_path)
     
