@@ -168,12 +168,35 @@ df_mocap_data_all.to_excel(savepath)
 
 
 #%%Split by obstacle / catwalk
-trial_info_path="{spikesorting_results_path}/{session_name}/sessions_infos.xlsx"
+recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spikesorting_results_path)
+
+trial_info_path=rf"{spikesorting_results_path}/{session_name}/sessions_infos.xlsx"
 
 trials_info = pd.read_excel(trial_info_path)
 
 catwalk_trials = trials_info['trials'][trials_info['type'] == 'catwalk']
 obstacle_trials = trials_info['trials'][trials_info['type'] == 'obstacle']
+
+
+"""
+Load Mocap data
+"""
+animal = session_name.split('_')[0]
+print(rf"Loading MOCAP data for Mocap session {animal}_{mocap_session}")
+mocap_files = list_recording_files(rf"{mocap_data_folder}/{animal}/Analysis",mocap_session)
+# print(rf"{len(mocap_files)} trials found")
+
+mocap_ttl = recordings_info['mocap_ttl_on'][::2]
+# print(rf"{len(mocap_ttl)} TTL found in recordings info")
+
+if len(mocap_ttl) > len(mocap_files):
+    print(rf"Be careful ! there are more TTL ({len(mocap_ttl)}) than mocap files ({len(mocap_files)})")
+elif len(mocap_ttl) < len(mocap_files):
+    print(rf"Be careful ! there are less TTL ({len(mocap_ttl)}) than mocap files ({len(mocap_files)})")
+    
+mocap_ttl_times = mocap_ttl/sampling_rate
+
+
 
 catwalk_data_mocap,obstacle_data_mocap = [],[]
 for i,ttl_time in enumerate(mocap_ttl_times):
