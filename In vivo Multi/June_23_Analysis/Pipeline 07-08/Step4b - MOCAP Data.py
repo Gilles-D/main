@@ -60,11 +60,12 @@ def file_info(file):
 #Directory location of raw csvs
 mocap_data_folder=r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/mocap_files\Auto-comp'
 
-force_rewrite = True
+force_rewrite = False
 
 Analysis = False
-Stance = True
-control_plot = False
+Stance = False
+State = True
+control_plot = True
 
 #%% Parameters computation
 
@@ -325,5 +326,85 @@ for j,file in enumerate(Files):
             
             df_stance.to_excel(save_path_stance)
                 
+            
+    if State == True:      
+        save_path_states = rf"{save_folder}/States_{idx[0]}_{idx[1]}_{idx[2]}.xlsx"
+        
+        if os.path.isfile(save_path_states) and force_rewrite == False:
+            print(rf"{save_path_states} already exists")
+        
+        else:
+                
+            
+            def detect_swing_states(speed):
+                # Convert speed to swing index
+                foot_swing = (np.array(speed) > 0.035).astype(int)
+                foot_swing_idx = np.where(foot_swing == 1)[0]
+                
+                # Detect bouts
+                bouts = []
+                start = foot_swing_idx[0]
+                for i in range(1, len(foot_swing_idx)):
+                    if foot_swing_idx[i] != foot_swing_idx[i-1] + 1:  # If not contiguous
+                        bouts.append((start, foot_swing_idx[i-1]))  # End of the current bout
+                        start = foot_swing_idx[i]  # Start of the next bout
+                bouts.append((start, foot_swing_idx[-1]))  # Add the last bout
+                
+                # Remove single entry bouts and bouts less than 5 long
+                bouts = [bout for bout in bouts if bout[0] != bout[1] and bout[1] - bout[0] + 1 >= 5]
+                
+                # Fuse close bouts
+                fused_bouts = []
+                prev_bout = bouts[0]
+                for curr_bout in bouts[1:]:
+                    # Check if current bout is close to the previous bout
+                    if curr_bout[0] <= prev_bout[1] + 2:
+                        # Fuse bouts
+                        prev_bout = (prev_bout[0], curr_bout[1])
+                    else:
+                        # Add the previous bout to the fused bouts list
+                        fused_bouts.append(prev_bout)
+                        prev_bout = curr_bout
+                
+                # Add the last bout
+                fused_bouts.append(prev_bout)
+                
+                return fused_bouts
+    
+    
+    
+            left_foot_swing = detect_swing_states(data_MOCAP.speed(f"{data_MOCAP.subject()}:Left_Foot"))
+            right_foot_swing = detect_swing_states(data_MOCAP.speed(f"{data_MOCAP.subject()}:Right_Foot"))
+    
+    
+            
+            if control_plot == True:
+                left_foot = data_MOCAP.coord(f"{data_MOCAP.subject()}:Left_Foot")
+                right_foot = data_MOCAP.coord(f"{data_MOCAP.subject()}:Right_Foot")
+    
+                plt.figure()
+                plt.plot(-left_foot[1],left_foot[2], color='r')
+                for swing in left_foot_swing:
+                    plt.axvspan(-left_foot[1][swing[0]],-left_foot[1][swing[1]],alpha=0.3)
+                
+                plt.figure()
+                plt.plot(left_foot[2], color='r')
+                for swing in left_foot_swing:
+                    plt.axvspan(swing[0],swing[1],alpha=0.3)
+                    
+                
+                plt.figure()
+                plt.plot(-right_foot[1],right_foot[2], color='b')
+                for swing in right_foot_swing:
+                    plt.axvspan(-right_foot[1][swing[0]],-right_foot[1][swing[1]],alpha=0.3)
+                
+                plt.figure()
+                plt.plot(right_foot[2], color='b')
+                for swing in right_foot_swing:
+                    plt.axvspan(swing[0],swing[1],alpha=0.3)
+          
+    
     print(f"{j+1}/{len(Files)}") 
+
+#%%
                 
