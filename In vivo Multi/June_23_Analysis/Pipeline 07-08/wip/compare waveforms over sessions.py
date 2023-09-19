@@ -12,6 +12,7 @@ import spikeinterface.qualitymetrics as sqm
 import spikeinterface.exporters as sexp
 import spikeinterface.widgets as sw
 from spikeinterface.curation import MergeUnitsSorting
+import spikeinterface.comparison as sc
 
 import os
 
@@ -39,8 +40,8 @@ import seaborn as sns
 #%%Parameters
 sorter_name='kilosort3'
 
-concatenated_signals_path = r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/concatenated_signals'
-spikesorting_results_folder = r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results'
+concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
+spikesorting_results_folder =r"D:\ePhy\SI_Data\spikesorting_results"
 
 
 session1 = '0022_01_08'
@@ -58,10 +59,11 @@ signal_folder1 = rf'{concatenated_signals_path}/{session1}'
 sorter_folder2 = rf'{spikesorting_results_folder}/{session2}/{sorter_name}/curated'
 signal_folder2 = rf'{concatenated_signals_path}/{session2}'
 
-sorter_result_session1 = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder1}')
-sorter_result_session2 = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder2}')
+sorter_result_session1 = ss.NpzSortingExtractor.load_from_folder(r'D:\ePhy\SI_Data\spikesorting_results\0022_01_08\kilosort3\in_container_sorting')
+sorter_result_session2 = ss.NpzSortingExtractor.load_from_folder(r'D:\ePhy\SI_Data\spikesorting_results\0022_07_08\kilosort3\in_container_sorting')
 
-we = si.load_waveforms(rf'{sorter_folder1}/curated/waveforms')
 
 we_session1 = si.WaveformExtractor.load_from_folder(rf'{sorter_folder1}/waveforms')
-we_session2 = si.WaveformExtractor.load_from_folder(f'{sorter_folder2}\we')
+we_session2 = si.WaveformExtractor.load_from_folder(f'{sorter_folder2}\waveforms')
+
+p_tcmp = sc.compare_templates(we_session1,we_session2)
