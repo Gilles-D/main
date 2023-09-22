@@ -57,8 +57,8 @@ spike_times = pd.read_excel(r"//equipe2-nas1/Public/DATA/Gilles/Spikesorting_Aug
 
 mocap_files = list_recording_files(r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/spikesorting_results/0022_01_08/kilosort3/curated/processing_data/sync_data_rate_sigma_20.0 msms_Gaussian')
 
-
-save_folder = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\0022_01_08\kilosort3\curated\processing_data\plots/Speed_Rasterplots" 
+behavior_to_plot = 'right_ankle_angle'
+save_folder = rf"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\0022_01_08\kilosort3\curated\processing_data\plots/{behavior_to_plot}_Rasterplots" 
 
 
 #%% Rasterplot whole session
@@ -92,6 +92,8 @@ for file in mocap_files:
     session = file.split('_')[-3]
     mocap_data = pd.read_excel(file)
     
+    
+    
     # 3. Filter the mocap_data to include all rows between the first and last non-NaN speed_back1
     filtered_mocap_data = mocap_data.dropna(subset=['speed_back1'])
     start_index = filtered_mocap_data.index[0]
@@ -102,9 +104,9 @@ for file in mocap_files:
     fig, axs = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
     
     # 4.1. Plot the speed_back1 data on the top subplot
-    axs[0].plot(subsampled_mocap_data['time_axis'], subsampled_mocap_data['speed_back1'], color='blue')
-    axs[0].set_title(rf'Speed_back1 {session}_{trial}')
-    axs[0].set_ylabel('Speed')
+    axs[0].plot(subsampled_mocap_data['time_axis'], subsampled_mocap_data[behavior_to_plot], color='blue')
+    axs[0].set_title(rf'{behavior_to_plot} {session}_{trial}')
+    axs[0].set_ylabel('mm')
     
     # 4.2. Create a raster plot for spike times on the bottom subplot
     for idx, column in enumerate(spike_times.columns[1:]):
