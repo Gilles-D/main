@@ -334,9 +334,10 @@ class MOCAP_file:
         import numpy as np
         
         ref_position = self.coord(marker_ref)
-        ref_position_med = np.array((np.median(ref_position[0]),np.median(ref_position[1]),np.median(ref_position[2])))
+        ref_position_med = np.array((np.nanmedian(ref_position[0]),np.nanmedian(ref_position[1]),np.nanmedian(ref_position[2])))
         
         marker_position = np.vstack(self.coord(marker)).T
+
         
         try:
             # distance_from_ref = marker_position - np.tile(ref_position_med, (marker_position.shape[0], 1)) 
@@ -357,7 +358,8 @@ class MOCAP_file:
         import numpy as np
         
         ref_position = self.coord(marker_ref)
-        ref_position_med = np.array((np.median(ref_position[0]),np.median(ref_position[1]),np.median(ref_position[2])))
+        ref_position_med = np.array((np.nanmedian(ref_position[0]),np.nanmedian(ref_position[1]),np.nanmedian(ref_position[2])))
+
         
         marker_position = self.coord(marker)
         
