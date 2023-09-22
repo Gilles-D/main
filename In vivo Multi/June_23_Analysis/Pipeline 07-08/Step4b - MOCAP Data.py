@@ -58,14 +58,14 @@ def file_info(file):
 
 #%% Parameters
 #Directory location of raw csvs
-mocap_data_folder=r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/mocap_files\Auto-comp'
+mocap_data_folder=r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/mocap_files\Auto-comp\0022'
 
 force_rewrite = False
 
-Analysis = False
+Analysis = True
 Stance = False
-State = True
-control_plot = True
+State = False
+control_plot = False
 
 #%% Parameters computation
 
@@ -119,7 +119,17 @@ for j,file in enumerate(Files):
             right_knee_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Knee")
             right_hip_norm = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Back1", f"{data_MOCAP.subject()}:Right_Hip")
             
+            #Get normalized coords for side
+            left_foot_norm_hip=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Left_Hip", f"{data_MOCAP.subject()}:Left_Foot")
+            left_ankle_norm_hip = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Left_Hip", f"{data_MOCAP.subject()}:Left_Ankle")
+            left_knee_norm_hip = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Left_Hip", f"{data_MOCAP.subject()}:Left_Knee")
+
             
+            right_foot_norm_hip=data_MOCAP.normalized(f"{data_MOCAP.subject()}:Right_Hip", f"{data_MOCAP.subject()}:Right_Foot")
+            right_ankle_norm_hip = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Right_Hip", f"{data_MOCAP.subject()}:Right_Ankle")
+            right_knee_norm_hip = data_MOCAP.normalized(f"{data_MOCAP.subject()}:Right_Hip", f"{data_MOCAP.subject()}:Right_Knee")
+
+                        
             #Get coord for obstacle
             obstacle = data_MOCAP.coord(f"{data_MOCAP.subject()}:Obstacle1")
             
@@ -226,6 +236,32 @@ for j,file in enumerate(Files):
                 'right_hip_x_norm' : right_hip_norm[1],
                 'right_hip_y_norm' : right_hip_norm[0],
                 'right_hip_z_norm' : right_hip_norm[2],
+                
+                'left_foot_x_norm_hip' : left_foot_norm_hip[1],
+                'left_foot_y_norm_hip' : left_foot_norm_hip[0],
+                'left_foot_z_norm_hip' : left_foot_norm_hip[2],
+                
+                'left_ankle_x_norm_hip' : left_ankle_norm_hip[1],
+                'left_ankle_y_norm_hip' : left_ankle_norm_hip[0],
+                'left_ankle_z_norm_hip' : left_ankle_norm_hip[2],
+                
+                'left_knee_x_norm_hip' : left_knee_norm_hip[1],
+                'left_knee_y_norm_hip' : left_knee_norm_hip[0],
+                'left_knee_z_norm_hip' : left_knee_norm_hip[2],
+                
+                
+                'right_foot_x_norm_hip' : right_foot_norm_hip[1],
+                'right_foot_y_norm_hip' : right_foot_norm_hip[0],
+                'right_foot_z_norm_hip' : right_foot_norm_hip[2],
+                
+                'right_ankle_x_norm_hip' : right_ankle_norm_hip[1],
+                'right_ankle_y_norm_hip' : right_ankle_norm_hip[0],
+                'right_ankle_z_norm_hip' : right_ankle_norm_hip[2],
+                
+                'right_knee_x_norm_hip' : right_knee_norm_hip[1],
+                'right_knee_y_norm_hip' : right_knee_norm_hip[0],
+                'right_knee_z_norm_hip' : right_knee_norm_hip[2],
+                
                 
                 'left_ankle_angle' : left_ankle_angle,
                 'left_knee_angle' : left_knee_angle,
