@@ -54,8 +54,8 @@ signal_folder = rf'{concatenated_signals_path}/{session_name}'
 plots_path = r'D:\ePhy\SI_Data\plots'
 
 #Window for raster
-window_before = 50 #ms before the stimulation
-window_after = 200 #ms before the stimulation
+window_before = 200 #ms before the stimulation
+window_after = 400 #ms before the stimulation
 stim_duration = 100 #ms
 
 #Reliability windows
@@ -123,7 +123,7 @@ def Check_Save_Dir(save_path):
 recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spikesorting_results_path)
 
 #Load Stim ttl times
-stim_idx = recordings_info['stim_ttl_on'][0::2]
+stim_idx = recordings_info['stim_ttl_on'][92:][0::2]
 
 
 
@@ -182,12 +182,33 @@ for unit in unit_list:
     plt.xlabel('Time (ms)')
     plt.ylabel('Stimulation #')
     plt.axvspan(0, 100, color='blue', alpha=0.05)
-    plt.xlim(-50, 200)
+    plt.xlim(-100, 400)
     
-
     savefig_path = rf'{sorter_folder}/curated/processing_data/plots/rasterplot_opto/unit_{unit}.png'
     Check_Save_Dir(os.path.dirname(savefig_path))
     plt.savefig(savefig_path)
+    savefig_path = rf'{sorter_folder}/curated/processing_data/plots/rasterplot_opto/unit_{unit}.svg'
+    Check_Save_Dir(os.path.dirname(savefig_path))
+    plt.savefig(savefig_path)
+    
+    plt.close()
+    
+    plt.figure()
+    plt.hist(np.concatenate(spikes_in_window), bins=np.arange(-100, 400, 5), color='black')  # Ajustez les bacs et la plage selon vos besoins
+    plt.title(rf"Histogram of First Spike Delays for Unit # {unit}")
+    plt.xlabel('Delay (ms)')
+    plt.ylabel('Count')
+    plt.axvspan(0, 100, color='blue', alpha=0.05)
+    plt.show()  # Ajoutez cette ligne si vous souhaitez voir l'histogramme immédiatement
+
+    savefig_path = rf'{sorter_folder}/curated/processing_data/plots/histo_opto_opto/unit_{unit}.png'
+    Check_Save_Dir(os.path.dirname(savefig_path))
+    plt.savefig(savefig_path)
+    
+    savefig_path = rf'{sorter_folder}/curated/processing_data/plots/histo_opto_opto/unit_{unit}.svg'
+    Check_Save_Dir(os.path.dirname(savefig_path))
+    plt.savefig(savefig_path)
+
     
     plt.close()
     
