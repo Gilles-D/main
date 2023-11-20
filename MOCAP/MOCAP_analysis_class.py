@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Fri Jul 23 15:54:49 2021
 
@@ -304,7 +303,7 @@ class Flat_CSV:
         import pandas as pd
         self.df_flat = pd.read_csv(filepath) #read the flat csv
         self.filepath=filepath #path to the flat csv file
-        self.frequency=100 #Hz
+        self.frequency=200 #Hz
 
     def dataframe(self):
         return self.df_flat
