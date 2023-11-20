@@ -15,10 +15,10 @@ import spikeinterface.sorters as ss
 import pickle
 
 #%%Parameters
-session_name = '0022_01_08'
-chans_to_plot = [2]
+session_name = '0026_01_08'
+chans_to_plot = [15]
 
-time_window = [33.4,33.6] #s
+time_window = [1026.5,1026.85] #s
 
 
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
@@ -141,7 +141,7 @@ for i, channel in enumerate(chans_to_plot, 1):
 plt.tight_layout()
 plt.show()
 
-plt.ylim(-2500,2000)
+plt.ylim(-3000,3000)
 
 Check_Save_Dir(plots_path)
 plt.savefig(rf"{plots_path}/signal_zoom.svg")
@@ -150,5 +150,5 @@ plt.savefig(rf"{plots_path}/signal_zoom.svg")
 import spikeinterface.widgets as sw
 
 #TODO : saving and beautification
-sw.plot_spikes_on_traces(we,order_channel_by_depth=True)
+sw.plot_spikes_on_traces(we,order_channel_by_depth=True,time_range=[1020,1023])
 sw.plot_spikes_on_traces(we,channel_ids=['12','13','15','14'],order_channel_by_depth=True)

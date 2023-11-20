@@ -432,6 +432,16 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
             sw.plot_timeseries(multirecording, channel_ids=multirecording.get_channel_ids(),time_range=[10,30])
         
         
+        
+                
+        if remove_stim_artefact == True:
+            stim_idx = recording_info['stim_ttl_on']
+            
+            multirecording = spre.remove_artifacts(multirecording,stim_idx, ms_before=1.2, ms_after=1.2,mode='linear')
+        
+
+            
+        
         """------------------Pre Processing------------------"""
         #Bandpass filter
         recording_f = spre.bandpass_filter(multirecording, freq_min=freq_min, freq_max=freq_max)
@@ -444,19 +454,12 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
                 recording_f = spre.notch_filter(recording_f, freq=i)
         
         
-        if remove_stim_artefact == True:
-            
-            
-            stim_idx = recording_info['stim_ttl_on']
-            
-            
-            recording_f = spre.remove_artifacts(recording_f,stim_idx, ms_before=1, ms_after=1)
-            
-            
-        
         
         #Median common ref
         recording_cmr = spre.common_reference(recording_f, reference='global', operator='median')
+        
+
+        
         if Plotting==True:
             w = sw.plot_timeseries(recording_cmr,time_range=[10,30], segment_index=0)
         
@@ -550,8 +553,8 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 ###################### TO CHANGE ####################################
 #####################################################################
 #Folder containing the folders of the session
-rhd_folder = r'D:/ePhy/Intan_Data/0026/0026_10_08'
-saving_name="0026_10_08"
+rhd_folder = r'D:/ePhy/Intan_Data/5756/5756_14_09'
+saving_name="5756_14_09_resorted"
 
 
 

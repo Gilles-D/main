@@ -28,14 +28,16 @@ import scipy.cluster.hierarchy as sch
 
 
 #%%Parameters
-session_name = '0026_02_08'
-mocap_session = "01"
+session_name = '0023_01_08'
+mocap_session = "00"
 
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
 concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
 plots_path = r'D:\ePhy\SI_Data\plots'
 
-sorter_name = "kilosort3"
+sorter_name='kilosort3'
+# sorter_name='mountainsort4'
+
 
 sorter_folder = rf'{spikesorting_results_path}/{session_name}/{sorter_name}'
 signal_folder = rf'{concatenated_signals_path}/{session_name}'

@@ -103,7 +103,7 @@ print(rf"{len(sorter_results.get_unit_ids())} units loaded")
 for unit in unit_list:
     sw.plot_autocorrelograms(sorter_results, window_ms=150.0, bin_ms=1.0, unit_ids=np.array([unit]))
     Check_Save_Dir(plots_path)
-    plt.savefig(rf"{plots_path}/Autocorr_unit_{unit}.svg")
+    plt.savefig(rf"{plots_path}/Autocorr_unit_{unit}.png")
     plt.close()
 
 

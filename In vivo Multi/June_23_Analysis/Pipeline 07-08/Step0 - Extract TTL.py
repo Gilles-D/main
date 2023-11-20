@@ -357,7 +357,7 @@ def list_recording_files(path):
     return fichiers
 
 #%% Main script
-session_folder_path = r'D:/ePhy/Intan_Data/0026'
+session_folder_path = r'D:/ePhy/Intan_Data/5756'
 
 recording_folders = list_recording_folders(session_folder_path)
 

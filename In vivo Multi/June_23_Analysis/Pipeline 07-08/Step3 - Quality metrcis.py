@@ -165,8 +165,9 @@ def fractionner_liste(liste, taille_sous_liste):
 
 
 #%% Parameters
-session_name = '0026_02_08'
+session_name = '0026_01_08'
 sorter_name='kilosort3'
+# sorter_name='mountainsort4'
 
 
 concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
@@ -283,16 +284,15 @@ for couple in similarity_couples_indexed:
     
     
 
-units_to_merge = [[8,21],
-                  [24, 33],
-                  [26, 35],
-                  [36,42],
-]
+units_to_merge = [[48, 57]]
 
-units_to_remove = [43]
+units_to_remove = [39, 40]
 
 # definitive curated units list
-clean_sorting = MergeUnitsSorting(sorter_result,units_to_merge).remove_units(spikes_not_passing_quality_metrics).remove_units(units_to_remove)
+if len(units_to_merge) > 0:
+    clean_sorting = MergeUnitsSorting(sorter_result,units_to_merge).remove_units(spikes_not_passing_quality_metrics).remove_units(units_to_remove)
+else:
+    clean_sorting = sorter_result.remove_units(spikes_not_passing_quality_metrics).remove_units(units_to_remove)
 
 # save the final curated spikesorting results
 save_path = rf"{sorter_folder}\curated"
@@ -320,8 +320,8 @@ pickle.dump(curation_infos, open(rf"{sorter_folder}\curated\curated_infos.pickle
 #%% export to phy
 #export to phy
 
-save_folder_phy = rf"{sorter_folder}\curated\phy"
-sexp.export_to_phy(clean_we, output_folder=save_folder_phy, remove_if_exists=True)
+# save_folder_phy = rf"{sorter_folder}\curated\phy"
+# sexp.export_to_phy(clean_we, output_folder=save_folder_phy, remove_if_exists=True)
 
 
 #%% waveform plots
@@ -342,7 +342,7 @@ Individual templates
 for i in unit_list:
     sw.plot_unit_templates(clean_we, unit_ids=np.array([i]))
     
-    savepath = rf"{sorter_folder}\curated\processing_data\waveforms\plots\unit_{i}.svg"
+    savepath = rf"{sorter_folder}\curated\processing_data\waveforms\plots\unit_{i}.png"
     Check_Save_Dir(os.path.dirname((savepath)))
     plt.savefig(savepath)
 
