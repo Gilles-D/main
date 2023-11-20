@@ -38,16 +38,21 @@ def plot_interpolated_positions_with_equal_axes(unit_name, positions_by_session,
     plt.gca().add_patch(rect)
     
     for session, (x_positions, y_positions) in positions_by_session.items():
-        plt.scatter(x_positions, y_positions, label=session, alpha=0.6)
+        plt.scatter(x_positions, y_positions, label=session, alpha=0.7, color='red', s=1)
     plt.title(f"Positions interpolées (x,y) de back1 pour {unit_name}")
+    
+    plt.xlim()
+    plt.gca().invert_xaxis()
+    
     plt.xlabel("Position X")
     plt.ylabel("Position Y")
-    plt.legend()
+    # plt.legend()
     plt.grid(True)
     plt.axis('equal')  # Mettre la même échelle pour les deux axes
+    
     plt.show()
-    plt.savefig(rf'{plot_path}/obstacle_unit_{unit_name}.png')
-    print(rf'{plot_path}/obstacle_unit_{unit_name}.png')
+    plt.savefig(rf'{plot_path}/obstacle_unit_{unit_name}.svg')
+    print(rf'{plot_path}/obstacle_unit_{unit_name}.svg')
 
 # 3. Traitement des données
 positions_by_session_dict = {unit: {} for unit in spike_times_data.columns[1:]}
