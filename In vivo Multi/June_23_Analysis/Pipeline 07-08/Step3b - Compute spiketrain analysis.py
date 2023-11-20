@@ -311,6 +311,7 @@ for unit in unit_list:
     
 
 time_axis_instantaneous_rate = range(len(inst_rates[0]))/(1/sampling_period)/1000
+#TODO : Checker sampling_period vs sampling_period_ir (pour régler le probleme facteur 10 sur l'éxe de temps)
 inst_rates_array = np.hstack(inst_rates)
 
 
