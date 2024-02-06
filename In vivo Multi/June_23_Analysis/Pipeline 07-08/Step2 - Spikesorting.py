@@ -94,19 +94,19 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
         #                                 'n_jobs' : 8,           #'Number of jobs (when saving ti binary) - default -1 (all cores)',
         #                                 'common_ref_removal': True,     #'remove common reference with median',
         #                             },
-                    # 'spykingcircus': {
-                    #                     'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
-                    #                     'adjacency_radius': 100,  # Radius in um to build channel neighborhood
-                    #                     'detect_threshold': 6,  # Threshold for detection
-                    #                     'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
-                    #                     'filter': True, # Enable or disable filter
-                    #                     'merge_spikes': True, #Enable or disable automatic mergind
-                    #                     'auto_merge': 0.75, #Automatic merging threshold
-                    #                     'num_workers': None, #Number of workers (if None, half of the cpu number is used)
-                    #                     'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
-                    #                     'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
-                    #                 }
-                 }
+        #             'spykingcircus': {
+        #                                 'detect_sign': -1,  #'Use -1 (negative),1 (positive) or 0 (both) depending on the sign of the spikes in the recording'
+        #                                 'adjacency_radius': 100,  # Radius in um to build channel neighborhood
+        #                                 'detect_threshold': 6,  # Threshold for detection
+        #                                 'template_width_ms': 3,  # Template width in ms. Recommended values: 3 for in vivo - 5 for in vitro
+        #                                 'filter': True, # Enable or disable filter
+        #                                 'merge_spikes': True, #Enable or disable automatic mergind
+        #                                 'auto_merge': 0.75, #Automatic merging threshold
+        #                                 'num_workers': None, #Number of workers (if None, half of the cpu number is used)
+        #                                 'whitening_max_elts': 1000,  # Max number of events per electrode for whitening
+        #                                 'clustering_max_elts': 10000,  # Max number of events per electrode for clustering
+        #                             }
+                   }
     
     print("Spike sorting starting")
 
@@ -119,7 +119,7 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
         
         if os.path.isdir(output_folder):
             print('Sorter folder found, load from folder')
-            sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{output_folder}/in_container_sorting')
+            sorter_result = se.NpzSortingExtractor.load_from_folder(rf'{output_folder}/in_container_sorting')
         else:
             sorter_result = ss.run_sorter(sorter_name,recording=record,output_folder=output_folder,docker_image=True,verbose=False,**sorter_param)
         
@@ -170,7 +170,7 @@ def spike_sorting(record,spikesorting_results_folder,saving_name,use_docker=True
 
         if os.path.isdir(f'{base_comp_folder}\sorter'):
             print('multiple comparaison sorter folder found, load from folder')
-            sorting_agreement = ss.NpzSortingExtractor.load_from_folder(f'{base_comp_folder}\sorter')
+            sorting_agreement = se.NpzSortingExtractor.load_from_folder(f'{base_comp_folder}\sorter')
         else:
             print('multiple comparaison sorter folder not found, computing from sorter list')
             comp_multi = sc.compare_multiple_sorters(sorting_list=sorter_list,
@@ -278,14 +278,13 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #Folder containing the folders of the session
 
 concatenated_signals = [
-"D:/ePhy/SI_Data/concatenated_signals/5755_08_08_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5756_14_09_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5756_15_08_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5756_10_08_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5756_08_08_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5755_14_09_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5755_15_08_resorted",
-"D:/ePhy/SI_Data/concatenated_signals/5755_10_08_resorted"
+# "D:/ePhy/SI_Data/concatenated_signals/0035_26_01",
+# "D:/ePhy/SI_Data/concatenated_signals/0034_24_01",
+# "D:/ePhy/SI_Data/concatenated_signals/0033_22_01",
+"D:/ePhy/SI_Data/concatenated_signals/0032_01_10",
+# "D:/ePhy/SI_Data/concatenated_signals/0031_01_10",
+# "D:/ePhy/SI_Data/concatenated_signals/0030_01_09",
+# "D:/ePhy/SI_Data/concatenated_signals/0030_01_11"
     ]
 
 
@@ -300,4 +299,12 @@ for session in concatenated_signals:
     session_name=os.path.basename(session)
     print(session_name)
     recording = si.load_extractor(session)
-    sorting = spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=True, plot_comp=False, export_to_phy = True)
+    sorting = spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=True, plot_comp=True, export_to_phy = False)
+
+
+#%% Get sorter param
+params = ss.get_default_sorter_params(sorter_name_or_class='kilosort3')
+print("Parameters:\n", params)
+
+desc = ss.get_sorter_params_description(sorter_name_or_class='kilosort3')
+print("Descriptions:\n", desc)

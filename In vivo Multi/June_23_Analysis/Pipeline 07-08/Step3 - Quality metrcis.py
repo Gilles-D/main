@@ -165,7 +165,7 @@ def fractionner_liste(liste, taille_sous_liste):
 
 
 #%% Parameters
-session_name = '0026_01_08'
+session_name = '0030_01_11'
 sorter_name='kilosort3'
 # sorter_name='mountainsort4'
 

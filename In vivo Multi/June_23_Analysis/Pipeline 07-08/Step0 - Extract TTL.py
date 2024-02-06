@@ -310,8 +310,8 @@ def Get_TTL_idx(file_list):
             'sampling_rate': sampling_rate,
             'digital_stim_signal_concatenated': digital_stim_signal_concatenated,
             'digital_mocap_signal_concatenated': digital_mocap_signal_concatenated,
-            'stim_ttl_on':stim_ttl_on_off,
-            'mocap_ttl_on':mocap_ttl_on_off
+            'stim_ttl_on':mocap_ttl_on_off,
+            'mocap_ttl_on':stim_ttl_on_off 
         }
     
     try:
@@ -357,7 +357,7 @@ def list_recording_files(path):
     return fichiers
 
 #%% Main script
-session_folder_path = r'D:/ePhy/Intan_Data/5756'
+session_folder_path = r'D:/ePhy/Intan_Data/0032'
 
 recording_folders = list_recording_folders(session_folder_path)
 
@@ -365,4 +365,3 @@ for folder in recording_folders:
     print(folder)
     file_list = list_recording_files(folder)
     Get_TTL_idx(file_list)
-    
