@@ -28,7 +28,7 @@ while 1:
     arduinoData = ser.readline().decode('ascii')
     print(arduinoData)
     test.append(arduinoData)
-    if str(arduinoData) == 'Start\r\n':
+    if str(arduinoData) == 'Start\r\n' or str(arduinoData) == 16753245:
         print("Start Recording")
         pyautogui.click(2388, 692) #Click start Vicon
         Timestamps.append(datetime.fromtimestamp(time.time()))
