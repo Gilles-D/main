@@ -35,14 +35,14 @@ def list_recording_files(path,type_file):
 
 #%% Parameters
 
-session = "0022_01_08"
+session = "0026_02_08"
 
 sync_data_path = rf"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results\{session}\kilosort3\curated\processing_data\sync_data_rate_sigma_20.0 msms_Gaussian"
-mocap_session_name = "0022_01"
+mocap_session_name = "0026_01"
 
 
-list_of_trials = [14, 15, 16, 17, 18, 19, 20, 21, 22]
-# list_of_trials = [3,4,5,6,7,8,9,10,11,12,13]
+# list_of_trials = [12,14,15,16,17]
+list_of_trials = [5,6,7,8,9,10]
 
 # List of columns to focus on
 focus_columns = [
@@ -71,9 +71,9 @@ focus_columns = [
     "back_orientation", "back_inclination",
     
     "speed_back1", "speed_left_foot", "speed_right_foot", 
-    "obstacle_x", "obstacle_y", "obstacle_z", 
+    # "obstacle_x", "obstacle_y", "obstacle_z", 
 
-    "distance_from_obstacle", "distance_from_obstacle_x", 
+    # "distance_from_obstacle", "distance_from_obstacle_x", 
     # "distance_from_start", "distance_from_end"
 ]
 
