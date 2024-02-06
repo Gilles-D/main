@@ -60,7 +60,7 @@ void brust(int stim_duration,float freq,int pulse_duration){
     void loop(){
       float stim_duration = 10;//in seconds
       float freq = 1;//in Hz
-      float pulse_duration = 100;//in ms  
+      float pulse_duration = 1;//in ms  
       float time_between_trans = 1;//in s
       
       brust(stim_duration,freq,pulse_duration);
