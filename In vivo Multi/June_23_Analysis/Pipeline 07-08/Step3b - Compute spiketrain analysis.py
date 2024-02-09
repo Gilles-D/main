@@ -12,6 +12,9 @@ import matplotlib.pyplot as plt
 import spikeinterface as si
 import spikeinterface.sorters as ss
 import spikeinterface.postprocessing as spost
+import spikeinterface.extractors as se
+
+
 
 from neo.core import SpikeTrain
 from quantities import ms, s, Hz
@@ -28,8 +31,8 @@ import scipy.cluster.hierarchy as sch
 
 
 #%%Parameters
-session_name = '0023_01_08'
-mocap_session = "00"
+session_name = '0023_09_08'
+mocap_session = "03"
 
 spikesorting_results_path = r"D:\ePhy\SI_Data\spikesorting_results"
 concatenated_signals_path = r'D:\ePhy\SI_Data\concatenated_signals'
@@ -234,7 +237,7 @@ Load units
 recordings_info = Get_recordings_info(session_name,concatenated_signals_path,spikesorting_results_path)
 
 print(rf"Loading spikesorting results for session {session_name}")
-sorter_results = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/curated').remove_empty_units()
+sorter_results = se.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/curated').remove_empty_units()
 signal = si.load_extractor(signal_folder)
 we = si.load_waveforms(rf'{sorter_folder}/curated/waveforms')
 

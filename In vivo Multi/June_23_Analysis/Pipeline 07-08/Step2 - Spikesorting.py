@@ -278,13 +278,7 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #Folder containing the folders of the session
 
 concatenated_signals = [
-# "D:/ePhy/SI_Data/concatenated_signals/0035_26_01",
-# "D:/ePhy/SI_Data/concatenated_signals/0034_24_01",
-# "D:/ePhy/SI_Data/concatenated_signals/0033_22_01",
-"D:/ePhy/SI_Data/concatenated_signals/0032_01_10",
-# "D:/ePhy/SI_Data/concatenated_signals/0031_01_10",
-# "D:/ePhy/SI_Data/concatenated_signals/0030_01_09",
-# "D:/ePhy/SI_Data/concatenated_signals/0030_01_11"
+'D:/ePhy/SI_Data/concatenated_signals/0032_01_10'
     ]
 
 

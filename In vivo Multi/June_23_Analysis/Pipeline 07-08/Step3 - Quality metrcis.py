@@ -23,6 +23,7 @@ import spikeinterface.postprocessing as spost
 import spikeinterface.qualitymetrics as sqm
 import spikeinterface.exporters as sexp
 import spikeinterface.widgets as sw
+import spikeinterface.extractors as se
 from spikeinterface.curation import MergeUnitsSorting
 
 import os
@@ -165,7 +166,7 @@ def fractionner_liste(liste, taille_sous_liste):
 
 
 #%% Parameters
-session_name = '0030_01_11'
+session_name = '0023_09_08'
 sorter_name='kilosort3'
 # sorter_name='mountainsort4'
 
@@ -205,7 +206,7 @@ similarity_threshold = 0.9
 """
 Loading
 """
-sorter_result = ss.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
+sorter_result = se.NpzSortingExtractor.load_from_folder(rf'{sorter_folder}/in_container_sorting')
 we = si.WaveformExtractor.load_from_folder(f'{sorter_folder}\we')
 similarity = np.load(rf"{sorter_folder}\we\similarity\similarity.npy")
 
@@ -284,9 +285,9 @@ for couple in similarity_couples_indexed:
     
     
 
-units_to_merge = [[48, 57]]
+units_to_merge = [[0,8], [35, 43], [1, 10], [41, 52,34], [8, 24],[39, 49]]
 
-units_to_remove = [39, 40]
+units_to_remove = []
 
 # definitive curated units list
 if len(units_to_merge) > 0:
@@ -296,7 +297,7 @@ else:
 
 # save the final curated spikesorting results
 save_path = rf"{sorter_folder}\curated"
-clean_sorting_saved = clean_sorting.save_to_folder(save_path)
+clean_sorting_saved = clean_sorting.save_to_folder(save_path, overwrite=True)
 
 #Get waveform from signal
 clean_we = si.extract_waveforms(signal, clean_sorting,folder=rf"{sorter_folder}\curated\waveforms",load_if_exists=True)
