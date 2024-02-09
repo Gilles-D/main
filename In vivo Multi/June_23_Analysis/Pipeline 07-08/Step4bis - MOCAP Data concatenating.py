@@ -91,13 +91,11 @@ def list_recording_files(path, session):
 
 
 #%%Parameters
-session_name = '0022_01_08'
-mocap_session = "01"
+session_name = '0026_08_08'
+mocap_session = "03"
 
 spikesorting_results_path = r"\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\spikesorting_results"
 concatenated_signals_path = r'\\equipe2-nas1\Public\DATA\Gilles\Spikesorting_August_2023\SI_Data\concatenated_signals'
-
-processing_data_path = rf"G:\Data\ePhy\{session_name}\processing_data"
 
 sorter_name = "kilosort3"
 
@@ -176,6 +174,7 @@ trials_info = pd.read_excel(trial_info_path)
 
 catwalk_trials = trials_info['trials'][trials_info['type'] == 'catwalk']
 obstacle_trials = trials_info['trials'][trials_info['type'] == 'obstacle']
+ladder_trials = trials_info['trials'][trials_info['type'] == 'ladder']
 
 
 """
@@ -198,7 +197,7 @@ mocap_ttl_times = mocap_ttl/sampling_rate
 
 
 
-catwalk_data_mocap,obstacle_data_mocap = [],[]
+catwalk_data_mocap,obstacle_data_mocap,ladder_data_mocap = [],[],[]
 for i,ttl_time in enumerate(mocap_ttl_times):
     mocap_file = None
     trial = i+1
@@ -225,15 +224,36 @@ for i,ttl_time in enumerate(mocap_ttl_times):
         
         mocap_data.insert(0,'time_axis',trial_time_axis)
         obstacle_data_mocap.append(mocap_data)
+        
+    elif mocap_file is not None and trial in ladder_trials:
+        mocap_data = pd.read_excel(mocap_file).iloc[:, 1:]
+                
+        trial_time_axis = (np.array(range(len(mocap_data)))/mocap_freq)+ttl_time-mocap_delay/mocap_freq
+        
+        mocap_data.insert(0,'time_axis',trial_time_axis)
+        ladder_data_mocap.append(mocap_data)
 
-df_mocap_catwalk = pd.concat(catwalk_data_mocap, axis=0)
-df_mocap_obstacle = pd.concat(obstacle_data_mocap, axis=0)
+if len(catwalk_data_mocap) > 0:
+    df_mocap_catwalk = pd.concat(catwalk_data_mocap, axis=0)
+    savepath_catwalk = rf"{sorter_folder}\curated\processing_data\Mocap_data_catwalk.xlsx"
+    Check_Save_Dir(os.path.dirname((savepath_catwalk)))
+    df_mocap_catwalk.to_excel(savepath_catwalk)    
 
-savepath_obstacle = rf"{sorter_folder}\curated\processing_data\Mocap_data_obstacle.xlsx"
-savepath_catwalk = rf"{sorter_folder}\curated\processing_data\Mocap_data_catwalk.xlsx"
 
-Check_Save_Dir(os.path.dirname((savepath_obstacle)))
+if len(obstacle_data_mocap) > 0:
+    df_mocap_obstacle = pd.concat(obstacle_data_mocap, axis=0)
+    savepath_obstacle = rf"{sorter_folder}\curated\processing_data\Mocap_data_obstacle.xlsx"
+    Check_Save_Dir(os.path.dirname((savepath_obstacle)))
+    df_mocap_obstacle.to_excel(savepath_obstacle)    
 
-df_mocap_catwalk.to_excel(savepath_catwalk)    
-df_mocap_obstacle.to_excel(savepath_obstacle)    
+    
+if len(ladder_data_mocap) > 0:
+    df_mocap_ladder = pd.concat(ladder_data_mocap, axis=0)
+    savepath_ladder = rf"{sorter_folder}\curated\processing_data\Mocap_data_ladder.xlsx"
+    Check_Save_Dir(os.path.dirname((savepath_ladder)))
+    df_mocap_ladder.to_excel(savepath_ladder)   
 
+
+
+
+ 

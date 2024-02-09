@@ -58,14 +58,14 @@ def file_info(file):
 
 #%% Parameters
 #Directory location of raw csvs
-mocap_data_folder=r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/mocap_files\Auto-comp\0022'
+mocap_data_folder=r'//equipe2-nas1/Public/DATA/Gilles/Spikesorting_August_2023/SI_Data/mocap_files\Auto-comp\0026'
 
 force_rewrite = False
 
 Analysis = True
-Stance = False
-State = False
-control_plot = False
+Stance = True
+State = True
+control_plot = True
 
 #%% Parameters computation
 
