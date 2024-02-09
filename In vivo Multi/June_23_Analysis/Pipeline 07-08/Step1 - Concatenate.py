@@ -5,7 +5,10 @@ Created on Thu Jul 13 14:59:35 2023
 @author: Gilles Delbecq
 
 Concatenate signal from intan files for a given session
-Saves concatenated signal for spikeinterface analysis (spikesorting)
+Saves concatenated signal for spikeinterface analysis in binary format (spikesorting)
+
+Inputs = intan files (.rhd format)
+Outputs = binary format (spikeinterface readable)
 
 """
 #%% Imports
@@ -557,6 +560,8 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
 #####################################################################
 ###################### TO CHANGE ####################################
 #####################################################################
+
+
 #Folder containing the folders of the session
 animal_id = "0032"
 session_name = "0032_01_10"
@@ -600,4 +605,3 @@ recording = concatenate_preprocessing(recordings,saving_dir,saving_name,
 t = time.localtime()
 current_time = time.strftime("%H:%M:%S", t)
 print(current_time)
-# spike_sorting(recording,spikesorting_results_folder,saving_name,plot_sorter=True, plot_comp=True)

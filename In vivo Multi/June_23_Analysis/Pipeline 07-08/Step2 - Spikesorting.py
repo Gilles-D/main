@@ -8,7 +8,7 @@ Perform spikinterface spikesorting
 Sorters (and parameters) can be set in the function spike_sorting()
 
 
-Inputs = concatenated signals (one or multiple sessions)
+Inputs = concatenated signals in binary format (one or multiple sessions)
 Outputs = sorting results (spikeinterface)
 
 
@@ -270,6 +270,14 @@ def plot_maker(sorter, we, save, sorter_name, save_path,saving_name):
             plt.close()
 
 
+#%% OPTIONAL : Get sorter parameters
+#Display default parameters and their description for a sorter
+params = ss.get_default_sorter_params(sorter_name_or_class='kilosort3')
+print("Parameters:\n", params)
+
+desc = ss.get_sorter_params_description(sorter_name_or_class='kilosort3')
+print("Descriptions:\n", desc)
+
 #%%Parameters
 
 #####################################################################
@@ -288,17 +296,9 @@ concatenated_files_folder = 'D:/ePhy/SI_Data/concatenated_signals'
 
 
 
-#%%
+#%% Main function
 for session in concatenated_signals:
     session_name=os.path.basename(session)
     print(session_name)
     recording = si.load_extractor(session)
     sorting = spike_sorting(recording,spikesorting_results_folder,session_name,plot_sorter=True, plot_comp=True, export_to_phy = False)
-
-
-#%% Get sorter param
-params = ss.get_default_sorter_params(sorter_name_or_class='kilosort3')
-print("Parameters:\n", params)
-
-desc = ss.get_sorter_params_description(sorter_name_or_class='kilosort3')
-print("Descriptions:\n", desc)
