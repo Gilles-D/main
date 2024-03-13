@@ -12,7 +12,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 
-file=r'I:/Data/Microscopie/SOD/1222/Tif/mapping/data.xlsx'
+file=r'//equipe2-nas1/Public/DATA/Gilles/Microscopie/0022/0022_Tiff_mapping/data.xlsx'
 folder = os.path.dirname(os.path.dirname(file))
 
 df = pd.read_excel(file,index_col=0)
