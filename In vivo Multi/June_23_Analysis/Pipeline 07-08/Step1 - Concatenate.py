@@ -462,7 +462,6 @@ def concatenate_preprocessing(recordings,saving_dir,saving_name,probe_path,exclu
         #Median common ref
 
         recording_cmr = spre.common_reference(recording_f, reference='global', operator='median')
-        # recording_cmr = recording_f
         print("DEBUG : CMR")
 
         
@@ -587,12 +586,6 @@ excluded_sites = []
 
 
 #%%Main script
-import time
-
-t = time.localtime()
-current_time = time.strftime("%H:%M:%S", t)
-print(current_time)
-
 recordings = list_recording_files(rhd_folder)
 
     
@@ -601,7 +594,3 @@ recording = concatenate_preprocessing(recordings,saving_dir,saving_name,
                                       freq_min=300, freq_max=6000,
                                       MOCAP_200Hz_notch=True,
                                       remove_stim_artefact=True)
-
-t = time.localtime()
-current_time = time.strftime("%H:%M:%S", t)
-print(current_time)
