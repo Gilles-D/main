@@ -14,6 +14,15 @@ import os
 #%%Functions
 
 def Get_TTL_idx(file_list):
+    """
+Gets the indexes of TTL pulses in the recordings and saves the information in a pickle file.
+
+Args:
+    file_list (list): A list of strings containing the file paths of the recordings.
+
+Returns:
+    saves it in a pickle file ttl_idx.pickle
+"""
     import sys
     import time
     import os
@@ -310,8 +319,8 @@ def Get_TTL_idx(file_list):
             'sampling_rate': sampling_rate,
             'digital_stim_signal_concatenated': digital_stim_signal_concatenated,
             'digital_mocap_signal_concatenated': digital_mocap_signal_concatenated,
-            'stim_ttl_on':mocap_ttl_on_off,
-            'mocap_ttl_on':stim_ttl_on_off 
+            'stim_ttl_on':stim_ttl_on_off,
+            'mocap_ttl_on':mocap_ttl_on_off 
         }
     
     try:
@@ -357,7 +366,7 @@ def list_recording_files(path):
     return fichiers
 
 #%% Main script
-session_folder_path = r'D:/ePhy/Intan_Data/0032'
+session_folder_path = r'D:/ePhy/Intan_Data/0035'
 
 recording_folders = list_recording_folders(session_folder_path)
 
