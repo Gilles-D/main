@@ -36,7 +36,7 @@ while 1:
 
     if str(arduinoData) == 'Stop\r\n':
         print("Stop Recording")
-        pyautogui.click(2387, 691) #Click stop Vicon
+        pyautogui.click(2387, 692) #Click stop Vicon
         # pyautogui.click(1888, -111)
         # time.sleep(0.1)#Sleep  
         # pyautogui.click(1888, -111) #Click stop AMP
