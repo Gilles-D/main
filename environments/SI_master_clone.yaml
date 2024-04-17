@@ -1,4 +1,4 @@
-name: SI_master
+name: SI_master_clone
 channels:
   - defaults
 dependencies:
@@ -216,14 +216,13 @@ dependencies:
       - elephant==0.13.0
       - et-xmlfile==1.1.0
       - fasteners==0.19
-      - figurl==0.2.22
+      - figurl==0.2.18
       - figurl-jupyter==0.2.8
       - fonttools==4.42.0
       - frozenlist==1.4.0
       - fsspec==2023.6.0
       - h5py==3.9.0
       - hdmf==3.9.0
-      - ipympl==0.9.3
       - ipywidgets==8.1.0
       - joblib==1.3.1
       - jupyterlab-widgets==3.0.8
@@ -231,46 +230,35 @@ dependencies:
       - kiwisolver==1.4.4
       - locket==1.0.0
       - matplotlib==3.7.2
-      - mouseinfo==0.1.3
       - msgpack==1.0.5
       - multidict==6.0.4
-      - neo==0.13.0
+      - neo==0.12.0
       - networkx==3.1
       - numcodecs==0.12.1
       - numpy==1.24.4
       - openpyxl==3.1.2
-      - packaging==23.2
+      - packaging==23.1
       - pandas==2.0.3
       - partd==1.4.0
       - pillow==10.0.0
-      - probeinterface==0.2.21
+      - probeinterface==0.2.20
       - pubnub==6.3.3
-      - pyautogui==0.9.54
       - pycryptodomex==3.18.0
-      - pygetwindow==0.0.9
-      - pymsgbox==1.0.9
       - pynwb==2.5.0
       - pyparsing==3.0.9
-      - pyperclip==1.8.2
-      - pyrect==0.2.0
-      - pyscreeze==0.1.30
-      - pyserial==3.5
-      - pytweening==1.2.0
-      - pyvips==2.2.2
-      - quantities==0.15.0
+      - quantities==0.14.1
       - ruamel-yaml==0.17.32
       - ruamel-yaml-clib==0.2.7
-      - scikit-learn==1.3.0
       - scipy==1.11.1
       - seaborn==0.12.2
       - simplejson==3.19.1
       - sklearn==0.0.post7
-      - sortingview==0.13.1
-      - spikeinterface==0.100.0
+      - sortingview==0.11.16
+      - spikeinterface==0.100.0.dev0
       - tblib==2.0.0
-      - threadpoolctl==3.3.0
+      - threadpoolctl==3.2.0
       - toolz==0.12.0
-      - tqdm==4.66.2
+      - tqdm==4.65.0
       - tzdata==2023.3
       - viziphant==0.3.0
       - websocket-client==1.6.1
