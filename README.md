@@ -12,20 +12,20 @@
 
 ---
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```
 PhD-Scripts/
 │
-├── 🔬  Histo/                 ← Histology image analysis
-├── ⚡  InVivo_Multi/           ← Multi-channel electrophysiology
-├── 🔹  InVivo_Single/          ← Unitary spike analysis
-└── 🏃  MOCAP/                 ← Motion capture & behavior
+├──  Histo/                 ← Histology image analysis
+├──  InVivo_Multi/          ← Multi-channel electrophysiology
+├──  InVivo_Single/         ← Unitary spike analysis
+└──  MOCAP/                 ← Motion capture & behavior
 ```
 
 ---
 
-## 🔬 Histo — Histological Image Analysis
+## Histo — Histological Image Analysis
 
 > Neuroanatomical mapping of mouse central nervous system sections
 
@@ -39,7 +39,7 @@ Contains scripts for histological image processing:
 
 ---
 
-## ⚡ In Vivo Multi — Multi-Channel Electrophysiology
+## In Vivo Multi — Multi-Channel Electrophysiology
 
 > Extracellular recordings from 16-channel arrays implanted in mouse motor cortex
 
@@ -62,7 +62,7 @@ Paradigm : In vivo, freely moving
 
 ---
 
-## 🔹 In Vivo Single — Unitary Spike Analysis
+## In Vivo Single — Unitary Spike Analysis
 
 > Spike train analysis on isolated single units using glass pipettes
 
@@ -81,7 +81,7 @@ Region   : Mouse Primary Motor Cortex (M1) and Primary Sensory Cortex (S1)
 
 ---
 
-## 🏃 MOCAP — Motion Capture & Behavioral Analysis
+## MOCAP — Motion Capture & Behavioral Analysis
 
 > Kinematic analysis of mouse locomotion using Vicon Nexus
 
@@ -100,8 +100,3 @@ System  : Vicon Nexus
 Subject : Mouse (quadruped locomotion)
 Output  : Joint angles, gait metrics, behavioral epochs
 ```
-<div align="center">
-
-`🧬 Histology` · `⚡ Electrophysiology` · `🏃 Behavior` · `🐭 Mouse`
-
-</div>
