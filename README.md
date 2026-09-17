@@ -1,4 +1,4 @@
-# 🧠 PhD Scripts Repository
+# PhD Scripts Repository
 
 <div align="center">
 
